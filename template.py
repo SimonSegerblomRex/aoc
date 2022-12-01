@@ -13,8 +13,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 def a(input):
     ...
 
-ANSWER_EXAMPLE = ...
-assert a(puzzle.example_data) == ANSWER_EXAMPLE
+assert a(puzzle.example_data) == ...
 answer = a(puzzle.input_data)
 print("a:", answer)
 puzzle.answer_a = answer
@@ -24,8 +23,7 @@ puzzle.answer_a = answer
 def b(input):
     ...
 
-ANSWER_EXAMPLE = ...
-assert b(puzzle.example_data) == ANSWER_EXAMPLE
+assert b(puzzle.example_data) == ...
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
