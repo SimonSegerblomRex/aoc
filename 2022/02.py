@@ -1,10 +1,7 @@
-import datetime
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 2
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -50,24 +47,13 @@ def a(input):
 answer = a(puzzle.input_data)
 print("a:", answer)
 #puzzle.answer_a = answer
+assert answer == 8392
 
 
 # Part b
-O_ROCK = "A"
-O_PAPER = "B"
-O_SCISSORS = "C"
-
 Y_LOSS = "X"
 Y_DRAW = "Y"
 Y_WIN = "Z"
-
-S_ROCK = 1
-S_PAPER = 2
-S_SCISSORS = 3
-
-S_LOSS = 0
-S_DRAW = 3
-S_WIN = 6
 
 SCORES = {
     (O_ROCK, Y_LOSS): S_SCISSORS + S_LOSS,
@@ -85,3 +71,4 @@ assert a(puzzle.example_data) == 12
 answer = a(puzzle.input_data)
 print("b:", answer)
 #puzzle.answer_b = answer
+assert answer == 10116
