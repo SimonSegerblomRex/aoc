@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import numpy as np
 from aocd.models import Puzzle
@@ -11,7 +12,8 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def a(input):
-    ...
+    print(input)
+    breakpoint()
 
 assert a(puzzle.example_data) == ...
 answer = a(puzzle.input_data)
@@ -21,7 +23,7 @@ puzzle.answer_a = answer
 
 # Part b
 def b(input):
-    ...
+    exit()
 
 assert b(puzzle.example_data) == ...
 answer = b(puzzle.input_data)
