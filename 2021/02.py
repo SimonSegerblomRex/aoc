@@ -11,11 +11,11 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(input):
-    input = [(line.split(" ")[0], int(line.split(" ")[1])) for line in input.split("\n")]
+def a(data):
+    data = [(line.split(" ")[0], int(line.split(" ")[1])) for line in data.split("\n")]
     horizontal = 0
     depth = 0
-    for command, steps in input:
+    for command, steps in data:
         if command == "forward":
             horizontal += steps
         elif command == "up":
@@ -33,12 +33,12 @@ puzzle.answer_a = answer
 
 
 # Part b
-def b(input):
-    input = [(line.split(" ")[0], int(line.split(" ")[1])) for line in input.split("\n")]
+def b(data):
+    data = [(line.split(" ")[0], int(line.split(" ")[1])) for line in data.split("\n")]
     horizontal = 0
     depth = 0
     aim = 0
-    for command, steps in input:
+    for command, steps in data:
         if command == "forward":
             horizontal += steps
             depth += steps * aim

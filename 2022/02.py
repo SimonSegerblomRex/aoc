@@ -35,10 +35,10 @@ SCORES = {
 }
 
 # Part a
-def a(input):
-    input = [i.split(" ") for i in input.split("\n")]
+def a(data):
+    data = [i.split(" ") for i in data.split("\n")]
     score = 0
-    for round in input:
+    for round in data:
         score += SCORES[tuple(round)]
     print(score)
     return score

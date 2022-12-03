@@ -7,8 +7,8 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(input):
-    packs = input.split("\n\n")
+def a(data):
+    packs = data.split("\n\n")
     calories_total = []
     for pack in packs:
         calories_total.append(sum([int(food) for food in pack.split("\n")]))
@@ -22,8 +22,8 @@ print("a:", answer)
 
 
 # Part b
-def b(input):
-    packs = input.split("\n\n")
+def b(data):
+    packs = data.split("\n\n")
     calories_total = []
     for pack in packs:
         calories_total.append(sum([int(food) for food in pack.split("\n")]))

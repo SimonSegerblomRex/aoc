@@ -11,13 +11,13 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(input):
-    bits = len(input.split("\n")[0])
+def a(data):
+    bits = len(data.split("\n")[0])
     print(bits)
-    input = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in input.split("\n")])
-    input = input[:, -bits:]
-    nbr_ones = input.sum(axis=0)
-    gamma = (nbr_ones > input.shape[0] // 2).astype(np.uint8)
+    data = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")])
+    data = data[:, -bits:]
+    nbr_ones = data.sum(axis=0)
+    gamma = (nbr_ones > data.shape[0] // 2).astype(np.uint8)
     epsilon = 1 - gamma
     gamma = int("".join(str(b) for b in gamma.tolist()), 2)
     epsilon = int("".join(str(b) for b in epsilon.tolist()), 2)
@@ -31,11 +31,11 @@ assert answer == 3277364
 
 
 # Part b
-def b(input):
-    bits = len(input.split("\n")[0])
+def b(data):
+    bits = len(data.split("\n")[0])
     print(bits)
-    input = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in input.split("\n")])
-    oxygen = input[:, -bits:]
+    data = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")])
+    oxygen = data[:, -bits:]
     # Oxygen
     for c in range(oxygen.shape[1]):
         counts = np.bincount(oxygen[:, c])
@@ -48,7 +48,7 @@ def b(input):
             break
     oxygen = oxygen[0]
     # CO2
-    co2 = input[:, -bits:]
+    co2 = data[:, -bits:]
     for c in range(co2.shape[1]):
         counts = np.bincount(co2[:, c])
         if counts[0] == counts[1]:

@@ -11,8 +11,8 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(input):
-    print(input)
+def a(data):
+    print(data)
     breakpoint()
 
 assert a(puzzle.example_data) == ...
@@ -22,7 +22,7 @@ puzzle.answer_a = answer
 
 
 # Part b
-def b(input):
+def b(data):
     exit()
 
 assert b(puzzle.example_data) == ...

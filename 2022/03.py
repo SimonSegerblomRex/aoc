@@ -8,8 +8,8 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(input):
-    rucksacks = input.split("\n")
+def a(data):
+    rucksacks = data.split("\n")
     s = 0
     for rucksack in rucksacks:
         size = len(rucksack)
@@ -31,8 +31,8 @@ print("a:", answer)
 
 
 # Part b
-def b(input):
-    rucksacks = input.split("\n")
+def b(data):
+    rucksacks = data.split("\n")
     groups = np.array(rucksacks)
     groups.shape = (-1, 3)
     s = 0

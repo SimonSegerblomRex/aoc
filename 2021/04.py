@@ -8,9 +8,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def _parse_bingo_input(input):
-    input = input.split("\n\n")
-    sequence, boards = input[0], input[1:]
+def _parse_bingo_data(data):
+    data = data.split("\n\n")
+    sequence, boards = data[0], data[1:]
     sequence = np.fromstring(sequence, dtype=int, sep=",")
     boards = np.dstack([
         np.fromstring(board.replace("\n", " "), dtype=int, sep=" ").reshape(5, 5)
@@ -18,8 +18,8 @@ def _parse_bingo_input(input):
     ])
     return sequence, boards
 
-def a(input):
-    sequence, boards = _parse_bingo_input(input)
+def a(data):
+    sequence, boards = _parse_bingo_data(data)
     state = np.full(boards.shape, False)
     for number in sequence:
         state |= boards == number
@@ -36,8 +36,8 @@ assert answer == 34506
 
 
 # Part b
-def b(input):
-    sequence, boards = _parse_bingo_input(input)
+def b(data):
+    sequence, boards = _parse_bingo_data(data)
     boards_with_bingo = np.full(boards.shape[2], False)
     bingo_scores = np.zeros(boards.shape[2], dtype=int)
     state = np.full(boards.shape, False)
