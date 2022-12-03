@@ -39,7 +39,7 @@ def a(input):
     input = [i.split(" ") for i in input.split("\n")]
     score = 0
     for round in input:
-        score +=  SCORES[tuple(round)]
+        score += SCORES[tuple(round)]
     print(score)
     return score
 
