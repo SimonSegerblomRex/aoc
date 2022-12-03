@@ -38,15 +38,13 @@ assert answer == 34506
 # Part b
 def b(data):
     sequence, boards = _parse_bingo_data(data)
-    boards_with_bingo = np.full(boards.shape[2], False)
     bingo_scores = np.zeros(boards.shape[2], dtype=int)
     state = np.full(boards.shape, False)
     for number in sequence:
         state |= boards == number
-        for i in np.flatnonzero(~boards_with_bingo):
+        for i in np.flatnonzero(bingo_scores == 0):
             board_state = state[..., i]
             if board_state.all(axis=0).any() or board_state.all(axis=1).any():
-                boards_with_bingo[i] = True
                 bingo_scores[i] = number * boards[~board_state, i].sum()
     return bingo_scores[i]
 
