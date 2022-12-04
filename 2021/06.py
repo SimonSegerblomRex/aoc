@@ -10,16 +10,13 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 # Part a
 def a(data, days):
     data = np.fromstring(data, dtype=np.uint8, sep=",")
-    total = 0
-    for fish in data:
-        count = np.bincount([fish], minlength=9)
-        for day in range(1, days + 1):
-            zero_count = count[0]
-            count = np.roll(count, -1)
-            count[6] += zero_count
-            count[8] = zero_count
-        total += np.sum(count)
-    return total
+    count = np.bincount(data, minlength=9)
+    for day in range(1, days + 1):
+        zero_count = count[0]
+        count = np.roll(count, -1)
+        count[6] += zero_count
+        count[8] = zero_count
+    return np.sum(count)
 
 answer_example = a(puzzle.example_data, days=80)
 print("example a:", answer_example)
