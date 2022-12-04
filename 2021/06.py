@@ -38,3 +38,4 @@ print("example b:", answer_example)
 assert answer_example == 26984457539
 answer = a(puzzle.input_data, days=256)
 print("b:", answer)
+assert answer == 1640526601595
