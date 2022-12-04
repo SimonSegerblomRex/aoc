@@ -1,7 +1,3 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2021
@@ -23,13 +19,14 @@ def a(data):
         elif command == "down":
             depth += steps
         else:
-            raise
+            raise ValueError(f"Unknown command '{command}'")
     return horizontal * depth
 
 
 assert a(puzzle.example_data) == 150
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer == 1728414
 
 
 # Part b
@@ -47,10 +44,11 @@ def b(data):
         elif command == "down":
             aim += steps
         else:
-            raise
+            raise ValueError(f"Unknown command '{command}'")
     return horizontal * depth
 
 
 assert b(puzzle.example_data) == 900
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer == 1765720035

@@ -1,6 +1,3 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
@@ -67,10 +64,7 @@ def b(data):
     co2 = int("".join(str(b) for b in co2.tolist()), 2)
     return oxygen * co2
 
-
-example_answer = b(puzzle.example_data)
-print(example_answer)
-assert example_answer == 230
+assert  b(puzzle.example_data) == 230
 answer = b(puzzle.input_data)
 print("b:", answer)
 assert answer == 5736383

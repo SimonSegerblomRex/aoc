@@ -11,7 +11,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 def a(data, days):
     data = np.fromstring(data, dtype=np.uint8, sep=",")
     count = np.bincount(data, minlength=9)
-    for day in range(1, days + 1):
+    for _ in range(1, days + 1):
         zero_count = count[0]
         count = np.roll(count, -1)
         count[6] += zero_count
