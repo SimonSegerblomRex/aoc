@@ -15,6 +15,7 @@ def a(data):
     print(data)
     breakpoint()
 
+
 assert a(puzzle.example_data) == ...
 answer = a(puzzle.input_data)
 print("a:", answer)
@@ -24,6 +25,7 @@ puzzle.answer_a = answer
 # Part b
 def b(data):
     exit()
+
 
 assert b(puzzle.example_data) == ...
 answer = b(puzzle.input_data)

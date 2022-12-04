@@ -13,7 +13,7 @@ def a(data):
     s = 0
     for rucksack in rucksacks:
         size = len(rucksack)
-        c1, c2 = rucksack[:size // 2], rucksack[size // 2:]
+        c1, c2 = rucksack[: size // 2], rucksack[size // 2 :]
         for c in c1:
             if c in c2:
                 break
@@ -24,10 +24,10 @@ def a(data):
         s += p
     return s
 
+
 assert a(puzzle.example_data) == 157
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
 
 
 # Part b
@@ -47,7 +47,7 @@ def b(data):
         s += p
     return s
 
+
 assert b(puzzle.example_data) == 70
 answer = b(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = answer

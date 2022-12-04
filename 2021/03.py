@@ -14,7 +14,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 def a(data):
     bits = len(data.split("\n")[0])
     print(bits)
-    data = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")])
+    data = np.vstack(
+        [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
+    )
     data = data[:, -bits:]
     nbr_ones = data.sum(axis=0)
     gamma = (nbr_ones > data.shape[0] // 2).astype(np.uint8)
@@ -23,18 +25,20 @@ def a(data):
     epsilon = int("".join(str(b) for b in epsilon.tolist()), 2)
     return gamma * epsilon
 
+
 assert a(puzzle.example_data) == 198
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 3277364
-#puzzle.answer_a = answer
 
 
 # Part b
 def b(data):
     bits = len(data.split("\n")[0])
     print(bits)
-    data = np.vstack([np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")])
+    data = np.vstack(
+        [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
+    )
     oxygen = data[:, -bits:]
     # Oxygen
     for c in range(oxygen.shape[1]):
@@ -63,10 +67,10 @@ def b(data):
     co2 = int("".join(str(b) for b in co2.tolist()), 2)
     return oxygen * co2
 
+
 example_answer = b(puzzle.example_data)
 print(example_answer)
 assert example_answer == 230
 answer = b(puzzle.input_data)
 print("b:", answer)
 assert answer == 5736383
-#puzzle.answer_b = answer

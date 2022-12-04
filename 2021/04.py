@@ -12,11 +12,14 @@ def _parse_bingo_data(data):
     data = data.split("\n\n")
     sequence, boards = data[0], data[1:]
     sequence = np.fromstring(sequence, dtype=int, sep=",")
-    boards = np.dstack([
-        np.fromstring(board.replace("\n", " "), dtype=int, sep=" ").reshape(5, 5)
-        for board in boards
-    ])
+    boards = np.dstack(
+        [
+            np.fromstring(board.replace("\n", " "), dtype=int, sep=" ").reshape(5, 5)
+            for board in boards
+        ]
+    )
     return sequence, boards
+
 
 def a(data):
     sequence, boards = _parse_bingo_data(data)
@@ -28,10 +31,10 @@ def a(data):
             if board_state.all(axis=0).any() or board_state.all(axis=1).any():
                 return number * boards[~board_state, i].sum()
 
+
 assert a(puzzle.example_data) == 4512
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
 assert answer == 34506
 
 
@@ -48,8 +51,8 @@ def b(data):
                 bingo_scores[i] = number * boards[~board_state, i].sum()
     return bingo_scores[i]
 
+
 assert b(puzzle.example_data) == 1924
 answer = b(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = answer
 assert answer == 7686

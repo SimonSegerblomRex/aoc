@@ -26,10 +26,10 @@ def a(data):
             raise
     return horizontal * depth
 
+
 assert a(puzzle.example_data) == 150
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
 
 
 # Part b
@@ -50,7 +50,7 @@ def b(data):
             raise
     return horizontal * depth
 
+
 assert b(puzzle.example_data) == 900
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer

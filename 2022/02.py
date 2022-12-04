@@ -43,10 +43,10 @@ def a(data):
     print(score)
     return score
 
-#assert a(puzzle.example_data) == ...
+
+assert a(puzzle.example_data) == 15
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
 assert answer == 8392
 
 
@@ -70,5 +70,4 @@ SCORES = {
 assert a(puzzle.example_data) == 12
 answer = a(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = answer
 assert answer == 10116
