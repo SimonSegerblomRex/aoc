@@ -1,7 +1,5 @@
-import re
-
 import numpy as np
-from scipy.ndimage import minimum_filter
+from scipy.ndimage import label, minimum_filter
 from aocd.models import Puzzle
 
 YEAR = 2021
@@ -19,21 +17,28 @@ def a(data):
     low_points = (height_map == min_value) & (height_map_plus_1 == min_value_plus_1)
     return height_map_plus_1[low_points].sum()
 
+
 example_answer = a(puzzle.example_data)
 print(example_answer)
 assert example_answer == 15
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 478
 
 
 # Part b
 def b(data):
-    exit()
+    height_map = np.array([[int(d) for d in line] for line in data.splitlines()], dtype=int)
+    image = np.ones(height_map.shape, dtype=np.uint8)
+    image[height_map == 9] = 0
+    labeled, _ = label(image)
+    sizes = np.bincount(labeled.flatten())[1:]
+    return np.prod(sorted(sizes)[-3:])
+
 
 example_answer = b(puzzle.example_data)
 print(example_answer)
-assert example_answer == ...
+assert example_answer == 1134
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1327014
