@@ -1,17 +1,21 @@
-import datetime
 import re
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 5
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data, boxes):
+def a(data):
+    ugly_boxes = re.findall(".{4}", data[:data.find("1")], re.DOTALL)
+    nbr_crates = int(re.findall("\d+\s+(\d+) \n", data)[0])
+    boxes = {}
+    for i in range(nbr_crates):
+        boxes[i + 1] = [e.strip(" \n[]") for e in ugly_boxes[i::nbr_crates] if e.strip(" \n[]")]
     instructions = re.findall("move (\d+) from (\d+) to (\d+)", data)
     for instruction in instructions:
         nbr, fr, to = [int(e) for e in instruction]
@@ -20,48 +24,21 @@ def a(data, boxes):
             boxes[to].insert(0, box)
     return "".join([stack[0] for stack in boxes.values()])
 
-boxes_example = {
-    1: ["N", "Z"],
-    2: ["D", "C", "M"],
-    3: ["P"]
-}
-boxes = {
-    1: ["N", "V", "C", "S"],
-    2: ["S", "N", "H", "J", "M", "Z"],
-    3: ["D", "N", "J", "G", "T", "C", "M"],
-    4: ["M", "R", "W", "J", "F", "D", "T"],
-    5: ["H", "F", "P"],
-    6: ["J", "H", "Z", "T", "C"],
-    7: ["Z", "L", "S", "F", "Q", "R", "P", "D"],
-    8: ["W", "P", "F", "D", "H", "L", "S", "C"],
-    9: ["Z", "G", "N", "F", "P", "M", "S", "D"],
-}
-example_answer = a(puzzle.example_data, boxes_example)
+example_answer = a(puzzle.example_data)
 print(example_answer)
 assert example_answer == "CMZ"
-answer = a(puzzle.input_data, boxes)
+answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
+assert answer == "CNSZFDVLJ"
 
 
-boxes_example = {
-    1: ["N", "Z"],
-    2: ["D", "C", "M"],
-    3: ["P"]
-}
-boxes = {
-    1: ["N", "V", "C", "S"],
-    2: ["S", "N", "H", "J", "M", "Z"],
-    3: ["D", "N", "J", "G", "T", "C", "M"],
-    4: ["M", "R", "W", "J", "F", "D", "T"],
-    5: ["H", "F", "P"],
-    6: ["J", "H", "Z", "T", "C"],
-    7: ["Z", "L", "S", "F", "Q", "R", "P", "D"],
-    8: ["W", "P", "F", "D", "H", "L", "S", "C"],
-    9: ["Z", "G", "N", "F", "P", "M", "S", "D"],
-}
 # Part b
-def b(data, boxes):
+def b(data):
+    ugly_boxes = re.findall(".{4}", data[:data.find("1")], re.DOTALL)
+    nbr_crates = int(re.findall("\d+\s+(\d+) \n", data)[0])
+    boxes = {}
+    for i in range(nbr_crates):
+        boxes[i + 1] = [e.strip(" \n[]") for e in ugly_boxes[i::nbr_crates] if e.strip(" \n[]")]
     instructions = re.findall("move (\d+) from (\d+) to (\d+)", data)
     for instruction in instructions:
         nbr, fr, to = [int(e) for e in instruction]
@@ -70,9 +47,9 @@ def b(data, boxes):
             boxes[to].insert(i, box)
     return "".join([stack[0] for stack in boxes.values()])
 
-example_answer = b(puzzle.example_data, boxes_example)
+example_answer = b(puzzle.example_data)
 print(example_answer)
 assert example_answer == "MCD"
-answer = b(puzzle.input_data, boxes)
+answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == "QNDWLMGNS"
