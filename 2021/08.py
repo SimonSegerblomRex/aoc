@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
@@ -28,6 +26,7 @@ def a(data):
     nbr_segments = np.array([len(digit) for digit in outputs])
     counts = np.bincount(nbr_segments, minlength=7)
     return counts[[2, 4, 3, 7]].sum()
+
 
 example_answer = a(puzzle.example_data_real)
 print(example_answer)
@@ -83,9 +82,10 @@ def b(data):
         total += number
     return total
 
+
 example_answer = b(puzzle.example_data_real)
 print(example_answer)
 assert example_answer == 61229
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 989396
