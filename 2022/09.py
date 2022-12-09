@@ -55,9 +55,9 @@ def a(data, tail_length, debug=False):
     moves = [(c, int(s)) for c, s in data]
     coords_head = [np.array((0, 0), dtype=int)]
     coords_tail = [[np.array((0, 0), dtype=int)] for _ in range(tail_length)]
-    for move in moves:
-        for _ in range(move[1]):
-            coords_head.append(coords_head[-1] + MOVES[move[0]])
+    for move, steps in moves:
+        for _ in range(steps):
+            coords_head.append(coords_head[-1] + MOVES[move])
             coords_tail[0].append(
                 get_new_tail_coord(coords_head[-1], coords_tail[0][-1])
             )
