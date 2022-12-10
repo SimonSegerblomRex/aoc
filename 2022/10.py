@@ -4,6 +4,8 @@ import re
 import numpy as np
 from aocd.models import Puzzle
 
+np.set_printoptions(linewidth=180)
+
 YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day
 
@@ -199,11 +201,35 @@ assert answer == 16880
 
 # Part b
 def b(data):
-    exit()
+    X = 1
+    x_incr = []
+    total = 0
+    instructions = data.splitlines()
+    crt = np.full((6, 40), 0, dtype=int)
+    for c in range(1, 40 * 6 + 1):
+        X += 0 if not x_incr else x_incr.pop(0)
+        if instructions:
+            instruction = instructions.pop(0)
+            if instruction.startswith("noop"):
+                x_incr.append(0)
+                pass
+            else:
+                instruction, arg = instruction.split(" ")
+                if instruction == "addx":
+                    x_incr.append(0)
+                    x_incr.append(int(arg))
+        if c in [20,60,100,140,180,220]:
+            total += c * X
+        sprite = [X - 1, X, X + 1]
+        if (c - 1) % 40 in sprite:
+            crt.ravel()[c - 1] = 1
+    return crt
+
+def print_image(x):
+    for i in range(x.shape[0]):
+        print("".join("#" if v else "." for v in x[i, :]))
 
 example_answer = b(EXAMPLE2)
-print(example_answer)
-assert example_answer == ...
+print_image(example_answer)
 answer = b(puzzle.input_data)
-print("b:", answer)
-puzzle.answer_b = answer
+print_image(answer)
