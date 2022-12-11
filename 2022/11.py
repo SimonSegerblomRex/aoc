@@ -25,38 +25,38 @@ class Monkey:
     divisible_by: int
     if_true_nbr: int
     if_false_nbr: int
+    inspected: int = 0
 
 
 # Part a
 def a(data, rounds, divide_by_three):
     data = re.finditer(PATTERN, data)
-    monkeys = {
-        int(m.group("nbr")): Monkey(
+    monkeys = [
+        Monkey(
             nbr=int(m.group("nbr")),
             items=np.fromstring(m.group("starting_items"), dtype=int, sep=", ").tolist(),
-            operation=m.group("operation"),
+            operation=eval(f"lambda old: {m.group('operation')}"),
             divisible_by=int(m.group("divisble_by")),
             if_true_nbr=int(m.group("if_true_nbr")),
             if_false_nbr=int(m.group("if_false_nbr")),
         )
         for m in data
-    }
-    inspected_items = np.zeros(len(monkeys), dtype=int)
-    magic = np.prod(list(set(m.divisible_by for m in monkeys.values())))
+    ]
+    magic = np.prod(list(set(m.divisible_by for m in monkeys)))
     for _ in range(rounds):
-        for i in range(len(monkeys)):
-            for old in monkeys[i].items:
-                new = eval(monkeys[i].operation)
+        for monkey in monkeys:
+            for old in monkey.items:
+                new = monkey.operation(old)
                 if divide_by_three:
                     new //= 3
                 new = new % magic
-                if new % monkeys[i].divisible_by:
-                    monkeys[monkeys[i].if_false_nbr].items.append(new)
-                else:
-                    monkeys[monkeys[i].if_true_nbr].items.append(new)
-                inspected_items[i] += 1
-            monkeys[i].items = []
-    return np.prod(sorted(inspected_items)[-2:])
+                throw_to = (
+                    monkey.if_false_nbr if (new % monkey.divisible_by) else monkey.if_true_nbr
+                )
+                monkeys[throw_to].items.append(new)
+            monkey.inspected += len(monkey.items)
+            monkey.items = []
+    return np.prod(sorted([m.inspected for m in monkeys])[-2:])
 
 
 example_answer = a(puzzle.example_data, 20, divide_by_three=True)
