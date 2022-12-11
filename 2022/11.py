@@ -13,8 +13,8 @@ PATTERN = r"""Monkey (?P<nbr>\d):
   Starting items: (?P<starting_items>.*)
   Operation: new = (?P<operation>.+)
   Test: divisible by (?P<divisble_by>\d+)
-    If true: throw to monkey (?P<if_true_nbr>\d+)
-    If false: throw to monkey (?P<if_false_nbr>\d+)"""
+    If true: throw to monkey (?P<true_nbr>\d+)
+    If false: throw to monkey (?P<false_nbr>\d+)"""
 
 
 @dataclass
@@ -23,8 +23,8 @@ class Monkey:
     items: list
     operation: str
     divisible_by: int
-    if_true_nbr: int
-    if_false_nbr: int
+    true_nbr: int
+    false_nbr: int
     inspected: int = 0
 
 
@@ -37,8 +37,8 @@ def a(data, rounds, divide_by_three):
             items=np.fromstring(m.group("starting_items"), dtype=int, sep=", ").tolist(),
             operation=eval(f"lambda old: {m.group('operation')}"),
             divisible_by=int(m.group("divisble_by")),
-            if_true_nbr=int(m.group("if_true_nbr")),
-            if_false_nbr=int(m.group("if_false_nbr")),
+            true_nbr=int(m.group("true_nbr")),
+            false_nbr=int(m.group("false_nbr")),
         )
         for m in data
     ]
@@ -49,14 +49,12 @@ def a(data, rounds, divide_by_three):
                 new = monkey.operation(old)
                 if divide_by_three:
                     new //= 3
-                new = new % magic
-                throw_to = (
-                    monkey.if_false_nbr if (new % monkey.divisible_by) else monkey.if_true_nbr
-                )
+                new %= magic
+                throw_to = monkey.false_nbr if (new % monkey.divisible_by) else monkey.true_nbr
                 monkeys[throw_to].items.append(new)
             monkey.inspected += len(monkey.items)
             monkey.items = []
-    return np.prod(sorted([m.inspected for m in monkeys])[-2:])
+    return np.prod(sorted(m.inspected for m in monkeys)[-2:])
 
 
 example_answer = a(puzzle.example_data, 20, divide_by_three=True)
