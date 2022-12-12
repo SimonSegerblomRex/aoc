@@ -37,7 +37,7 @@ def a(data):
         mountain_map[(y, x)] = tmp
 
     paths = []
-    best_score = [-1]
+    best_score = [np.inf]
     def find_paths(path):
         curr_hill = path[-1]
         for next_hill in mountain_map[curr_hill]:
@@ -53,12 +53,14 @@ def a(data):
                     continue
             """
             curr_score = len(new_path)
-            if (best_score[0] > 0) and (curr_score > best_score[0]):
+            if curr_score > best_score[0]:
+                continue
+            if curr_score + np.abs(end[0] - next_hill[0]) + np.abs(end[1] - next_hill[1]) > best_score:
                 continue
             if (next_hill[0] == end[0]) and (next_hill[1] == end[1]):
                 best_score[0] = curr_score
                 paths.append(new_path)
-                break  # FIXME: OK..?
+                return  # FIXME: OK..?
             else:
                 find_paths(new_path)
         return paths
