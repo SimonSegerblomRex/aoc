@@ -1,11 +1,10 @@
-import datetime
-import re
+import queue
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 12
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -35,16 +34,12 @@ def a(data):
         tmp = [c for c in tmp if check_height((y, x), c)]
         mountain_map[(y, x)] = tmp
 
-    paths = []
-    best_score = [np.inf]
-    dead_end = []
     def a_star(start, end):
         def h(node):
             return np.abs(end[0]- node[0]) + np.abs(end[1] - node[1])
 
-        open_set = [start]
-
-        path = [start]
+        open_set = queue.PriorityQueue()
+        open_set.put((0, start))
 
         g_score = np.full(grid.shape, np.inf)
         g_score[start] = 0
@@ -52,23 +47,20 @@ def a(data):
         f_score = np.full(grid.shape, np.inf)
         f_score[start] = h(start)
 
-        while open_set:
-            current = open_set.pop(0)
+        while not open_set.empty():
+            _, current = open_set.get()
             if (current[0] == end[0]) and (current[1] == end[1]):
                 return int(g_score[current])
 
             for next_hill in mountain_map[current]:
                 tentative_g_score = g_score[current] + 1
                 if tentative_g_score < g_score[next_hill]:
-                    #came_from[]  # Behövs inte?
                     g_score[next_hill] = tentative_g_score
                     f_score[next_hill] = tentative_g_score + h(next_hill)
-                    if next_hill not in open_set:
-                        open_set.append(next_hill)
+                    if next_hill not in open_set.queue:
+                        open_set.put((f_score[next_hill], next_hill))
 
-                #breakpoint()
-    tmp = a_star(start, end)
-    return tmp
+    return a_star(start, end)
 
 example_answer = a(puzzle.example_data)
 print(example_answer)
@@ -103,16 +95,12 @@ def b(data):
         tmp = [c for c in tmp if check_height((y, x), c)]
         mountain_map[(y, x)] = tmp
 
-    paths = []
-    best_score = [np.inf]
-    dead_end = []
     def a_star(start, end):
         def h(node):
             return np.abs(end[0]- node[0]) + np.abs(end[1] - node[1])
 
-        open_set = [start]
-
-        path = [start]
+        open_set = queue.PriorityQueue()
+        open_set.put((0, start))
 
         g_score = np.full(grid.shape, np.inf)
         g_score[start] = 0
@@ -120,21 +108,19 @@ def b(data):
         f_score = np.full(grid.shape, np.inf)
         f_score[start] = h(start)
 
-        while open_set:
-            current = open_set.pop(0)
+        while not open_set.empty():
+            _, current = open_set.get()
             if (current[0] == end[0]) and (current[1] == end[1]):
                 return int(g_score[current])
 
             for next_hill in mountain_map[current]:
                 tentative_g_score = g_score[current] + 1
                 if tentative_g_score < g_score[next_hill]:
-                    #came_from[]  # Behövs inte?
                     g_score[next_hill] = tentative_g_score
                     f_score[next_hill] = tentative_g_score + h(next_hill)
-                    if next_hill not in open_set:
-                        open_set.append(next_hill)
+                    if next_hill not in open_set.queue:
+                        open_set.put((f_score[next_hill], next_hill))
 
-                #breakpoint()
     scores = []
     for i, j in zip(*np.where(grid == 0)):
         scores.append(a_star((i, j), end))
@@ -145,4 +131,4 @@ print(example_answer)
 assert example_answer == 29
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 430
