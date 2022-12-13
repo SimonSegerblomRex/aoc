@@ -11,28 +11,32 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 def check(l0, l1):
-    if len(l1) < len(l0):
+    #if len(l1) < len(l0):
+    #    return False
+    #l1 = l1[:len(l0)]
+    """
+    if not l0:
+        return True
+    if not l1:
         return False
-    l1 = l1[:len(l0)]
+    """
     for v0, v1 in zip(l0, l1):
         if isinstance(v0, int) and isinstance(v1, int):
-            if v1 < v0:
+            if v0 < v1:
+                return True
+            elif v1 < v0:
                 return False
         elif isinstance(v0, list) and isinstance(v1, list):
-            check(v0, v1)
-            if not check(v0, v1):
-                return False
+            return check(v0, v1)
         elif isinstance(v0, list) and isinstance(v1, int):
-            l1 = [v1] * len(v0)
-            if not check(v0, l1):
-                return False
+            return check(v0, [v1])
         elif isinstance(v0, int) and isinstance(v1, list):
-            l0 = [v0] * len(v1)
-            if not check(l0, v1):
-                return False
+            return check([v0], v1)
         else:
             print("Shouldn't end up here!")
             breakpoint()
+    if len(l1) < len(l0):
+        return False
     return True
 
 # Part a
@@ -43,6 +47,7 @@ def a(data):
     s = 0
     for i, p in enumerate(pairs):
         if check(p[0], p[1]):
+            print(i + 1)
             s += i + 1
     return s
 
