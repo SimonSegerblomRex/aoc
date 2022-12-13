@@ -32,7 +32,7 @@ def check(l0, l1):
 
 # Part a
 def a(data):
-    pairs = ([ast.literal_eval(line) for line in lines.split("\n")] for lines in data.split("\n\n"))
+    pairs = ([ast.literal_eval(p) for p in lines.split("\n")] for lines in data.split("\n\n"))
     return sum(i + 1 for i, p in enumerate(pairs) if check(*p) <= 0)
 
 
@@ -46,7 +46,7 @@ assert answer == 6428
 
 # Part b
 def b(data):
-    packets = [ast.literal_eval(line) for line in data.replace("\n\n", "\n").splitlines()]
+    packets = [ast.literal_eval(p) for p in data.replace("\n\n", "\n").splitlines()]
     packets.extend([[[2]], [[6]]])
     packets = sorted(packets, key=functools.cmp_to_key(check))
     return (packets.index([[2]]) + 1) * (packets.index([[6]]) + 1)

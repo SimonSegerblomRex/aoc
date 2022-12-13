@@ -22,7 +22,7 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 def a(data):
     outputs = []
     for line in data.splitlines():
-        outputs += line.split("|")[-1].strip(" ").split(" ")
+        outputs += line.split(" | ")[-1].split(" ")
     nbr_segments = np.array([len(digit) for digit in outputs])
     counts = np.bincount(nbr_segments, minlength=7)
     return counts[[2, 4, 3, 7]].sum()
@@ -40,8 +40,8 @@ assert answer == 470
 def b(data):
     total = 0
     for line in data.splitlines():
-        signals, outputs = line.split("|")
-        signals = np.array(signals.strip(" ").split(" "))
+        signals, outputs = line.split(" | ")
+        signals = np.array(signals.split(" "))
         nbr_segments = np.array([len(digit) for digit in signals])
         digits = {}
         digits[1] = signals[nbr_segments == 2][0]
@@ -80,6 +80,7 @@ def b(data):
         outputs = ["".join(sorted(output)) for output in outputs.strip(" ").split(" ")]
         number = int("".join(str(signals_to_digits[output]) for output in outputs))
         total += number
+
     return total
 
 
