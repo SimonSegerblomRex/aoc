@@ -9,27 +9,22 @@ DAY = datetime.datetime.today().day
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-PATTERN = r"Sensor at x=(\d+), y=(\d+): closest beacon is at x=(\d+), y=(\d+)"
+PATTERN = r"Sensor at x=([-\d]+), y=([-\d]+): closest beacon is at x=([-\d]+), y=([-\d]+)"
 
 # Part a
 def a(data, y):
     data = re.findall(PATTERN, data)
     data = [tuple(map(int, e)) for e in data]
     x = set()
-
+    exclude = set()
     for xs, ys, xb, yb in data:
         md = np.abs(xs - xb) + np.abs(ys - yb)
         if (yd := np.abs(ys - y)) <= md:
             x.update(range(xs - (md - yd), xs + (md - yd) + 1))
-
-    for xs, ys, xb, yb in data:
         if yb == y:
-            x.discard(xb)
-        #if ys == y:
-        #    x.discard(xs)
-    breakpoint()
+            exclude.add(xb)
 
-    return len(x)
+    return len(x - exclude)
 
 
 example_answer = a(puzzle.example_data, y=10)
