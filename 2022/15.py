@@ -30,19 +30,39 @@ def a(data, y):
 example_answer = a(puzzle.example_data, y=10)
 print(example_answer)
 assert example_answer == 26
-answer = a(puzzle.input_data, y=2000000)
-print("a:", answer)
-puzzle.answer_a = answer
-####B######################
+#answer = a(puzzle.input_data, y=2000000)
+#print("a:", answer)
+#assert answer == 5367037
+
 
 # Part b
-def b(data):
-    exit()
+def find_x(data, y):
+    x = set()
+    exclude = set()
+    for xs, ys, xb, yb in data:
+        md = np.abs(xs - xb) + np.abs(ys - yb)
+        if (yd := np.abs(ys - y)) <= md:
+            x.update(range(xs - (md - yd), xs + (md - yd) + 1))
+        #qif yb == y:
+        #    exclude.add(xb)
+    return list(x)
 
 
-example_answer = b(puzzle.example_data)
+def b(data, max_c):
+    data = re.findall(PATTERN, data)
+    data = [tuple(map(int, e)) for e in data]
+    grid = np.zeros((max_c + 1, max_c + 1), dtype=bool)
+    for i in range(grid.shape[0]):
+        xc = np.array(find_x(data, i))
+        xc = xc[(xc >=0 ) & (xc <= max_c)]
+        grid[i, xc] = True
+    y, x = np.argwhere(grid == False).tolist()[0]
+    return x * 4000000 + y
+
+
+example_answer = b(puzzle.example_data, max_c=20)
 print(example_answer)
-assert example_answer == ...
-answer = b(puzzle.input_data)
+assert example_answer == 56000011
+answer = b(puzzle.input_data, max_c=4000000)
 print("b:", answer)
 puzzle.answer_b = answer
