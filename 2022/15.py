@@ -1,16 +1,16 @@
-import datetime
 import re
+from collections import Counter
 
-import numpy as np
 from aocd.models import Puzzle
-from scipy.sparse import dok_array
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 15
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-PATTERN = r"Sensor at x=([-\d]+), y=([-\d]+): closest beacon is at x=([-\d]+), y=([-\d]+)"
+PATTERN = (
+    r"Sensor at x=([-\d]+), y=([-\d]+): closest beacon is at x=([-\d]+), y=([-\d]+)"
+)
 
 # Part a
 def a(data, y):
@@ -31,9 +31,9 @@ def a(data, y):
 example_answer = a(puzzle.example_data, y=10)
 print(example_answer)
 assert example_answer == 26
-#answer = a(puzzle.input_data, y=2000000)
-#print("a:", answer)
-#assert answer == 5367037
+answer = a(puzzle.input_data, y=2000000)
+print("a:", answer)
+assert answer == 5367037
 
 
 # Part b
@@ -48,7 +48,9 @@ def find_x(data, y, max_c):
     return x
 
 
-def tmp2(data, max_c):
+def b(data, max_c):
+    data = re.findall(PATTERN, data)
+    data = [tuple(map(int, e)) for e in data]
     lines = []
     for xs, ys, xb, yb in data:
         md = abs(xs - xb) + abs(ys - yb)
@@ -67,23 +69,17 @@ def tmp2(data, max_c):
             x0 = max(curr_line[0][0], other_line[0][0])
             x1 = min(curr_line[0][1], other_line[0][1])
             x = (other_line[1][1] - curr_line[1][1]) // 2
-            y = curr_line[1][0]*x + curr_line[1][1]
+            y = curr_line[1][0] * x + curr_line[1][1]
             if (x0 <= x <= x1) and (0 <= x <= max_c) and (0 <= y <= max_c):
                 yy.append(y)
-    from collections import Counter
+
     cc = Counter(yy)
     for y, _ in cc.most_common():
-        print(y)
-        xx = find_x(data, y, max_c)
-        if xx:
+        x = find_x(data, y, max_c)
+        if x:
             break
-    return 4000000 * list(xx)[0] + y
+    return 4000000 * list(x)[0] + y
 
-
-def b(data, max_c):
-    data = re.findall(PATTERN, data)
-    data = [tuple(map(int, e)) for e in data]
-    return tmp2(data, max_c)
 
 example_answer = b(puzzle.example_data, max_c=20)
 print(example_answer)
