@@ -36,27 +36,26 @@ assert example_answer == 26
 
 
 # Part b
-def find_x(data, y):
+def find_c(data, y, max_c):
+    print(y)
     x = set()
-    exclude = set()
     for xs, ys, xb, yb in data:
         md = np.abs(xs - xb) + np.abs(ys - yb)
         if (yd := np.abs(ys - y)) <= md:
             x.update(range(xs - (md - yd), xs + (md - yd) + 1))
-        #qif yb == y:
-        #    exclude.add(xb)
-    return list(x)
+    x = set(range(max_c + 1)) - x
+    if x:
+        return [(xe, y) for xe in x]
+    return []
 
 
 def b(data, max_c):
     data = re.findall(PATTERN, data)
     data = [tuple(map(int, e)) for e in data]
-    grid = np.zeros((max_c + 1, max_c + 1), dtype=bool)
-    for i in range(grid.shape[0]):
-        xc = np.array(find_x(data, i))
-        xc = xc[(xc >=0 ) & (xc <= max_c)]
-        grid[i, xc] = True
-    y, x = np.argwhere(grid == False).tolist()[0]
+    c = set()
+    for i in range(max_c + 1):
+        c.update(find_c(data, i, max_c))
+    x, y = list(c)[0]
     return x * 4000000 + y
 
 
