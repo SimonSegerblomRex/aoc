@@ -3,6 +3,7 @@ import re
 
 import numpy as np
 from aocd.models import Puzzle
+from scipy.sparse import dok_array
 
 YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day
@@ -18,8 +19,8 @@ def a(data, y):
     x = set()
     exclude = set()
     for xs, ys, xb, yb in data:
-        md = np.abs(xs - xb) + np.abs(ys - yb)
-        if (yd := np.abs(ys - y)) <= md:
+        md = abs(xs - xb) + abs(ys - yb)
+        if (yd := abs(ys - y)) <= md:
             x.update(range(xs - (md - yd), xs + (md - yd) + 1))
         if yb == y:
             exclude.add(xb)
@@ -36,32 +37,57 @@ assert example_answer == 26
 
 
 # Part b
-def find_c(data, y, max_c):
-    print(y)
+def find_x(data, y, max_c):
     x = set()
     for xs, ys, xb, yb in data:
-        md = np.abs(xs - xb) + np.abs(ys - yb)
-        if (yd := np.abs(ys - y)) <= md:
+        md = abs(xs - xb) + abs(ys - yb)
+        if (yd := abs(ys - y)) <= md:
             x.update(range(xs - (md - yd), xs + (md - yd) + 1))
     x = set(range(max_c + 1)) - x
-    if x:
-        return [(xe, y) for xe in x]
-    return []
+
+    return x
+
+
+def tmp2(data, max_c):
+    lines = []
+    for xs, ys, xb, yb in data:
+        md = abs(xs - xb) + abs(ys - yb)
+        # [(x0, x1), (k, m)] (y = k*x + m)
+        lines.append([(xs - md - 1, xs), (1, ys - (xs - md - 1))])
+        lines.append([(xs, xs + md + 1), (1, ys - md - 1 - xs)])
+        lines.append([(xs - md - 1, xs), (-1, ys + xs - md - 1)])
+        lines.append([(xs, xs + md + 1), (-1, ys + md + 1 + xs)])
+    yy = []
+    for i, curr_line in enumerate(lines):
+        for j, other_line in enumerate(lines):
+            if j == i:
+                continue
+            if curr_line[1][0] == other_line[1][0]:
+                continue
+            x0 = max(curr_line[0][0], other_line[0][0])
+            x1 = min(curr_line[0][1], other_line[0][1])
+            x = (other_line[1][1] - curr_line[1][1]) // 2
+            y = curr_line[1][0]*x + curr_line[1][1]
+            if (x0 <= x <= x1) and (0 <= x <= max_c) and (0 <= y <= max_c):
+                yy.append(y)
+    from collections import Counter
+    cc = Counter(yy)
+    for y, _ in cc.most_common():
+        print(y)
+        xx = find_x(data, y, max_c)
+        if xx:
+            break
+    return 4000000 * list(xx)[0] + y
 
 
 def b(data, max_c):
     data = re.findall(PATTERN, data)
     data = [tuple(map(int, e)) for e in data]
-    c = set()
-    for i in range(max_c + 1):
-        c.update(find_c(data, i, max_c))
-    x, y = list(c)[0]
-    return x * 4000000 + y
-
+    return tmp2(data, max_c)
 
 example_answer = b(puzzle.example_data, max_c=20)
 print(example_answer)
 assert example_answer == 56000011
 answer = b(puzzle.input_data, max_c=4000000)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 11914583249288
