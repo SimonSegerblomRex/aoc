@@ -54,11 +54,32 @@ def a(data):
 
     # brute-force
     max_pressure_released = 0
-    nbr_itreations = len(list(enumerate(itertools.permutations(interesting_valves, len(interesting_valves)))))
-    for i, path in enumerate(itertools.permutations(interesting_valves, len(interesting_valves))):
+    tmp = [dists["AA"][valve] for valve in interesting_valves]
+
+    paths = []
+    def find_paths(path, time_remaining):
+        curr_pos = path[-1]
+        possible_next_pos = interesting_valves - set(path)
+        if not possible_next_pos:
+            paths.append(path)
+            return
+        for i, next_pos in enumerate(possible_next_pos):
+            if time_remaining - (dists[curr_pos][next_pos] + 1) <= 0:
+                paths.append(path)
+                continue
+            find_paths(
+                [*path, next_pos],
+                time_remaining - (dists[curr_pos][next_pos] + 1)
+            )
+
+    find_paths(["AA"], time_remaining=30)
+
+    for path in paths:
+        if not path:
+            continue
         time_remaining = 30
         pressure_released = 0
-        curr_pos = "AA"
+        curr_pos = path.pop(0)
         for next_pos in path:
             time_remaining -= dists[curr_pos][next_pos] + 1
             if time_remaining < 0:
@@ -66,10 +87,10 @@ def a(data):
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
         max_pressure_released = max(max_pressure_released, pressure_released)
-        print(f"{i}/{nbr_itreations}")
 
     #breakpoint()
     print(max_pressure_released)
+    breakpoint()
     return max_pressure_released
 
     # hmmm
