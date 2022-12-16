@@ -39,47 +39,66 @@ def djikstra(start, end, graph):
 
 def a(data):
     data = re.findall(PATTERN, data)
-    data = {e[0]: [int(e[1]), e[2].split(", ") or [e[2]]] for e in data}
+    data = {e[0]: [int(e[1]), set(e[2].split(", ")) or [e[2]]] for e in data}
     valves = list(data.keys())
 
-    interesting_valves = [valve for valve, (p, _) in data.items() if p > 0]
+    interesting_valves = set(valve for valve, (p, _) in data.items() if p > 0)
     graph = {valve: data[valve][1] for valve in valves}
-    dists = {}
-    for start, end in itertools.combinations(interesting_valves, 2):
+    dists = defaultdict(dict)
+    for start, end in itertools.combinations(valves, 2):
         dist = djikstra(start, end, graph)
-        dists[(start, end)] = dist
-        dists[(end, start)] = dist
-    breakpoint()
+        dists[start][start] = 0
+        dists[end][end] = 0
+        dists[start][end] = dist
+        dists[end][start] = dist
 
+    # brute-force
+    max_pressure_released = 0
+    nbr_itreations = len(list(enumerate(itertools.permutations(interesting_valves, len(interesting_valves)))))
+    for i, path in enumerate(itertools.permutations(interesting_valves, len(interesting_valves))):
+        time_remaining = 30
+        pressure_released = 0
+        curr_pos = "AA"
+        for next_pos in path:
+            time_remaining -= dists[curr_pos][next_pos] + 1
+            if time_remaining < 0:
+                break
+            pressure_released += time_remaining * data[next_pos][0]
+            curr_pos = next_pos
+        max_pressure_released = max(max_pressure_released, pressure_released)
+        print(f"{i}/{nbr_itreations}")
+
+    #breakpoint()
+    print(max_pressure_released)
+    return max_pressure_released
+
+    # hmmm
     curr_pos = "AA"
     open_valves = []
     remaining_time = 30
     released_pressure = 0
     while remaining_time:
         curr_flow_rate, neighbours = data[curr_pos]
-        if remaining_time == 1:
-            # Only have option of opening valve at curr_pos
-            released_pressure += data[curr_pos][0]
-            break
-        else:
-            candidates = [valve for valve, (p, _) in data.items() if p > 0]
-            # Calculate number of steps to each candidate
-            # FIXME!
-            breakpoint()
+        other_candidates = neighbours.intersection(interesting_valves)  # FIXME: Should we do this..?
+        if 0:
             options = [
-                ((remaining_time - 1) * curr_flow_rate, curr_pos),
-                *(((remaining_time - 2) * data[neigbour][0], neigbour) for neigbour in neighbours)
+                #(pressure_to_be_released, node, nbr_of_steps)
+                ((remaining_time - 1) * curr_flow_rate, curr_pos, 0),
+                *(((remaining_time - dists[curr_pos][valve] - 1) * data[valve][0], valve, dists[curr_pos][valve]) for valve in other_candidates)
             ]
-        pressure_to_be_released, next_move = sorted(options)[-1]
-        if next_move == curr_pos:
-            remaining_time -= 1
         else:
-            # Assume that we always open the valve we move to...
-            remaining_time -= 2
-        print(next_move)
+            options = [
+                ((remaining_time - dists[curr_pos][valve] - 1) * data[valve][0], valve, dists[curr_pos][valve]) for valve in other_candidates
+            ]
+        options = [option for option in options if ((option[-1] + 1) <= remaining_time)]
+        if not options:
+            break
+        pressure_to_be_released, next_pos, nbr_of_steps = sorted(options)[-1]
+        print(curr_pos, next_pos)
         released_pressure += pressure_to_be_released
-        data[next_move][0] = 0
-        curr_pos = next_move
+        curr_pos = next_pos
+        remaining_time -= nbr_of_steps + 1
+        interesting_valves.remove(next_pos)
     return released_pressure
 
 
