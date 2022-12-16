@@ -84,7 +84,9 @@ def a(data):
                 break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
-        max_pressure_released = max(max_pressure_released, pressure_released)
+        if pressure_released > max_pressure_released:
+            print(pressure_released)
+            max_pressure_released = pressure_released
 
     return max_pressure_released
 
@@ -170,7 +172,9 @@ def b(data):
                 break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
-        max_pressure_released = max(max_pressure_released, pressure_released)
+        if pressure_released > max_pressure_released:
+            print(pressure_released)
+            max_pressure_released = pressure_released
 
     return max_pressure_released
 
