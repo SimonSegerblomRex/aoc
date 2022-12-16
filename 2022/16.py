@@ -140,7 +140,7 @@ def b(data):
             )
         while possible_elephant_next_pos:
             next_pos = possible_elephant_next_pos.pop()
-            next_elephant_time_remaining = your_time_remaining - (dists[elephant_curr_pos][next_pos] + 1)
+            next_elephant_time_remaining = elephant_time_remaining - (dists[elephant_curr_pos][next_pos] + 1)
             yield from find_paths(
                 [path[0].copy(), [*path[1], next_pos]],
                 your_time_remaining, next_elephant_time_remaining,
