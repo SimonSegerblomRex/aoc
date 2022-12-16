@@ -57,15 +57,17 @@ def a(data):
     def find_paths(path, time_remaining):
         curr_pos = path[-1]
         possible_next_pos = interesting_valves - set(path)
-        if not possible_next_pos or (time_remaining <= 0):
-            paths.append(path.copy())
+        possible_next_pos = [
+            next_pos
+            for next_pos in possible_next_pos
+            if time_remaining - (dists[curr_pos][next_pos] + 1) >= 0
+        ]
+        if not possible_next_pos:
+            paths.append(path)
             return
         while possible_next_pos:
             next_pos = possible_next_pos.pop()
             next_time_remaining = time_remaining - (dists[curr_pos][next_pos] + 1)
-            if next_time_remaining <= 0:
-                paths.append(path.copy())
-                continue
             find_paths(
                 [*path, next_pos],
                 next_time_remaining,
@@ -116,46 +118,62 @@ def b(data):
         dists[end][start] = dist
 
     # brute-force
-    your_paths = []
-    elephant_paths = []
-    def find_paths(your_path, elephant_path, your_time_remaining, elephant_time_remaining):
-        your_curr_pos = your_path[-1]
-        elephant_curr_pos = elephant_path[-1]
-        possible_next_pos = interesting_valves - set(your_path) - set(elephant_path)
-        if not possible_next_pos or (your_time_remaining <= 0):
-            your_paths.append(your_path.copy())
+    paths = []
+    def find_paths(path, your_time_remaining, elephant_time_remaining):
+        your_curr_pos = path[0][-1]
+        elephant_curr_pos = path[1][-1]
+
+        possible_next_pos = interesting_valves - set(path[0]) - set(path[1])
+        possible_your_next_pos = [
+            next_pos
+            for next_pos in possible_next_pos
+            if your_time_remaining - (dists[your_curr_pos][next_pos] + 1) >= 0
+        ]
+        possible_elephant_next_pos = [
+            next_pos
+            for next_pos in possible_next_pos
+            if elephant_time_remaining - (dists[elephant_curr_pos][next_pos] + 1) >= 0
+        ]
+        if not possible_your_next_pos and not possible_elephant_next_pos:
+            paths.append(path)
             return
-        while possible_next_pos:
-            your_next_pos = possible_next_pos.pop()
-            elephant_next_pos = possible_next_pos.pop()
-            your_next_time_remaining = time_remaining - (dists[curr_pos][your_next_pos] + 1)
-            elephant_next_time_remaining = time_remaining - (dists[curr_pos][elephant_next_pos] + 1)
-            if your_next_time_remaining <= 0:
-                paths.append(path.copy())
-                continue
+        while possible_your_next_pos:
+            next_pos = possible_your_next_pos.pop()
+            next_your_time_remaining = your_time_remaining - (dists[your_curr_pos][next_pos] + 1)
             find_paths(
-                [*path, next_pos],
-                next_time_remaining,
+                [[*path[0], next_pos], path[1].copy()],
+                next_your_time_remaining, elephant_time_remaining,
+            )
+        while possible_elephant_next_pos:
+            next_pos = possible_elephant_next_pos.pop()
+            next_elephant_time_remaining = your_time_remaining - (dists[elephant_curr_pos][next_pos] + 1)
+            find_paths(
+                [path[0].copy(), [*path[1], next_pos]],
+                your_time_remaining, next_elephant_time_remaining,
             )
 
-            if time_remaining - (dists[curr_pos][next_pos] + 1) <= 0:
-                paths.append(path.copy())
-                continue
-            find_paths(
-                [*path, next_pos],
-                time_remaining - (dists[curr_pos][next_pos] + 1)
-            )
-
-    find_paths(["AA"], ["AA"], your_time_remaining=26, elephant_time_remaining=26)
+    find_paths([["AA"], ["AA"]], your_time_remaining=26, elephant_time_remaining=26)
 
     max_pressure_released = 0
-    for path in paths:
-        if not path:
+    for your_path, elephant_path in paths:
+        if not your_path:
             continue
+        if not elephant_path:
+            continue
+        # You
         time_remaining = 26
         pressure_released = 0
-        curr_pos = path.pop(0)
-        for next_pos in path:
+        curr_pos = your_path.pop(0)
+        for next_pos in your_path:
+            time_remaining -= dists[curr_pos][next_pos] + 1
+            if time_remaining <= 0:
+                break
+            pressure_released += time_remaining * data[next_pos][0]
+            curr_pos = next_pos
+        # Elephant
+        time_remaining = 26
+        curr_pos = elephant_path.pop(0)
+        for next_pos in elephant_path:
             time_remaining -= dists[curr_pos][next_pos] + 1
             if time_remaining <= 0:
                 break
