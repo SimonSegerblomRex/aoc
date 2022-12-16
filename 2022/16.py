@@ -53,19 +53,16 @@ def a(data):
         dists[end][start] = dist
 
     # brute-force
-    max_pressure_released = 0
-    tmp = [dists["AA"][valve] for valve in interesting_valves]
-
     paths = []
     def find_paths(path, time_remaining):
         curr_pos = path[-1]
         possible_next_pos = interesting_valves - set(path)
-        if not possible_next_pos:
-            paths.append(path)
+        if not possible_next_pos or (time_remaining <= 0):
+            paths.append(path.copy())
             return
         for i, next_pos in enumerate(possible_next_pos):
             if time_remaining - (dists[curr_pos][next_pos] + 1) <= 0:
-                paths.append(path)
+                paths.append(path.copy())
                 continue
             find_paths(
                 [*path, next_pos],
@@ -73,7 +70,9 @@ def a(data):
             )
 
     find_paths(["AA"], time_remaining=30)
+    breakpoint()
 
+    max_pressure_released = 0
     for path in paths:
         if not path:
             continue
@@ -82,7 +81,7 @@ def a(data):
         curr_pos = path.pop(0)
         for next_pos in path:
             time_remaining -= dists[curr_pos][next_pos] + 1
-            if time_remaining < 0:
+            if time_remaining <= 0:
                 break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
