@@ -1,12 +1,10 @@
-import datetime
-
 import numpy as np
 from aocd.models import Puzzle
 
 np.set_printoptions(edgeitems=10, linewidth=180)
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 17
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -54,15 +52,16 @@ SHAPES = [
 ]
 
 # Part a
-def a(data, debug=False):
-    grid_height = 4*2022+4 + 1
+def a(data, nbr_rocks, debug=False):
+    grid_height = 10000
     grid_width = 7
     nbr_instructions = len(data)
-    grid = np.zeros((grid_height, grid_width), dtype=int)
+    grid = np.zeros((grid_height, grid_width), dtype=np.uint8)
     grid[-1, :] = 2
     top = grid.shape[0] - 1
     move_nbr = 0
-    for rock_nbr in range(2022 + 1):
+    reduced_height = 0
+    for rock_nbr in range(nbr_rocks + 1):
         shape_nbr = rock_nbr % len(SHAPES)
         rock = SHAPES[shape_nbr]
         rock_height, rock_width = rock.shape
@@ -93,29 +92,34 @@ def a(data, debug=False):
                 grid[curr_loc][rock] = 2
                 break
             i = next_i
+            # Check if we can reduce size...
+            tmp = np.argmax(grid, axis=0).max()
+            if tmp < grid.shape[0] - 1000:
+                height_reduction = grid.shape[0] - tmp - 1
+                reduced_height += height_reduction
+                grid = np.roll(grid, height_reduction, axis=0)
+                grid[:height_reduction, :] = 0
+                i += height_reduction
+                top += height_reduction
         top = min(top, i)
+
         if debug:
             print(grid[top - 4:, :])
             breakpoint()
-    return grid_height - top - 3
+    return grid_height - top - 3 + reduced_height
 
 
-example_answer = a(EXAMPLE_DATA)
+example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)
 print(example_answer)
 assert example_answer == 3068
-answer = a(puzzle.input_data)
+answer = a(puzzle.input_data, nbr_rocks=2022)
 print("a:", answer)
-puzzle.answer_a = answer
-
+assert answer == 3119
 
 # Part b
-def b(data):
-    exit()
-
-
-example_answer = b(EXAMPLE_DATA)
+example_answer = a(EXAMPLE_DATA, nbr_rocks=1000000000000)
 print(example_answer)
-assert example_answer == ...
-answer = b(puzzle.input_data)
+assert example_answer == 1514285714288
+answer = a(puzzle.input_data, nbr_rocks=1000000000000)
 print("b:", answer)
 puzzle.answer_b = answer
