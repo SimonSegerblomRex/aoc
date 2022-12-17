@@ -51,9 +51,11 @@ SHAPES = [
     ),
 ]
 
+
 # Part a
 def a(data, nbr_rocks, debug=False):
-    grid_height = 10000
+    moves = [1 if c == ">" else -1 for c in data]
+    grid_height = 100
     grid_width = 7
     nbr_instructions = len(data)
     grid = np.zeros((grid_height, grid_width), dtype=np.uint8)
@@ -75,8 +77,9 @@ def a(data, nbr_rocks, debug=False):
                 breakpoint()
                 grid[curr_loc][rock] = 0
             # Move sideways
-            move = 1 if data[move_nbr % nbr_instructions] == ">" else -1
+            move = moves[move_nbr]
             move_nbr += 1
+            move_nbr %= nbr_instructions
             next_j = np.clip(j + move, 0, grid_width - rock_width)
             next_loc = np.s_[i:i + rock_height, next_j:next_j + rock_width]
             if (grid[next_loc][rock] == 2).any():
@@ -90,22 +93,30 @@ def a(data, nbr_rocks, debug=False):
             if (grid[next_loc][rock] == 2).any():
                 # Hit something...
                 grid[curr_loc][rock] = 2
+                #if (i == top) and (grid[i, :] == 2).all():
+                #TODO: Look for more known repeated states...
+                if (shape_nbr == 0) and (move_nbr == 4) and (j == 0):# and (grid[i + 1, [0, 1, 6]] == 2).all():  #FIXME: j == 2 för exempeldatan, j == 0 för inputdatan
+                    print("hmm")
+                    breakpoint()
                 break
             i = next_i
-            # Check if we can reduce size...
-            tmp = np.argmax(grid, axis=0).max()
-            if tmp < grid.shape[0] - 1000:
-                height_reduction = grid.shape[0] - tmp - 1
-                reduced_height += height_reduction
-                grid = np.roll(grid, height_reduction, axis=0)
-                grid[:height_reduction, :] = 0
-                i += height_reduction
-                top += height_reduction
+
+        # Check if we can reduce size...
+        tmp = np.argmax(grid, axis=0).max()
+        if tmp < grid.shape[0] - 10:
+            height_reduction = grid.shape[0] - tmp - 2
+            reduced_height += height_reduction
+            grid = np.roll(grid, height_reduction, axis=0)
+            grid[:height_reduction, :] = 0
+            i += height_reduction
+            top += height_reduction
         top = min(top, i)
 
         if debug:
             print(grid[top - 4:, :])
             breakpoint()
+        if not rock_nbr % 10000:
+            print(rock_nbr)
     return grid_height - top - 3 + reduced_height
 
 
@@ -117,9 +128,10 @@ print("a:", answer)
 assert answer == 3119
 
 # Part b
-example_answer = a(EXAMPLE_DATA, nbr_rocks=1000000000000)
-print(example_answer)
-assert example_answer == 1514285714288
+if 0:
+    example_answer = a(EXAMPLE_DATA, nbr_rocks=1000000000000)
+    print(example_answer)
+    assert example_answer == 1514285714288
 answer = a(puzzle.input_data, nbr_rocks=1000000000000)
 print("b:", answer)
 puzzle.answer_b = answer
