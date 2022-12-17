@@ -63,12 +63,45 @@ def a(data, nbr_rocks, debug=False):
     top = grid.shape[0] - 1
     move_nbr = 0
     reduced_height = 0
-    for rock_nbr in range(nbr_rocks + 1):
+    #prev_height = [0] * 100
+    rock_nbr = 0
+    #for rock_nbr in range(nbr_rocks + 1):
+    first_time = True
+    second_time = False
+    first_height = 0
+    first_nbr_rocks = 0
+    while rock_nbr <= nbr_rocks:
+        if not (rock_nbr % len(moves)) and rock_nbr and (move_nbr == 0):
+            if 1:
+                print(grid[top:, :], rock_nbr, (grid_height - top - 3 + reduced_height))
+                breakpoint()
+            else:
+                if second_time:
+                    second_height = (grid_height - top - 3 + reduced_height)
+                    second_time = False
+                    tmp = (nbr_rocks - rock_nbr) // first_nbr_rocks * (second_height-first_height)
+                    reduced_height += tmp
+                    rock_nbr += (nbr_rocks - rock_nbr) // first_nbr_rocks * first_nbr_rocks
+                if first_time:
+                    first_height = (grid_height - top - 3 + reduced_height)
+                    first_nbr_rocks = rock_nbr
+                    first_time = False
+                    second_time = True
+                """
+                # Back?
+                (2022-240)//120
+                #196+198*14+
+                print(grid[top:, :], rock_nbr, (grid_height - top - 3 + reduced_height))
+                tmp = (nbr_rocks - rock_nbr) // rock_nbr * (grid_height - top - 3 + reduced_height)
+                breakpoint()
+                """
+
         shape_nbr = rock_nbr % len(SHAPES)
         rock = SHAPES[shape_nbr]
         rock_height, rock_width = rock.shape
         i = top - rock_height - 3
         j = 2
+
         while True:
             curr_loc = np.s_[i:i + rock_height, j:j + rock_width]
             if debug:
@@ -93,12 +126,8 @@ def a(data, nbr_rocks, debug=False):
             if (grid[next_loc][rock] == 2).any():
                 # Hit something...
                 grid[curr_loc][rock] = 2
-                #if (i == top) and (grid[i, :] == 2).all():
-                #TODO: Look for more known repeated states...
-                if (shape_nbr == 0) and (move_nbr == 4) and (j == 0):# and (grid[i + 1, [0, 1, 6]] == 2).all():  #FIXME: j == 2 för exempeldatan, j == 0 för inputdatan
-                    print("hmm")
-                    breakpoint()
                 break
+
             i = next_i
 
         # Check if we can reduce size...
@@ -117,8 +146,13 @@ def a(data, nbr_rocks, debug=False):
             breakpoint()
         if not rock_nbr % 10000:
             print(rock_nbr)
-    return grid_height - top - 3 + reduced_height
+        #prev_height.put(grid_height - top - 3)
+        #prev_height.put(grid_height - top - 3 + reduced_height)
+        #prev_height[rock_nbr % 100] = grid_height - top - 3 + reduced_height
+        rock_nbr += 1
 
+
+    return grid_height - top - 3 + reduced_height
 
 example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)
 print(example_answer)
