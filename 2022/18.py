@@ -11,11 +11,10 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def parse_data(data):
-    data = [np.fromstring(line, dtype=int, sep=",") for line in data.splitlines()]
-    data = np.vstack(data)
-    xx = data[:, 1]
-    yy = data[:, 0]
-    zz = data[:, 2]
+    data = np.vstack(
+        [np.fromstring(line, dtype=int, sep=",") for line in data.splitlines()]
+    )
+    xx, yy, zz = np.hsplit(data, 3)
     width = np.max(xx) + 1
     height = np.max(yy) + 1
     depth = np.max(zz) + 1
@@ -26,14 +25,8 @@ def parse_data(data):
 
 
 def calc_surface_area(grid):
-    return (
-        np.sum(np.diff(grid, axis=0) > 0)
-        + np.sum(np.diff(grid[::-1, :, :], axis=0) > 0)
-        + np.sum(np.diff(grid, axis=1) > 0)
-        + np.sum(np.diff(grid[:, ::-1, :], axis=1) > 0)
-        + np.sum(np.diff(grid, axis=2) > 0)
-        + np.sum(np.diff(grid[:, :, ::-1], axis=2) > 0)
-    )
+    return sum((np.diff(grid, axis=i) != 0).sum() for i in range(grid.ndim))
+
 
 def a(data):
     grid = parse_data(data)
