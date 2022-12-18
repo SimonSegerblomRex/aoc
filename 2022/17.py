@@ -66,15 +66,15 @@ def a(data, nbr_rocks, debug=False):
     rock_nbr = 0
     heights = []
     rocks = []
-    while rock_nbr <= nbr_rocks:
+    while rock_nbr < nbr_rocks:
         shape_nbr = rock_nbr % len(SHAPES)
         rock = SHAPES[shape_nbr]
         rock_height, rock_width = rock.shape
         i = top - rock_height - 3
         j = 2
 
-        if (move_nbr == 1):
-            heights.append(grid_height - top - 3 + reduced_height)
+        if move_nbr == 1:
+            heights.append(grid_height - top - 1 + reduced_height)
             rocks.append(rock_nbr)
             if len(heights) > 1:
                 height_diff = heights[1] - heights[0]
@@ -82,13 +82,12 @@ def a(data, nbr_rocks, debug=False):
                 f = (nbr_rocks - rock_nbr) // rock_diff
                 reduced_height += f * height_diff
                 rock_nbr += f * rock_diff
-                breakpoint()
 
         while True:
-            curr_loc = np.s_[i:i + rock_height, j:j + rock_width]
+            curr_loc = np.s_[i : i + rock_height, j : j + rock_width]
             if debug:
                 grid[curr_loc][rock] = 1
-                print(grid[top - 4:, :])
+                print(grid[top - 4 :, :])
                 breakpoint()
                 grid[curr_loc][rock] = 0
             # Move sideways
@@ -96,18 +95,19 @@ def a(data, nbr_rocks, debug=False):
             move_nbr += 1
             move_nbr %= nbr_instructions
             next_j = np.clip(j + move, 0, grid_width - rock_width)
-            next_loc = np.s_[i:i + rock_height, next_j:next_j + rock_width]
+            next_loc = np.s_[i : i + rock_height, next_j : next_j + rock_width]
             if (grid[next_loc][rock] == 2).any():
                 # Hit something...
                 next_j = j
             j = next_j
-            curr_loc = np.s_[i:i + rock_height, j:j + rock_width]
+            curr_loc = np.s_[i : i + rock_height, j : j + rock_width]
             # Move down
             next_i = i + 1
-            next_loc = np.s_[next_i:next_i + rock_height, j:j + rock_width]
+            next_loc = np.s_[next_i : next_i + rock_height, j : j + rock_width]
             if (grid[next_loc][rock] == 2).any():
                 # Hit something...
                 grid[curr_loc][rock] = 2
+                top = min(top, i)
                 break
 
             i = next_i
@@ -124,16 +124,16 @@ def a(data, nbr_rocks, debug=False):
         top = min(top, i)
 
         if debug:
-            print(grid[top - 4:, :])
+            print(grid[top - 4 :, :])
             breakpoint()
         if not rock_nbr % 10000:
             print(rock_nbr)
         rock_nbr += 1
 
-    return grid_height - top - 3 + reduced_height
+    return grid_height - top - 1 + reduced_height
 
 
-example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)
+example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)  # , debug=True)
 print(example_answer)
 assert example_answer == 3068
 answer = a(puzzle.input_data, nbr_rocks=2022)
@@ -146,4 +146,4 @@ print(example_answer)
 assert example_answer == 1514285714288
 answer = a(puzzle.input_data, nbr_rocks=1000000000000)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1536994219669
