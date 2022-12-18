@@ -63,45 +63,26 @@ def a(data, nbr_rocks, debug=False):
     top = grid.shape[0] - 1
     move_nbr = 0
     reduced_height = 0
-    #prev_height = [0] * 100
     rock_nbr = 0
-    #for rock_nbr in range(nbr_rocks + 1):
-    first_time = True
-    second_time = False
-    first_height = 0
-    first_nbr_rocks = 0
+    heights = []
+    rocks = []
     while rock_nbr <= nbr_rocks:
-        #breakpoint()
-        if not (rock_nbr % len(moves)) and rock_nbr and (move_nbr == 0):
-            if 1:
-                print(grid[top:, :], rock_nbr, (grid_height - top - 3 + reduced_height))
-                breakpoint()
-            else:
-                if second_time:
-                    second_height = (grid_height - top - 3 + reduced_height)
-                    second_time = False
-                    tmp = (nbr_rocks - rock_nbr) // first_nbr_rocks * (second_height-first_height)
-                    reduced_height += tmp
-                    rock_nbr += (nbr_rocks - rock_nbr) // first_nbr_rocks * first_nbr_rocks
-                if first_time:
-                    first_height = (grid_height - top - 3 + reduced_height)
-                    first_nbr_rocks = rock_nbr
-                    first_time = False
-                    second_time = True
-                """
-                # Back?
-                (2022-240)//120
-                #196+198*14+
-                print(grid[top:, :], rock_nbr, (grid_height - top - 3 + reduced_height))
-                tmp = (nbr_rocks - rock_nbr) // rock_nbr * (grid_height - top - 3 + reduced_height)
-                breakpoint()
-                """
-
         shape_nbr = rock_nbr % len(SHAPES)
         rock = SHAPES[shape_nbr]
         rock_height, rock_width = rock.shape
         i = top - rock_height - 3
         j = 2
+
+        if (move_nbr == 1):
+            heights.append(grid_height - top - 3 + reduced_height)
+            rocks.append(rock_nbr)
+            if len(heights) > 1:
+                height_diff = heights[1] - heights[0]
+                rock_diff = rocks[1] - rocks[0]
+                f = (nbr_rocks - rock_nbr) // rock_diff
+                reduced_height += f * height_diff
+                rock_nbr += f * rock_diff
+                breakpoint()
 
         while True:
             curr_loc = np.s_[i:i + rock_height, j:j + rock_width]
@@ -147,19 +128,11 @@ def a(data, nbr_rocks, debug=False):
             breakpoint()
         if not rock_nbr % 10000:
             print(rock_nbr)
-        #prev_height.put(grid_height - top - 3)
-        #prev_height.put(grid_height - top - 3 + reduced_height)
-        #prev_height[rock_nbr % 100] = grid_height - top - 3 + reduced_height
         rock_nbr += 1
-
 
     return grid_height - top - 3 + reduced_height
 
 
-tmp = a(EXAMPLE_DATA, nbr_rocks=200)
-tmp2 = a(EXAMPLE_DATA, nbr_rocks=222)
-tmp3 = tmp*9+tmp2
-#breakpoint()
 example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)
 print(example_answer)
 assert example_answer == 3068
@@ -168,10 +141,9 @@ print("a:", answer)
 assert answer == 3119
 
 # Part b
-if 0:
-    example_answer = a(EXAMPLE_DATA, nbr_rocks=1000000000000)
-    print(example_answer)
-    assert example_answer == 1514285714288
+example_answer = a(EXAMPLE_DATA, nbr_rocks=1000000000000)
+print(example_answer)
+assert example_answer == 1514285714288
 answer = a(puzzle.input_data, nbr_rocks=1000000000000)
 print("b:", answer)
 puzzle.answer_b = answer
