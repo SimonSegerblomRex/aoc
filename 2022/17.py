@@ -55,7 +55,7 @@ SHAPES = [
 # Part a
 def a(data, nbr_rocks, debug=False):
     moves = [1 if c == ">" else -1 for c in data]
-    grid_height = 100
+    grid_height = 80
     grid_width = 7
     nbr_instructions = len(data)
     grid = np.zeros((grid_height, grid_width), dtype=np.uint8)
@@ -71,6 +71,7 @@ def a(data, nbr_rocks, debug=False):
     first_height = 0
     first_nbr_rocks = 0
     while rock_nbr <= nbr_rocks:
+        #breakpoint()
         if not (rock_nbr % len(moves)) and rock_nbr and (move_nbr == 0):
             if 1:
                 print(grid[top:, :], rock_nbr, (grid_height - top - 3 + reduced_height))
@@ -154,6 +155,11 @@ def a(data, nbr_rocks, debug=False):
 
     return grid_height - top - 3 + reduced_height
 
+
+tmp = a(EXAMPLE_DATA, nbr_rocks=200)
+tmp2 = a(EXAMPLE_DATA, nbr_rocks=222)
+tmp3 = tmp*9+tmp2
+#breakpoint()
 example_answer = a(EXAMPLE_DATA, nbr_rocks=2022)
 print(example_answer)
 assert example_answer == 3068

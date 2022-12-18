@@ -10,6 +10,21 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
+def parse_data(data):
+    data = [np.fromstring(line, dtype=int, sep=",") for line in data.splitlines()]
+    data = np.vstack(data)
+    xx = data[:, 1]
+    yy = data[:, 0]
+    zz = data[:, 2]
+    width = np.max(xx) + 1
+    height = np.max(yy) + 1
+    depth = np.max(zz) + 1
+    grid = np.zeros((width, height, depth), dtype=int)
+    grid[xx, yy, zz] = 1
+    grid = np.pad(grid, 1)
+    return grid
+
+
 def calc_surface_area(grid):
     return (
         np.sum(np.diff(grid, axis=0) > 0)
@@ -21,18 +36,7 @@ def calc_surface_area(grid):
     )
 
 def a(data):
-    data = [np.fromstring(line, dtype=int, sep=",") for line in data.splitlines()]
-    data = np.vstack(data)
-    xx = data[:, 1]
-    yy = data[:, 0]
-    zz = data[:, 2]
-    width = np.max(xx) + 1
-    height = np.max(yy) + 1
-    depth = np.max(zz) + 1
-    grid = np.zeros((width, height, depth), dtype=int)
-    for x, y, z in zip(xx, yy, zz):
-        grid[x, y, z] = 1
-    grid = np.pad(grid, 1)
+    grid = parse_data(data)
     return calc_surface_area(grid)
 
 
@@ -46,18 +50,7 @@ assert answer == 3326
 
 # Part b
 def b(data):
-    data = [np.fromstring(line, dtype=int, sep=",") for line in data.splitlines()]
-    data = np.vstack(data)
-    xx = data[:, 1]
-    yy = data[:, 0]
-    zz = data[:, 2]
-    width = np.max(xx) + 1
-    height = np.max(yy) + 1
-    depth = np.max(zz) + 1
-    grid = np.zeros((width, height, depth), dtype=int)
-    for x, y, z in zip(xx, yy, zz):
-        grid[x, y, z] = 1
-    grid = np.pad(grid, 1)
+    grid = parse_data(data)
     filled = binary_fill_holes(grid)
     trapped = filled - grid
     return calc_surface_area(grid) - calc_surface_area(trapped)
