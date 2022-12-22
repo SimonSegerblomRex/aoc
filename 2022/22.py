@@ -11,7 +11,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
+def a(data, debug=False):
     board, instructions = data.split("\n\n")
     board = board.replace(" ", "1")
     board = board.replace(".", "0")
@@ -19,28 +19,29 @@ def a(data):
     rows = [np.frombuffer(row.encode(), dtype=np.uint8) - ord("0") for row in board.splitlines()]
     width = max(map(len, rows))
     rows = [np.pad(row, (0, width - len(row)), constant_values=1) for row in rows]
-    breakpoint()
     board = np.vstack(rows)
-    height = board.shape[0]
+    board = np.pad(board, ((1, 1), (1, 1)), constant_values=1) #...
+    height, width = board.shape
     instructions = re.findall("(\d+|[A-Z])", instructions)
-    i = 0
+    i = 1
     j = board[i, :].argmin()
     move_dir = (0, 1)
+    debug_board = board.copy()
     while instructions:
         instruction = instructions.pop(0)
         if instruction.isdigit():
             for step in range(int(instruction)):
-                next_i = i + move_dir[0]
-                next_j = j + move_dir[1]
+                next_i = (i + move_dir[0])
+                next_j = (j + move_dir[1])
                 if board[next_i, next_j] == 1:
                     if move_dir == (0, 1):
-                        next_j = board[i, :].argmin()
+                        next_j = (board[i, :] != 1).argmax()
                     elif move_dir == (0, -1):
-                        next_i = width - board[:, j][::-1].argmin()  # CHECK!!!
+                        next_j = width - (board[i, :] != 1)[::-1].argmax() - 1
                     elif move_dir == (1, 0):
-                        next_i = board[:, j].argmin()
+                        next_i = (board[:, j] != 1).argmax()
                     elif move_dir == (-1, 0):
-                        next_i = height - board[:, j][::-1].argmin()
+                        next_i = height - (board[:, j] != 1)[::-1].argmax() - 1
                 if board[next_i, next_j] == 2:
                     break
                 i = next_i
@@ -64,19 +65,27 @@ def a(data):
                     move_dir = (-1, 0)
                 elif move_dir == (-1, 0):
                     move_dir = (0, 1)
-        if 0:
-            board[i, j] = 3
-            print(board)
-            print(i, j, move_dir, instruction)
-            breakpoint()
-            board[i, j] = 0
+        if debug:
+            debug_symbol = {
+                (0,1): 3,
+                (1, 0): 4,
+                (0, -1): 5,
+                (-1, 0): 6,
+            }
+            debug_board[i, j] = debug_symbol[move_dir]
+            #print(debug_board)
+            #print(i, j, move_dir, instruction)
+            #breakpoint()
     face_score = {
         (0,1): 0,
         (1, 0): 1,
         (0, -1): 2,
         (-1, 0): 3,
     }
-    return (i - 1) * 1000 + 4 * (j - 1) + face_score[move_dir]
+    if debug:
+        print(debug_board)
+        print(i, j, move_dir)
+    return int(i * 1000 + 4 * j + face_score[move_dir])
     breakpoint()
 
 example_answer = a(puzzle.example_data)
@@ -84,7 +93,7 @@ print(example_answer)
 assert example_answer == 6032
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 60362
 
 
 # Part b
