@@ -10,18 +10,20 @@ DAY = datetime.datetime.today().day
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-"""
 # Part a
 def a(data, debug=False):
     board, instructions = data.split("\n\n")
     board = board.replace(" ", "1")
     board = board.replace(".", "0")
     board = board.replace("#", "2")
-    rows = [np.frombuffer(row.encode(), dtype=np.uint8) - ord("0") for row in board.splitlines()]
+    rows = [
+        np.frombuffer(row.encode(), dtype=np.uint8) - ord("0")
+        for row in board.splitlines()
+    ]
     width = max(map(len, rows))
     rows = [np.pad(row, (0, width - len(row)), constant_values=1) for row in rows]
     board = np.vstack(rows)
-    board = np.pad(board, ((1, 1), (1, 1)), constant_values=1) #...
+    board = np.pad(board, ((1, 1), (1, 1)), constant_values=1)  # ...
     height, width = board.shape
     instructions = re.findall("(\d+|[A-Z])", instructions)
     i = 1
@@ -32,8 +34,8 @@ def a(data, debug=False):
         instruction = instructions.pop(0)
         if instruction.isdigit():
             for step in range(int(instruction)):
-                next_i = (i + move_dir[0])
-                next_j = (j + move_dir[1])
+                next_i = i + move_dir[0]
+                next_j = j + move_dir[1]
                 if board[next_i, next_j] == 1:
                     if move_dir == (0, 1):
                         next_j = (board[i, :] != 1).argmax()
@@ -68,17 +70,17 @@ def a(data, debug=False):
                     move_dir = (0, 1)
         if debug:
             debug_symbol = {
-                (0,1): 3,
+                (0, 1): 3,
                 (1, 0): 4,
                 (0, -1): 5,
                 (-1, 0): 6,
             }
             debug_board[i, j] = debug_symbol[move_dir]
-            #print(debug_board)
-            #print(i, j, move_dir, instruction)
-            #breakpoint()
+            # print(debug_board)
+            # print(i, j, move_dir, instruction)
+            # breakpoint()
     face_score = {
-        (0,1): 0,
+        (0, 1): 0,
         (1, 0): 1,
         (0, -1): 2,
         (-1, 0): 3,
@@ -89,13 +91,13 @@ def a(data, debug=False):
     return int(i * 1000 + 4 * j + face_score[move_dir])
     breakpoint()
 
+
 example_answer = a(puzzle.example_data)
 print(example_answer)
 assert example_answer == 6032
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 60362
-"""
 
 
 # Part b
@@ -104,7 +106,10 @@ def b(data, debug=False, example=False):
     board = board.replace(" ", "1")
     board = board.replace(".", "0")
     board = board.replace("#", "2")
-    rows = [np.frombuffer(row.encode(), dtype=np.uint8) - ord("0") for row in board.splitlines()]
+    rows = [
+        np.frombuffer(row.encode(), dtype=np.uint8) - ord("0")
+        for row in board.splitlines()
+    ]
     width = max(map(len, rows))
     rows = [np.pad(row, (0, width - len(row)), constant_values=1) for row in rows]
     board = np.vstack(rows)
@@ -134,20 +139,23 @@ def b(data, debug=False, example=False):
         # Dummy
         faces[0] = tmp[0, 0]
 
-
     if example:
-        test = np.block([
-            [faces[0], faces[0], faces[1], faces[0]],
-            [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
-            [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
-        ])
+        test = np.block(
+            [
+                [faces[0], faces[0], faces[1], faces[0]],
+                [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
+                [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
+            ]
+        )
     else:
-        test = np.block([
-            [faces[0], faces[1], faces[2]],
-            [faces[0], faces[6], faces[0]],
-            [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
-            [np.rot90(faces[5], -1), faces[0], faces[0]],
-        ])
+        test = np.block(
+            [
+                [faces[0], faces[1], faces[2]],
+                [faces[0], faces[6], faces[0]],
+                [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
+                [np.rot90(faces[5], -1), faces[0], faces[0]],
+            ]
+        )
     np.testing.assert_array_equal(board, test)
 
     instructions = re.findall("(\d+|[A-Z])", instructions)
@@ -200,20 +208,21 @@ def b(data, debug=False, example=False):
         if instruction.isdigit():
             for step in range(int(instruction)):
                 next_face = curr_face
-                next_i = (i + move_dir[0])
-                next_j = (j + move_dir[1])
+                next_move_dir = move_dir
+                next_i = i + move_dir[0]
+                next_j = j + move_dir[1]
                 if next_j >= side:
                     assert move_dir == (0, 1)
                     next_face = next_face_map[move_dir][curr_face]
                     if curr_face == 5:
                         next_i = 0
                         next_j = side - 1 - i
-                        move_dir = (1, 0)
+                        next_move_dir = (1, 0)
                         debug_set.add("A")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = i
-                        move_dir = (-1, 0)
+                        next_move_dir = (-1, 0)
                         debug_set.add("B")
                     else:
                         next_j = 0
@@ -224,12 +233,12 @@ def b(data, debug=False, example=False):
                     if curr_face == 5:
                         next_i = 0
                         next_j = i
-                        move_dir = (1, 0)
+                        next_move_dir = (1, 0)
                         debug_set.add("D")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = side - 1 - i
-                        move_dir = (-1, 0)
+                        next_move_dir = (-1, 0)
                         debug_set.add("E")
                     else:
                         next_j = side - 1
@@ -240,22 +249,22 @@ def b(data, debug=False, example=False):
                     if curr_face == 2:
                         next_i = j
                         next_j = side - 1
-                        move_dir = (0, -1)
+                        next_move_dir = (0, -1)
                         debug_set.add("G")
                     elif curr_face == 3:
                         next_i = side - 1
                         next_j = side - 1 - j
-                        move_dir = (-1, 0)
+                        next_move_dir = (-1, 0)
                         debug_set.add("H")
                     elif curr_face == 4:
                         next_i = side - 1 - j
                         next_j = 0
-                        move_dir = (0, 1)
+                        next_move_dir = (0, 1)
                         debug_set.add("I")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = side - 1 - j
-                        move_dir = (-1, 0)
+                        next_move_dir = (-1, 0)
                         debug_set.add("J")
                     else:
                         next_i = 0
@@ -266,75 +275,110 @@ def b(data, debug=False, example=False):
                     if curr_face == 2:
                         next_i = side - 1 - j
                         next_j = side - 1
-                        move_dir = (0, -1)
+                        next_move_dir = (0, -1)
                         debug_set.add("L")
                     elif curr_face == 3:
                         next_i = 0
                         next_j = side - 1 - j
-                        move_dir = (1, 0)
+                        next_move_dir = (1, 0)
                         debug_set.add("M")
                     elif curr_face == 4:
                         next_i = j
                         next_j = 0
-                        move_dir = (0, 1)
+                        next_move_dir = (0, 1)
                         debug_set.add("N")
                     elif curr_face == 5:
                         next_i = 0
                         next_j = side - 1 - j
-                        move_dir = (1, 0)
+                        next_move_dir = (1, 0)
                         debug_set.add("O")
                     else:
                         next_i = side - 1
                         debug_set.add("P")
 
-
                 if 0:
                     if example:
                         # For example data
                         faces[curr_face][i, j] = 4
-                        tmp2 = np.block([
-                            [faces[0], faces[0], faces[1], faces[0]],
-                            [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
-                            [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
-                        ])
+                        tmp2 = np.block(
+                            [
+                                [faces[0], faces[0], faces[1], faces[0]],
+                                [
+                                    np.rot90(faces[5], 2),
+                                    np.rot90(faces[4], 1),
+                                    faces[6],
+                                    faces[0],
+                                ],
+                                [
+                                    faces[0],
+                                    faces[0],
+                                    np.rot90(faces[3], 2),
+                                    np.rot90(faces[2], 2),
+                                ],
+                            ]
+                        )
                         faces[curr_face][i, j] = 0
                     else:
                         faces[curr_face][i, j] = 4
-                        tmp2 = np.block([
-                            [faces[0], faces[1], faces[2]],
-                            [faces[0], faces[6], faces[0]],
-                            [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
-                            [np.rot90(faces[5], -1), faces[0], faces[0]],
-                        ])
+                        tmp2 = np.block(
+                            [
+                                [faces[0], faces[1], faces[2]],
+                                [faces[0], faces[6], faces[0]],
+                                [
+                                    np.rot90(faces[4], 2),
+                                    np.rot90(faces[3], 2),
+                                    faces[0],
+                                ],
+                                [np.rot90(faces[5], -1), faces[0], faces[0]],
+                            ]
+                        )
                         faces[curr_face][i, j] = 0
-                    #print(tmp2)
-                    if 1:
-                        if (curr_face != next_face):
+                    # print(tmp2)
+                    if 0:
+                        if curr_face != next_face:
                             debug_next = [1, 1]
                         if debug_next:
                             debug_next.pop()
-                            plt.imshow(tmp2, aspect="equal")#;plt.show()
+                            plt.imshow(tmp2, aspect="equal")  # ;plt.show()
                             plt.draw()
                             print(curr_face)
                             plt.pause(0.01)
                             plt.clf()
                             breakpoint()
                     elif 1:
-                        print("curr_face:", curr_face, "i:", i, "j:", j, "move_dir:", move_dir, "instruction:", debug_counter)
-                        plt.imshow(tmp2, aspect="equal")#;plt.show()
+                        print(
+                            "curr_face:",
+                            curr_face,
+                            "i:",
+                            i,
+                            "j:",
+                            j,
+                            "move_dir:",
+                            move_dir,
+                            "instruction:",
+                            debug_counter,
+                        )
+                        plt.imshow(tmp2, aspect="equal")  # ;plt.show()
                         plt.draw()
                         plt.pause(0.05)
                         plt.clf()
-                    #breakpoint()
-
+                    # breakpoint()
 
                 if faces[next_face][next_i, next_j] == 2:
                     break
                 curr_face = next_face
+                move_dir = next_move_dir
                 i = next_i
                 j = next_j
 
         else:
+            """
+            move_dir_orig = move_dir
+            if instruction == "L":
+                move_dir2 = tuple(np.array([[0, -1], [1, 0]]) @ move_dir)
+            else:
+                move_dir2 = tuple(np.array([[0, 1], [-1, 0]]) @ move_dir)
+            """
             if instruction == "L":
                 if move_dir == (0, 1):
                     move_dir = (-1, 0)
@@ -344,7 +388,7 @@ def b(data, debug=False, example=False):
                     move_dir = (1, 0)
                 elif move_dir == (1, 0):
                     move_dir = (0, 1)
-            else:
+            elif instruction == "R":
                 if move_dir == (0, 1):
                     move_dir = (1, 0)
                 elif move_dir == (1, 0):
@@ -353,6 +397,11 @@ def b(data, debug=False, example=False):
                     move_dir = (-1, 0)
                 elif move_dir == (-1, 0):
                     move_dir = (0, 1)
+            else:
+                raise ValueError(f"Unknown instruction '{instruction}'")
+            """
+            assert move_dir == move_dir2
+            """
         if debug:
             debug_symbol = {
                 (0, 1): 3,
@@ -361,9 +410,9 @@ def b(data, debug=False, example=False):
                 (-1, 0): 6,
             }
             debug_board[i, j] = debug_symbol[move_dir]
-            #print(debug_board)
-            #print(i, j, move_dir, instruction)
-            #breakpoint()
+            # print(debug_board)
+            # print(i, j, move_dir, instruction)
+            # breakpoint()
     face_score = {
         (0, 1): 0,
         (1, 0): 1,
@@ -377,20 +426,24 @@ def b(data, debug=False, example=False):
     if example:
         # For example data
         faces[curr_face][i, j] = 4
-        tmp2 = np.block([
-            [faces[0], faces[0], faces[1], faces[0]],
-            [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
-            [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
-        ])
+        tmp2 = np.block(
+            [
+                [faces[0], faces[0], faces[1], faces[0]],
+                [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
+                [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
+            ]
+        )
         faces[curr_face][i, j] = 0
     else:
         faces[curr_face][i, j] = 4
-        tmp2 = np.block([
-            [faces[0], faces[1], faces[2]],
-            [faces[0], faces[6], faces[0]],
-            [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
-            [np.rot90(faces[5], -1), faces[0], faces[0]],
-        ])
+        tmp2 = np.block(
+            [
+                [faces[0], faces[1], faces[2]],
+                [faces[0], faces[6], faces[0]],
+                [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
+                [np.rot90(faces[5], -1), faces[0], faces[0]],
+            ]
+        )
         faces[curr_face][i, j] = 0
 
     i, j = np.argwhere(tmp2 == 4)[0]
@@ -404,17 +457,18 @@ def b(data, debug=False, example=False):
         > (i + 1) * 1000 + (j + 1) * 4 + 3
 
     input data:
-        i = 130
-        j = 44
-        curr_face = 4
-        move_dir = (0, -1) (blir höger roterat)
+        i = 73
+        j = 71
+        curr_face = 6
+        move_dir = (0, 1)  # samma i boards koordinatsystem
 
-        > (i + 1) * 1000 + (j + 1) * 4 + 0
-        131180 --> too high
+        > (i + 1) * 1000 + (j + 1) * 4 + face_score[move_dir]
+        74288
     """
-    print(debug_set)
+    print(sorted(debug_set))
     breakpoint()
-    #return int((i + 1) * 1000 + 4 * (j + 1) + face_score[move_dir])
+    # return int((i + 1) * 1000 + 4 * (j + 1) + face_score[move_dir])
+
 
 if 0:
     example_answer = b(puzzle.example_data, example=True)
@@ -422,4 +476,4 @@ if 0:
     assert example_answer == 5031
 answer = b(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = answer
+# puzzle.answer_b = answer
