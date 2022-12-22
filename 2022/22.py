@@ -3,12 +3,12 @@ import re
 
 import numpy as np
 from aocd.models import Puzzle
+import matplotlib.pyplot as plt
 
 YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day
 
 puzzle = Puzzle(year=YEAR, day=DAY)
-
 
 """
 # Part a
@@ -133,6 +133,23 @@ def b(data, debug=False, example=False):
         faces[6] = tmp[1, 1]
         # Dummy
         faces[0] = tmp[0, 0]
+
+
+    if example:
+        test = np.block([
+            [faces[0], faces[0], faces[1], faces[0]],
+            [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
+            [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
+        ])
+    else:
+        test = np.block([
+            [faces[0], faces[1], faces[2]],
+            [faces[0], faces[6], faces[0]],
+            [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
+            [np.rot90(faces[5], -1), faces[0], faces[0]],
+        ])
+    np.testing.assert_array_equal(board, test)
+
     instructions = re.findall("(\d+|[A-Z])", instructions)
     next_face_map = {
         (0, 1): {
@@ -173,7 +190,12 @@ def b(data, debug=False, example=False):
     j = faces[curr_face].argmin()
     move_dir = (0, 1)
     debug_board = board.copy()
+    debug_set = set()
+    debug_next = []
+    plt.figure(figsize=(6, 9), frameon=False, layout="tight")
+    debug_counter = 0
     while instructions:
+        debug_counter += 1
         instruction = instructions.pop(0)
         if instruction.isdigit():
             for step in range(int(instruction)):
@@ -187,12 +209,15 @@ def b(data, debug=False, example=False):
                         next_i = 0
                         next_j = side - 1 - i
                         move_dir = (1, 0)
+                        debug_set.add("A")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = i
                         move_dir = (-1, 0)
+                        debug_set.add("B")
                     else:
                         next_j = 0
+                        debug_set.add("C")
                 elif next_j < 0:
                     assert move_dir == (0, -1)
                     next_face = next_face_map[move_dir][curr_face]
@@ -200,12 +225,15 @@ def b(data, debug=False, example=False):
                         next_i = 0
                         next_j = i
                         move_dir = (1, 0)
+                        debug_set.add("D")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = side - 1 - i
                         move_dir = (-1, 0)
+                        debug_set.add("E")
                     else:
                         next_j = side - 1
+                        debug_set.add("F")
                 elif next_i >= side:
                     assert move_dir == (1, 0)
                     next_face = next_face_map[move_dir][curr_face]
@@ -213,20 +241,25 @@ def b(data, debug=False, example=False):
                         next_i = j
                         next_j = side - 1
                         move_dir = (0, -1)
+                        debug_set.add("G")
                     elif curr_face == 3:
                         next_i = side - 1
                         next_j = side - 1 - j
                         move_dir = (-1, 0)
+                        debug_set.add("H")
                     elif curr_face == 4:
                         next_i = side - 1 - j
                         next_j = 0
                         move_dir = (0, 1)
+                        debug_set.add("I")
                     elif curr_face == 6:
                         next_i = side - 1
                         next_j = side - 1 - j
                         move_dir = (-1, 0)
+                        debug_set.add("J")
                     else:
                         next_i = 0
+                        debug_set.add("K")
                 elif next_i < 0:
                     assert move_dir == (-1, 0)
                     next_face = next_face_map[move_dir][curr_face]
@@ -234,27 +267,28 @@ def b(data, debug=False, example=False):
                         next_i = side - 1 - j
                         next_j = side - 1
                         move_dir = (0, -1)
+                        debug_set.add("L")
                     elif curr_face == 3:
                         next_i = 0
                         next_j = side - 1 - j
                         move_dir = (1, 0)
+                        debug_set.add("M")
                     elif curr_face == 4:
                         next_i = j
                         next_j = 0
                         move_dir = (0, 1)
+                        debug_set.add("N")
                     elif curr_face == 5:
                         next_i = 0
                         next_j = side - 1 - j
                         move_dir = (1, 0)
+                        debug_set.add("O")
                     else:
                         next_i = side - 1
+                        debug_set.add("P")
 
-                if faces[next_face][next_i, next_j] == 2:
-                    break
-                curr_face = next_face
-                i = next_i
-                j = next_j
-                if 1:
+
+                if 0:
                     if example:
                         # For example data
                         faces[curr_face][i, j] = 4
@@ -274,7 +308,31 @@ def b(data, debug=False, example=False):
                         ])
                         faces[curr_face][i, j] = 0
                     #print(tmp2)
+                    if 1:
+                        if (curr_face != next_face):
+                            debug_next = [1, 1]
+                        if debug_next:
+                            debug_next.pop()
+                            plt.imshow(tmp2, aspect="equal")#;plt.show()
+                            plt.draw()
+                            print(curr_face)
+                            plt.pause(0.01)
+                            plt.clf()
+                            breakpoint()
+                    elif 1:
+                        print("curr_face:", curr_face, "i:", i, "j:", j, "move_dir:", move_dir, "instruction:", debug_counter)
+                        plt.imshow(tmp2, aspect="equal")#;plt.show()
+                        plt.draw()
+                        plt.pause(0.05)
+                        plt.clf()
                     #breakpoint()
+
+
+                if faces[next_face][next_i, next_j] == 2:
+                    break
+                curr_face = next_face
+                i = next_i
+                j = next_j
 
         else:
             if instruction == "L":
@@ -312,9 +370,28 @@ def b(data, debug=False, example=False):
         (0, -1): 2,
         (-1, 0): 3,
     }
+
     if debug:
         print(debug_board)
-        print(i, j, move_dir)
+    print(i, j, move_dir, curr_face)
+    if example:
+        # For example data
+        faces[curr_face][i, j] = 4
+        tmp2 = np.block([
+            [faces[0], faces[0], faces[1], faces[0]],
+            [np.rot90(faces[5], 2), np.rot90(faces[4], 1), faces[6], faces[0]],
+            [faces[0], faces[0], np.rot90(faces[3], 2), np.rot90(faces[2], 2)],
+        ])
+        faces[curr_face][i, j] = 0
+    else:
+        faces[curr_face][i, j] = 4
+        tmp2 = np.block([
+            [faces[0], faces[1], faces[2]],
+            [faces[0], faces[6], faces[0]],
+            [np.rot90(faces[4], 2), np.rot90(faces[3], 2), faces[0]],
+            [np.rot90(faces[5], -1), faces[0], faces[0]],
+        ])
+        faces[curr_face][i, j] = 0
 
     i, j = np.argwhere(tmp2 == 4)[0]
     """
@@ -335,8 +412,9 @@ def b(data, debug=False, example=False):
         > (i + 1) * 1000 + (j + 1) * 4 + 0
         131180 --> too high
     """
+    print(debug_set)
     breakpoint()
-    return int((i + 1) * 1000 + 4 * (j + 1) + face_score[move_dir])
+    #return int((i + 1) * 1000 + 4 * (j + 1) + face_score[move_dir])
 
 if 0:
     example_answer = b(puzzle.example_data, example=True)
@@ -344,4 +422,4 @@ if 0:
     assert example_answer == 5031
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+#puzzle.answer_b = answer
