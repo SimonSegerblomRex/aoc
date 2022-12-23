@@ -126,4 +126,4 @@ print(example_answer)
 assert example_answer == 20
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer == 350
+assert answer == 950
