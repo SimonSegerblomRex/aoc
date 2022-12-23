@@ -19,7 +19,7 @@ def a(data):
     ]
     grid = np.vstack(rows)
     y_coords, x_coords = np.nonzero(grid)
-    elves =  dict.fromkeys(zip(x_coords, y_coords))
+    elves = dict.fromkeys(zip(x_coords, y_coords))
 
     directions_check_order = ["north", "south", "west", "east"]
     for _ in range(10):
@@ -56,7 +56,9 @@ def a(data):
                     elves[(x, y)] = coords_in_direction[1]
                     break
         destinations = set()
-        duplicate_destinations = {d for d in elves.values() if d in destinations or destinations.add(d)}
+        duplicate_destinations = {
+            d for d in elves.values() if d in destinations or destinations.add(d)
+        }
         duplicate_destinations.add(None)
         staying = {c: d for c, d in elves.items() if d in duplicate_destinations}
         elves = dict.fromkeys((*(destinations - duplicate_destinations), *staying))
@@ -73,7 +75,7 @@ print(example_answer)
 assert example_answer == 110
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
+assert answer == 4075
 
 
 # Part b
@@ -86,29 +88,12 @@ def b(data):
     ]
     grid = np.vstack(rows)
     y_coords, x_coords = np.nonzero(grid)
-    elves =  dict.fromkeys(zip(x_coords, y_coords))
+    elves = dict.fromkeys(zip(x_coords, y_coords))
 
     directions_check_order = ["north", "south", "west", "east"]
     round = 1
     while True:
         coords = set(elves)
-        if 0:
-            # Debug print
-            x, y = zip(*elves)
-            width = max(x) - min(x) + 1
-            height = max(y) - min(y) + 1
-            x = np.array(x) - min(x)
-            y = np.array(y) - min(y)
-            tmpcoords = list(zip(x, y))
-            print("")
-            for y in range(height):
-                for x in range(width):
-                    if (x, y) in tmpcoords:
-                        print("#", end="")
-                    else:
-                        print(".", end="")
-                print("")
-            breakpoint()
         for x, y in elves:
             to_check = {
                 "north": [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1)],
@@ -124,7 +109,9 @@ def b(data):
                     elves[(x, y)] = coords_in_direction[1]
                     break
         destinations = set()
-        duplicate_destinations = {d for d in elves.values() if d in destinations or destinations.add(d)}
+        duplicate_destinations = {
+            d for d in elves.values() if d in destinations or destinations.add(d)
+        }
         duplicate_destinations.add(None)
         staying = {c: d for c, d in elves.items() if d in duplicate_destinations}
         if len(staying) == len(elves):
@@ -139,4 +126,4 @@ print(example_answer)
 assert example_answer == 20
 answer = b(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = answer
+assert answer == 350
