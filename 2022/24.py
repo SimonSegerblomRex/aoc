@@ -39,7 +39,8 @@ def debug_print(walls, winds, curr_pos):
         print("")
     breakpoint()
 
-def a(data):
+
+def create_3D_grid(data):
     rows = [
         np.frombuffer(row.encode(), dtype=np.uint8)
         for row in data.splitlines()
@@ -80,9 +81,15 @@ def a(data):
         winds["r"][0, :] += 1
         winds["r"][winds["r"] == width - 1] = 1
 
-    grid3D[start[0], start[1], 0] = 2
-    curr_state = 0
+    return grid3D, start, goal
+
+
+def shortest_path(grid3D, start, goal, curr_state):
+    grid3D = grid3D.copy()
+    grid3D[start[0], start[1], curr_state] = 2
     counter = 0
+    height, width = grid3D.shape[:2]
+    wind_states = np.lcm(height - 2, width - 2)
     while True:
         counter += 1
         curr_state += 1
@@ -91,32 +98,39 @@ def a(data):
         i, j = np.nonzero(grid3D[..., curr_state - 1] == 2)
         grid3D[i, j, curr_state] |= 2
 
-        grid3D[(i - 1).clip(0, width - 1), j, curr_state] |= 2
-        grid3D[(i + 1).clip(0, width - 1), j, curr_state] |= 2
-        grid3D[i, (j - 1).clip(0, height - 1), curr_state] |= 2
-        grid3D[i, (j + 1).clip(0, height - 1), curr_state] |= 2
+        grid3D[(i - 1).clip(0, height - 1), j, curr_state] |= 2
+        grid3D[(i + 1).clip(0, height - 1), j, curr_state] |= 2
+        grid3D[i, (j - 1).clip(0, width - 1), curr_state] |= 2
+        grid3D[i, (j + 1).clip(0, width - 1), curr_state] |= 2
 
         if grid3D[goal[0], goal[1], curr_state] == 2:
-            return counter
+            return counter, curr_state
+
+def a(data):
+    grid3D, start, goal = create_3D_grid(data)
+    return shortest_path(grid3D, start, goal, 0)[0]
 
 
-#example_answer = a(puzzle.example_data)
-#print(example_answer)
 example_answer = a(EXAMPLE_DATA)
 print(example_answer)
 assert example_answer == 18
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 373
 
 
 # Part b
 def b(data):
-    exit()
+    grid3D, start, goal = create_3D_grid(data)
+    first, curr_state = shortest_path(grid3D, start, goal, 0)
+    second, curr_state = shortest_path(grid3D, goal, start, curr_state)
+    third, _ = shortest_path(grid3D, start, goal, curr_state)
+    return first + second + third
+
 
 example_answer = b(EXAMPLE_DATA)
 print(example_answer)
-assert example_answer == ...
+assert example_answer == 54
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+#puzzle.answer_b = int(answer)
