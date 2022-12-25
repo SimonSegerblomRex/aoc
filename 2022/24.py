@@ -1,5 +1,3 @@
-import copy
-
 import numpy as np
 from aocd.models import Puzzle
 
@@ -32,7 +30,7 @@ def debug_print(walls, winds, curr_pos):
             elif np.all(winds["r"] == [[x],[y]], axis=0).any():
                 print(">", end="")
             elif (x, y) == curr_pos:
-                print("E")
+                print("E", end="")
             else:
                 #FIXME
                 print(".", end="")
@@ -70,22 +68,22 @@ def create_3D_grid(data):
         grid3D[winds["d"][0, :], winds["d"][1, :], i] = 3
         grid3D[winds["l"][0, :], winds["l"][1, :], i] = 3
         grid3D[winds["r"][0, :], winds["r"][1, :], i] = 3
-        #debug_print(walls, winds, curr_pos)
+        #debug_print(walls, winds, start)
         # Move winds
         winds["u"][1, :] -= 1
-        winds["u"][winds["u"] == 0] = height - 2
+        winds["u"][1, winds["u"][1, :] == 0] = height - 2
         winds["d"][1, :] += 1
-        winds["d"][winds["d"] == height - 1] = 1
+        winds["d"][1, winds["d"][1, :] == height - 1] = 1
         winds["l"][0, :] -= 1
-        winds["l"][winds["l"] == 0] = width - 2
+        winds["l"][0, winds["l"][0, :] == 0] = width - 2
         winds["r"][0, :] += 1
-        winds["r"][winds["r"] == width - 1] = 1
+        winds["r"][0, winds["r"][0, :] == width - 1] = 1
 
     return grid3D, start, goal
 
 
-def shortest_path(grid3D, start, goal, curr_state):
-    grid3D = grid3D.copy()
+def shortest_path(grid3D_orig, start, goal, curr_state):
+    grid3D = grid3D_orig.copy()
     grid3D[start[0], start[1], curr_state] = 2
     counter = 0
     height, width = grid3D.shape[:2]
@@ -133,4 +131,4 @@ print(example_answer)
 assert example_answer == 54
 answer = b(puzzle.input_data)
 print("b:", answer)
-#puzzle.answer_b = int(answer)
+assert answer == 997
