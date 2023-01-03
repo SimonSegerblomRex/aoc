@@ -56,7 +56,9 @@ def b(data):
             cave_map[connection[0]].add(connection[1])
             cave_map[connection[1]].add(connection[0])
     paths = []
-    small_caves = [cave for cave in caves if cave.islower() and cave not in ["start", "end"]]
+    small_caves = [
+        cave for cave in caves if cave.islower() and cave not in ["start", "end"]
+    ]
 
     def find_paths(path):
         curr_cave = path[-1]

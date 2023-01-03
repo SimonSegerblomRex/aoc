@@ -1,9 +1,9 @@
 import datetime
 import re
 
+import matplotlib.pyplot as plt
 import numpy as np
 from aocd.models import Puzzle
-import matplotlib.pyplot as plt
 
 YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day

@@ -54,6 +54,7 @@ def a(data):
 
     # brute-force
     paths = []
+
     def find_paths(path, time_remaining):
         curr_pos = path[-1]
         possible_next_pos = interesting_valves - set(path)
@@ -82,7 +83,7 @@ def a(data):
             time_remaining -= dists[curr_pos][next_pos] + 1
             if time_remaining <= 0:
                 raise RuntimeError("Shouldn't end up here...")
-                #break
+                # break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
         if pressure_released > max_pressure_released:
@@ -134,26 +135,34 @@ def b(data):
         ]
         while possible_your_next_pos:
             next_pos = possible_your_next_pos.pop()
-            next_your_time_remaining = your_time_remaining - (dists[your_curr_pos][next_pos] + 1)
+            next_your_time_remaining = your_time_remaining - (
+                dists[your_curr_pos][next_pos] + 1
+            )
             if next_your_time_remaining <= 0:
                 continue
             yield from find_paths(
                 [[*path[0], next_pos], path[1].copy()],
-                next_your_time_remaining, elephant_time_remaining,
+                next_your_time_remaining,
+                elephant_time_remaining,
             )
         while possible_elephant_next_pos:
             next_pos = possible_elephant_next_pos.pop()
-            next_elephant_time_remaining = elephant_time_remaining - (dists[elephant_curr_pos][next_pos] + 1)
+            next_elephant_time_remaining = elephant_time_remaining - (
+                dists[elephant_curr_pos][next_pos] + 1
+            )
             if next_elephant_time_remaining <= 0:
                 continue
             yield from find_paths(
                 [path[0].copy(), [*path[1], next_pos]],
-                your_time_remaining, next_elephant_time_remaining,
+                your_time_remaining,
+                next_elephant_time_remaining,
             )
         yield path
 
     max_pressure_released = 0
-    for your_path, elephant_path in find_paths([["AA"], ["AA"]], your_time_remaining=26, elephant_time_remaining=26):
+    for your_path, elephant_path in find_paths(
+        [["AA"], ["AA"]], your_time_remaining=26, elephant_time_remaining=26
+    ):
         # You
         time_remaining = 26
         pressure_released = 0
@@ -162,7 +171,7 @@ def b(data):
             time_remaining -= dists[curr_pos][next_pos] + 1
             if time_remaining <= 0:
                 raise RuntimeError("Shouldn't end up here 2...")
-                #break
+                # break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
         # Elephant
@@ -172,7 +181,7 @@ def b(data):
             time_remaining -= dists[curr_pos][next_pos] + 1
             if time_remaining <= 0:
                 raise RuntimeError("Shouldn't end up here 3...")
-                #break
+                # break
             pressure_released += time_remaining * data[next_pos][0]
             curr_pos = next_pos
         if pressure_released > max_pressure_released:

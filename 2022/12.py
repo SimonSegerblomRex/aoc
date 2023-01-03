@@ -11,7 +11,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def parse_moutain_map(data):
-    grid = np.vstack([np.frombuffer(line.encode(), dtype=np.uint8) for line in data.splitlines()]) - ord("a")
+    grid = np.vstack(
+        [np.frombuffer(line.encode(), dtype=np.uint8) for line in data.splitlines()]
+    ) - ord("a")
     grid = grid.astype(int)
     start = tuple(np.array(np.where(grid == 242)).flatten())
     end = tuple(np.array(np.where(grid == 228)).flatten())
@@ -19,11 +21,13 @@ def parse_moutain_map(data):
     grid[end] = 25
     height, width = grid.shape
     mountain_map = {}
+
     def check_height(c0, c1):
         return (grid[c1] - grid[c0]) < 2
+
     for y, x in np.ndindex(grid.shape):
         tmp = []
-        if (y > 0):
+        if y > 0:
             tmp.append((y - 1, x))
         if x > 0:
             tmp.append((y, x - 1))
@@ -38,7 +42,7 @@ def parse_moutain_map(data):
 
 def a_star(start, end, grid, node_map):
     def h(node):
-        return np.abs(end[0]- node[0]) + np.abs(end[1] - node[1])
+        return np.abs(end[0] - node[0]) + np.abs(end[1] - node[1])
 
     open_set = queue.PriorityQueue()
     open_set.put((0, start))
@@ -67,6 +71,7 @@ def a(data):
     grid, start, end, mountain_map = parse_moutain_map(data)
     return a_star(start, end, grid, mountain_map)
 
+
 example_answer = a(puzzle.example_data)
 print(example_answer)
 assert example_answer == 31
@@ -82,6 +87,7 @@ def b(data):
     for i, j in zip(*np.where(grid == 0)):
         scores.append(a_star((i, j), end, grid, mountain_map))
     return min([s for s in scores if s is not None])
+
 
 example_answer = b(puzzle.example_data)
 print(example_answer)

@@ -18,6 +18,7 @@ def a(data, days):
         count[8] = zero_count
     return np.sum(count)
 
+
 answer_example = a(puzzle.example_data, days=80)
 print("example a:", answer_example)
 assert answer_example == 5934

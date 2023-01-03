@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.ndimage import label, minimum_filter
 from aocd.models import Puzzle
+from scipy.ndimage import label, minimum_filter
 
 YEAR = 2021
 DAY = 9
@@ -10,7 +10,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def a(data):
-    height_map = np.array([[int(d) for d in line] for line in data.splitlines()], dtype=int)
+    height_map = np.array(
+        [[int(d) for d in line] for line in data.splitlines()], dtype=int
+    )
     min_value = minimum_filter(height_map, size=(3, 3))
     height_map_plus_1 = height_map + 1
     min_value_plus_1 = minimum_filter(height_map_plus_1, size=(3, 3))
@@ -28,7 +30,9 @@ assert answer == 478
 
 # Part b
 def b(data):
-    height_map = np.array([[int(d) for d in line] for line in data.splitlines()], dtype=int)
+    height_map = np.array(
+        [[int(d) for d in line] for line in data.splitlines()], dtype=int
+    )
     image = np.ones(height_map.shape, dtype=np.uint8)
     image[height_map == 9] = 0
     labeled, _ = label(image)

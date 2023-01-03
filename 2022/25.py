@@ -13,7 +13,7 @@ def dec2SNAFU(x):
     l = [0, *list(map(int, l))]
     o = []
     r = 0
-    for i, v in zip(range(len(l) - 1, -1 , -1), l[::-1]):
+    for i, v in zip(range(len(l) - 1, -1, -1), l[::-1]):
         v += r
         if v > 2:
             if v == 3:
@@ -31,7 +31,7 @@ def dec2SNAFU(x):
         else:
             o.append(v)
             r = 0
-    t =  "".join(map(str, o))[::-1]
+    t = "".join(map(str, o))[::-1]
     return t[1:] if (t[0] == "0") else t
 
 

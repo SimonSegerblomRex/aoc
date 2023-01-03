@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.signal import convolve2d
 from aocd.models import Puzzle
+from scipy.signal import convolve2d
 
 YEAR = 2021
 DAY = 11

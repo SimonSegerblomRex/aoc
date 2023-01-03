@@ -14,7 +14,9 @@ def _parse_crates(data):
     nbr_crates = int(re.findall(r"\d+\s+(\d+) \n", data)[0])
     crates = {}
     for i in range(nbr_crates):
-        crates[i + 1] = [e.strip(" \n[]") for e in ugly_crates[i::nbr_crates] if e.strip(" \n[]")]
+        crates[i + 1] = [
+            e.strip(" \n[]") for e in ugly_crates[i::nbr_crates] if e.strip(" \n[]")
+        ]
     return crates
 
 

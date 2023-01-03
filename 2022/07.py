@@ -65,6 +65,7 @@ def a(data):
         dir_sizes.append((d, t))
     return sum([s for d, s in dir_sizes if s <= 100000])
 
+
 example_answer = a(example)
 print(example_answer)
 assert example_answer == 95437
@@ -107,6 +108,7 @@ def b(data):
     total_size = total_size_bad_root - total_size_not_root
     need_to_free = 70000000 - total_size
     return min([s for d, s in dir_sizes if s >= 30000000 - need_to_free])
+
 
 example_answer = b(example)
 print(example_answer)

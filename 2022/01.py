@@ -15,10 +15,12 @@ def a(data):
     return max(calories_total)
 
 
-ANSWER_EXAMPLE = 24000
-assert a(puzzle.example_data) == ANSWER_EXAMPLE
+example_answer = a(puzzle.example_data)
+print(example_answer)
+assert example_answer == 24000
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer == 69281
 
 
 # Part b
@@ -30,7 +32,9 @@ def b(data):
     return sum(sorted(calories_total)[-3:])
 
 
-ANSWER_EXAMPLE = 45000
-assert b(puzzle.example_data) == ANSWER_EXAMPLE
+example_answer = b(puzzle.example_data)
+print(example_answer)
+assert example_answer == 45000
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer == 201524

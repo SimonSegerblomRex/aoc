@@ -32,7 +32,9 @@ def check(l0, l1):
 
 # Part a
 def a(data):
-    pairs = ([ast.literal_eval(p) for p in lines.split("\n")] for lines in data.split("\n\n"))
+    pairs = (
+        [ast.literal_eval(p) for p in lines.split("\n")] for lines in data.split("\n\n")
+    )
     return sum(i + 1 for i, p in enumerate(pairs) if check(*p) <= 0)
 
 

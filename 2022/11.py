@@ -34,7 +34,9 @@ def a(data, rounds, divide_by_three):
     monkeys = [
         Monkey(
             nbr=int(m.group("nbr")),
-            items=np.fromstring(m.group("starting_items"), dtype=int, sep=", ").tolist(),
+            items=np.fromstring(
+                m.group("starting_items"), dtype=int, sep=", "
+            ).tolist(),
             operation=eval(f"lambda old: {m.group('operation')}"),
             divisible_by=int(m.group("divisble_by")),
             true_nbr=int(m.group("true_nbr")),
@@ -50,7 +52,9 @@ def a(data, rounds, divide_by_three):
                 if divide_by_three:
                     new //= 3
                 new %= magic
-                throw_to = monkey.false_nbr if (new % monkey.divisible_by) else monkey.true_nbr
+                throw_to = (
+                    monkey.false_nbr if (new % monkey.divisible_by) else monkey.true_nbr
+                )
                 monkeys[throw_to].items.append(new)
             monkey.inspected += len(monkey.items)
             monkey.items = []

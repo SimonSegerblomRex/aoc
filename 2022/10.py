@@ -187,11 +187,12 @@ def a(data):
                 if instruction == "addx":
                     x_incr.append(0)
                     x_incr.append(int(arg))
-        if c in [20,60,100,140,180,220]:
+        if c in [20, 60, 100, 140, 180, 220]:
             total += c * X
     return total
 
-#a(EXAMPLE1)
+
+# a(EXAMPLE1)
 example_answer = a(EXAMPLE2)
 print(example_answer)
 assert example_answer == 13140
@@ -218,16 +219,18 @@ def b(data):
                 if instruction == "addx":
                     x_incr.append(0)
                     x_incr.append(int(arg))
-        if c in [20,60,100,140,180,220]:
+        if c in [20, 60, 100, 140, 180, 220]:
             total += c * X
         sprite = [X - 1, X, X + 1]
         if (c - 1) % 40 in sprite:
             crt.ravel()[c - 1] = 1
     return crt
 
+
 def print_image(x):
     for i in range(x.shape[0]):
         print("".join("#" if v else "." for v in x[i, :]))
+
 
 example_answer = b(EXAMPLE2)
 print_image(example_answer)

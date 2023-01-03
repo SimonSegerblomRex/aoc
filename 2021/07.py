@@ -15,6 +15,7 @@ def a(data):
         costs.append(np.sum(np.abs(positions - alignment_pos)))
     return np.min(costs)
 
+
 assert a(puzzle.example_data) == 37
 answer = a(puzzle.input_data)
 print("a:", answer)
@@ -29,6 +30,7 @@ def b(data):
         steps = np.abs(positions - alignment_pos)
         costs.append(((steps + 1) / 2 * steps).astype(int).sum())
     return np.min(costs)
+
 
 assert b(puzzle.example_data) == 168
 answer = b(puzzle.input_data)

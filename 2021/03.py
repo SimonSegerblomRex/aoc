@@ -64,7 +64,8 @@ def b(data):
     co2 = int("".join(str(b) for b in co2.tolist()), 2)
     return oxygen * co2
 
-assert  b(puzzle.example_data) == 230
+
+assert b(puzzle.example_data) == 230
 answer = b(puzzle.input_data)
 print("b:", answer)
 assert answer == 5736383

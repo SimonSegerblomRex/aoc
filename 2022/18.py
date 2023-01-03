@@ -2,7 +2,6 @@ import numpy as np
 from aocd.models import Puzzle
 from scipy.ndimage import binary_fill_holes
 
-
 YEAR = 2022
 DAY = 18
 

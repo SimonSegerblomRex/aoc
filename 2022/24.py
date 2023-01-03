@@ -19,30 +19,27 @@ def debug_print(walls, winds, curr_pos):
     print("")
     for y in range(height):
         for x in range(width):
-            if np.all(walls == [[x],[y]], axis=0).any():
+            if np.all(walls == [[x], [y]], axis=0).any():
                 print("#", end="")
-            elif np.all(winds["u"] == [[x],[y]], axis=0).any():
+            elif np.all(winds["u"] == [[x], [y]], axis=0).any():
                 print("^", end="")
-            elif np.all(winds["d"] == [[x],[y]], axis=0).any():
+            elif np.all(winds["d"] == [[x], [y]], axis=0).any():
                 print("v", end="")
-            elif np.all(winds["l"] == [[x],[y]], axis=0).any():
+            elif np.all(winds["l"] == [[x], [y]], axis=0).any():
                 print("<", end="")
-            elif np.all(winds["r"] == [[x],[y]], axis=0).any():
+            elif np.all(winds["r"] == [[x], [y]], axis=0).any():
                 print(">", end="")
             elif (x, y) == curr_pos:
                 print("E", end="")
             else:
-                #FIXME
+                # FIXME
                 print(".", end="")
         print("")
     breakpoint()
 
 
 def create_3D_grid(data):
-    rows = [
-        np.frombuffer(row.encode(), dtype=np.uint8)
-        for row in data.splitlines()
-    ]
+    rows = [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
     grid = np.vstack(rows)
     height, width = grid.shape
     start_y = 0
@@ -68,7 +65,7 @@ def create_3D_grid(data):
         grid3D[winds["d"][0, :], winds["d"][1, :], i] = 3
         grid3D[winds["l"][0, :], winds["l"][1, :], i] = 3
         grid3D[winds["r"][0, :], winds["r"][1, :], i] = 3
-        #debug_print(walls, winds, start)
+        # debug_print(walls, winds, start)
         # Move winds
         winds["u"][1, :] -= 1
         winds["u"][1, winds["u"][1, :] == 0] = height - 2
@@ -103,6 +100,7 @@ def shortest_path(grid3D_orig, start, goal, curr_state):
 
         if grid3D[goal[0], goal[1], curr_state] == 2:
             return counter, curr_state
+
 
 def a(data):
     grid3D, start, goal = create_3D_grid(data)
