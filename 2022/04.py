@@ -1,4 +1,3 @@
-import datetime
 import re
 
 from aocd.models import Puzzle

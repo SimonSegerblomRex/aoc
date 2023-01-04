@@ -1,4 +1,3 @@
-import datetime
 import itertools
 import re
 from collections import defaultdict
@@ -6,8 +5,8 @@ from collections import defaultdict
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 16
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 

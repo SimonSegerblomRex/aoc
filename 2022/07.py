@@ -1,11 +1,10 @@
-import datetime
 import re
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2022
+DAY = 7
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 

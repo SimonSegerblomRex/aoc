@@ -1,4 +1,3 @@
-import datetime
 import re
 
 import numpy as np
@@ -40,7 +39,7 @@ def b(data):
             y0, y1 = sorted((y0, y1))
             grid[y0 : y1 + 1, x0 : x1 + 1] += 1
         else:
-            # Asume 45 degree slope
+            # Assume 45 degree slope
             x0s, x1s = sorted((x0, x1))
             y0s, y1s = sorted((y0, y1))
             xx = list(range(x0s, x1s + 1))
