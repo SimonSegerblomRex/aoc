@@ -83,8 +83,7 @@ def shortest_path(grid3D_orig, start, goal, curr_state):
     grid3D = grid3D_orig.copy()
     grid3D[start[0], start[1], curr_state] = 2
     counter = 0
-    height, width = grid3D.shape[:2]
-    wind_states = np.lcm(height - 2, width - 2)
+    height, width, wind_states = grid3D.shape
     while True:
         counter += 1
         curr_state += 1

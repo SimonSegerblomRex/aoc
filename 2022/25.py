@@ -22,7 +22,6 @@ def dec2SNAFU(x):
                 o.append("-")
             elif v == 5:
                 o.append("0")
-                rem = 1
             else:
                 print("Shouldn't end up here")
                 print(v)
