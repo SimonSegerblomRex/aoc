@@ -227,8 +227,10 @@ def b(data):
 
 
 def print_image(x):
+    print("")
     for i in range(x.shape[0]):
-        print("".join("#" if v else "." for v in x[i, :]))
+        print("".join("\u2588" if v else " " for v in x[i, :]))
+    print("")
 
 
 example_answer = b(EXAMPLE2)

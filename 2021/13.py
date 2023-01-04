@@ -32,7 +32,7 @@ fold along x=5"""
 
 
 # Part a
-def a(data):
+def a(data, part_a=False):
     coords, instructions = data.split("\n\n")
     coords = np.fromstring(coords.replace("\n", ","), sep=",", dtype=int).reshape(-1, 2)
     instructions = re.findall("(x|y)=(\d+)", instructions)
@@ -44,33 +44,35 @@ def a(data):
         coord = int(coord)
         if axis == "y":
             l1 = grid[:, :coord]
-            l2 = grid[:, coord + 1:][:, ::-1]
+            l2 = grid[:, coord + 1 :][:, ::-1]
             l2 = np.pad(l2, ((0, 0), (l1.shape[1] - l2.shape[1], 0)))
             grid = l1 | l2
         else:
             l1 = grid[:coord, :]
-            l2 = grid[coord + 1:, :][::-1, :]
+            l2 = grid[coord + 1 :, :][::-1, :]
             l2 = np.pad(l2, ((l1.shape[0] - l2.shape[0], 0), (0, 0)))
             grid = l1 | l2
-        return grid.sum()
+        if part_a:
+            return grid.sum()
+    return grid
 
 
-example_answer = a(EXAMPLE_DATA)
+example_answer = a(EXAMPLE_DATA, part_a=True)
 print(example_answer)
 assert example_answer == 17
-answer = a(puzzle.input_data)
+answer = a(puzzle.input_data, part_a=True)
 print("a:", answer)
 assert answer == 706
 
 
 # Part b
-def b(data):
-    exit()
+def print_image(x):
+    print("")
+    for i in range(x.shape[0]):
+        print("".join("\u2588" if v else " " for v in x[i, :]))
+    print("")
 
 
-example_answer = b(EXAMPLE_DATA)
-print(example_answer)
-assert example_answer == ...
-answer = b(puzzle.input_data)
-print("b:", answer)
-puzzle.answer_b = answer
+grid = a(puzzle.input_data)
+grid = grid.astype(int).T
+print_image(grid)
