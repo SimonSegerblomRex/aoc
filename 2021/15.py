@@ -58,12 +58,21 @@ puzzle.answer_a = answer
 
 # Part b
 def b(data):
-    exit()
+    grid = np.vstack([np.fromiter(row, dtype=int) for row in data.splitlines()])
+    grid -= 1
+    blocks = [grid + i + j for i, j in np.ndindex((5, 5))]
+    blocks = [blocks[i:i + 5] for i in range(0, len(blocks), 5)]
+    grid = np.block(blocks)
+    grid %= 9
+    grid += 1
+    start = (0, 0)
+    end = tuple(np.array(grid.shape) - 1)
+    return int(djikstra(start, end, grid))
 
 
 example_answer = b(puzzle.example_data)
 print(example_answer)
-assert example_answer == ...
+assert example_answer == 315
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
