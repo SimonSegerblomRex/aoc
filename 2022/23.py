@@ -32,11 +32,7 @@ def debug_print(elves):
 def a(data, rounds):
     data = data.replace(".", "0")
     data = data.replace("#", "1")
-    rows = [
-        np.frombuffer(row.encode(), dtype=np.uint8) - ord("0")
-        for row in data.splitlines()
-    ]
-    grid = np.vstack(rows)
+    grid = np.vstack([np.fromiter(row, dtype=np.uint8) for row in data.splitlines()])
     y_coords, x_coords = np.nonzero(grid)
     elves = dict.fromkeys(zip(x_coords, y_coords))
 

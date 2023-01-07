@@ -54,9 +54,7 @@ assert answer == 1688
 
 # Part b
 def b(data):
-    grid = np.vstack(
-        [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
-    )
+    grid = np.vstack([np.fromiter(row, dtype=np.uint8) for row in data.splitlines()])
     height, width = grid.shape
     scores = np.zeros(grid.shape, dtype=int)
     for i in range(1, height - 1):

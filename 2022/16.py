@@ -15,9 +15,7 @@ PATTERN = r"Valve ([A-Z]+) has flow rate=(\d+); tunnels? leads? to valves? (.+)"
 
 # Part a
 def djikstra(start, end, graph):
-    steps = 0
     dist = defaultdict(lambda: np.inf)
-    prev = defaultdict(lambda: None)
     dist[start] = 0
 
     to_visit = [start]
@@ -29,7 +27,6 @@ def djikstra(start, end, graph):
             tentative_dist = dist[curr_node] + 1
             if tentative_dist < dist[node]:
                 dist[node] = tentative_dist
-                prev[node] = curr_node
                 if node not in to_visit:
                     to_visit.append(node)
 
