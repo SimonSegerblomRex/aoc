@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
@@ -29,8 +27,6 @@ def djikstra(start, end, grid):
     to_visit = [start]
     while to_visit:
         curr_node = to_visit.pop(0)
-        if curr_node == end:
-            break
         for node in neighbours(curr_node):
             tentative_dist = dist[curr_node] + grid[node]
             if tentative_dist < dist[node]:
