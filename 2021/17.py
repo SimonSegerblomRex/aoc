@@ -48,13 +48,43 @@ print("a:", answer)
 
 
 # Part b
-def b(data):
-    exit()
+def b(x0, x1, y0, y1):
+    # From part a we have:
+    y_n = lambda n, y: n * (y - (n - 1) / 2)
+    y_max = -1 - y0
+    # y_min can't be smaller than y0
+    y_min = y0
+    # For x we have the limits
+    x_max = x1
+    x_min = 1
+    # Check all combinations
+    count = 0
+    tmp2 = []
+    for x_v in range(x_min, x_max + 1):
+        for y_v in range(y_min, y_max + 1):
+            x_p = 0
+            y_p = 0
+            x_vv = x_v
+            y_vv = y_v
+            while True:
+                x_p += x_vv
+                y_p += y_vv
+                x_vv -= 1
+                y_vv -= 1
+                x_vv = max(x_vv, 0)
+                if y_p < y0:
+                    break
+                if x_p > x1:
+                    break
+                if (x0 <= x_p <= x1) and (y0 <= y_p <= y1):
+                    count += 1
+                    break
+    return count
 
 
-example_answer = b(puzzle.example_data)
+example_answer = b(20, 30, -10, -5)
 print(example_answer)
-assert example_answer == ...
-answer = b(puzzle.input_data)
+assert example_answer == 112
+answer = b(281, 311, -74, -54)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1070
