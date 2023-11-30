@@ -16,9 +16,11 @@ def a(data):
     breakpoint()
 
 
-example_answer = a(puzzle.example_data)
-print(example_answer)
-assert example_answer == ...
+for example in puzzle.examples:
+    if example.answer_a:
+        example_answer = a(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
+        assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
 puzzle.answer_a = answer
@@ -26,12 +28,15 @@ puzzle.answer_a = answer
 
 # Part b
 def b(data):
-    exit()
+    print(data)
+    breakpoint()
 
 
-example_answer = b(puzzle.example_data)
-print(example_answer)
-assert example_answer == ...
+for example in puzzle.examples:
+    if example.answer_b:
+        example_answer = b(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
+        assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
