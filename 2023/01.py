@@ -1,56 +1,36 @@
 import datetime
 import re
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 1
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-if 0:
-    # Part a
-    def a(data):
-        #data = list(map(int, data.splitlines()))
-        #data = data.splitlines())
-        #packs = data.split("\n\n")
-        #data = re.findall("(\d+)-(\d+),(\d+)-(\d+)", data)
-        #lines = iter(data.splitlines())
-        """
-        data = data.splitlines()
-        data = (line.split(" ") for line in data)
-        grid = np.vstack(
-            [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
-        )
-        """
-        lines = iter(data.splitlines())
-        numbers = []
-        for line in lines:
-            match = re.search(".*?(\d).*(\d).*", line)
-            print(line)
-            try:
-                numbers.append(int(match.group(1) + match.group(2)))
-            except:
-                match = re.search(".*(\d).*", line)
-                numbers.append(int(match.group(1) + match.group(1)))
-        breakpoint()
-        return np.sum(numbers)
-        breakpoint()
+
+# Part a
+def a(data):
+    lines = iter(data.splitlines())
+    numbers = []
+    for line in lines:
+        digits = re.findall(r"(\d)", line)
+        numbers.append(int(digits[0] + digits[-1]))
+    return sum(numbers)
 
 
-    for example in puzzle.examples:
-        if example.answer_a:
-            example_answer = a(example.input_data)
-            print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-            assert str(example_answer) == example.answer_a
-    answer = a(puzzle.input_data)
-    print("a:", answer)
-    puzzle.answer_a = answer
+for example in puzzle.examples:
+    if example.answer_a:
+        example_answer = a(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
+        assert str(example_answer) == example.answer_a
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 56049
 
 
-def to_number(s):
-    mapp = {
+def to_digit(s):
+    string_map = {
         "one": 1,
         "two": 2,
         "three": 3,
@@ -62,26 +42,22 @@ def to_number(s):
         "nine": 9,
     }
     try:
-        return mapp[s]
-    except:
+        return string_map[s]
+    except KeyError:
         return int(s)
+
 
 # Part b
 def b(data):
     lines = iter(data.splitlines())
     numbers = []
-    try:
-        for line in lines:
-            match = re.search(".*?(\d|one|two|three|four|five|six|seven|eight|nine).*(\d|one|two|three|four|five|six|seven|eight|nine).*", line)
-            try:
-                numbers.append(int(str(to_number(match.group(1))) +  str(to_number(match.group(2)))))
-            except:
-                match = re.search(".*(\d|one|two|three|four|five|six|seven|eight|nine).*", line)
-                numbers.append(int(str(to_number(match.group(1))) +  str(to_number(match.group(1)))))
-    except:
-        breakpoint()
-    print(numbers)
-    return np.sum(numbers)
+    for line in lines:
+        digits = re.findall(
+            r"(?=(\d|one|two|three|four|five|six|seven|eight|nine))", line
+        )
+        numbers.append(int(str(to_digit(digits[0])) + str(to_digit(digits[-1]))))
+    return sum(numbers)
+
 
 example = """two1nine
 eightwothree
@@ -92,8 +68,7 @@ zoneight234
 7pqrstsixteen
 """
 
-tmp = b(example)
-breakpoint()
+assert b(example) == 281
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 54530
