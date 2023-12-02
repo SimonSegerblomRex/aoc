@@ -1,11 +1,8 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 2
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -25,7 +22,6 @@ def a(data):
                 n, c = e.strip().split(" ")
                 nn[c] += int(n)
             if nn["red"] > 12 or nn["green"] > 13 or nn["blue"] > 14:
-                print()
                 break
         else:
             good_games.append(game_id)
@@ -37,9 +33,9 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-#answer = a(puzzle.input_data)
-#print("a:", answer)
-#puzzle.answer_a = answer
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 2278
 
 
 # Part b
@@ -57,12 +53,8 @@ def b(data):
             for e in nc:
                 n, c = e.strip().split(" ")
                 nn[c] += int(n)
-            if nn["red"] > mm["red"]:
-                mm["red"] = nn["red"]
-            if nn["green"] > mm["green"]:
-                mm["green"] = nn["green"]
-            if nn["blue"] > mm["blue"]:
-                mm["blue"] = nn["blue"]
+            for c in mm:
+                mm[c] = max(mm[c], nn[c])
         s += np.prod(list(mm.values()))
     return s
 
@@ -74,4 +66,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 67953
