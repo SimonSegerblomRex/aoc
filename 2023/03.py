@@ -1,5 +1,6 @@
 import datetime
 import re
+from collections import defaultdict
 
 import numpy as np
 from aocd.models import Puzzle
@@ -46,7 +47,7 @@ def a_old_broken(data):
         tt = row.copy().astype(int)
         tt[~good] = -1
         tmp = "".join(str(c) for c in tt)
-        print([int(e) for e in tmp.split("-1") if e])
+        #print([int(e) for e in tmp.split("-1") if e])
         hmm.extend([int(e) for e in tmp.split("-1") if e])
         s_good += sum([int(e) for e in tmp.split("-1") if e])
     bad_digits = np.logical_and(digits, ~good_digits)
@@ -54,10 +55,10 @@ def a_old_broken(data):
         tt = row.copy().astype(int)
         tt[~good] = -1
         tmp = "".join(str(c) for c in tt)
-        print([int(e) for e in tmp.split("-1") if e])
+        #print([int(e) for e in tmp.split("-1") if e])
         s_bad += sum([int(e) for e in tmp.split("-1") if e])
     s_total = sum(int(n) for n in re.findall(r"(\d+)", data))
-    print(s_total, s_good, s_bad)
+    #print(s_total, s_good, s_bad)
     assert s_total == s_good + s_bad
     for iy, ix in np.ndindex(grid.shape):
         if iy == 0:
@@ -98,47 +99,61 @@ def a(data):
             s_bad += int("".join(str(n) for n in candidate))
     s_total = sum(int(n) for n in re.findall(r"(\d+)", data))
     return s_total - s_bad
-    breakpoint()
+
 
 for example in puzzle.examples:
     if example.answer_a:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-
-if 0:
-    example2 = """407..114..
-    ...*......
-    ..35..633.
-    .....1#..*
-    617*.....2
-    .....+.58.
-    ..592...22
-    ..9...755-
-    ...$2*....
-    .664.598.."""
-    print(a(example2), 4361 - 60 + 9 + 1 + 2 + 2 + 22, "AAAAAAAAAAA")
-    assert a(example2) == 4361 - 60 + 9 + 1 + 2 + 2 + 22
-    breakpoint()
-
 answer = a(puzzle.input_data)
 print("a:", answer)
 print("old:", a_old_broken(puzzle.input_data), " vs ", answer)
-assert answer > 457353
-puzzle.answer_a = answer
+assert answer == 546312
 
-breakpoint()
+
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    lines = data.splitlines()
+    lines = [f".{line}." for line in lines]
+    width = len(lines[0])
+    lines.insert(0, "." * width)
+    lines.append("." * width)
+    height = len(lines)
+    maybe_gears = defaultdict(list)
+    for y in range(1, height):
+        number = []
+        for x in range(1, width):
+            if "0" <= lines[y][x] <= "9":
+                number.append(lines[y][x])
+            else:
+                if number:
+                    for j in range(y - 1, y + 2):
+                        for i in range(x - len(number) - 1, x + 1):
+                            if lines[j][i] == "*":
+                                n = int("".join(number))
+                                maybe_gears[(j, i)].append(n)
+                number = []
+    tmp = set(tuple(sorted(e)) for e in maybe_gears.values() if len(e) == 2)
+    s = 0
+    for t in tmp:
+        s += t[0] * t[1]
+    return s
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
+example = """467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598.."""
+
+assert b(example) == 467835
+
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
