@@ -44,17 +44,13 @@ def b(data):
     s = 0
     for line in lines:
         p1, p2 = line.split(":")
-        game_id = int(p1.split(" ")[1])
         subsets = p2.split(";")
         mm = {"red": 0, "green": 0, "blue": 0}
         for cset in subsets:
             nc = cset.split(",")
-            nn = {"red": 0, "green": 0, "blue": 0}
             for e in nc:
                 n, c = e.strip().split(" ")
-                nn[c] += int(n)
-            for c in mm:
-                mm[c] = max(mm[c], nn[c])
+                mm[c] = max(mm[c], int(n))
         s += np.prod(list(mm.values()))
     return s
 

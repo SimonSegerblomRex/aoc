@@ -14,48 +14,50 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def a(data):
-    try:
-        s = 0
-        ss = 0
-        grid = np.vstack(
-            [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
-        )
-        symbols = np.logical_and(grid != 254, grid > 9)
-        kernel = np.array([
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-        ])
-        hack = convolve2d(
-            symbols.astype(np.uint8),
-            kernel,
-            mode="same",
-            boundary="fill",
-        ) > 0
-        digits = grid < 10
-        bad_digits = np.logical_and(digits, hack)
-        background = grid > 9
-        tmp = np.ones(grid.shape, dtype=np.uint8) * 255
-        tmp[digits] = 0
-        tmp[bad_digits] = 1
-        markers = bad_digits.astype(int)
-        markers[background] = -1
-        ww = watershed_ift(tmp, markers)
-        bad_digits = ww > 0
-        good_digits = np.logical_and(digits, ~bad_digits)
-        for row, d in zip(grid, digits):
-            row[~d] = 0
-            tmp = "".join(str(c) for c in row)
-            ss += sum([int(e) if e else 0 for e in tmp.split("0")])
-        for row, good in zip(grid, good_digits):
-            row[~good] = 0
-            tmp = "".join(str(c) for c in row)
-            s += sum([int(e) if e else 0 for e in tmp.split("0")])
-        #for row, mask in zip(grid, hack):
-        #    breakpoint()
-        return ss - s
-    except:
-        breakpoint()
+    s_good = 0
+    s_bad = 0
+    grid = np.vstack(
+        [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
+    )
+    symbols = np.logical_and(grid != 254, grid > 9)
+    kernel = np.array([
+        [1, 1, 1],
+        [1, 0, 1],
+        [1, 1, 1],
+    ])
+    hack = convolve2d(
+        symbols.astype(np.uint8),
+        kernel,
+        mode="same",
+        boundary="fill",
+    ) > 0
+    digits = grid < 10
+    good_digits = np.logical_and(digits, hack)
+    background = grid > 9
+    tmp = np.ones(grid.shape, dtype=np.uint8) * 3
+    tmp[digits] = 1
+    tmp[good_digits] = 2
+    markers = good_digits.astype(int) * 2
+    markers[background] = -1
+    ww = watershed_ift(tmp, markers, structure=np.array([[0,0,0],[1, 1, 1],[0,0,0]]))
+    good_digits = ww > 0
+    for row, good in zip(grid.copy(), good_digits):
+        tt = row.copy().astype(int)
+        tt[~good] = -1
+        tmp = "".join(str(c) for c in tt)
+        print([int(e) for e in tmp.split("-1") if e])
+        s_good += sum([int(e) for e in tmp.split("-1") if e])
+    bad_digits = np.logical_and(digits, ~good_digits)
+    for row, good in zip(grid.copy(), bad_digits):
+        tt = row.copy().astype(int)
+        tt[~good] = -1
+        tmp = "".join(str(c) for c in tt)
+        print([int(e) for e in tmp.split("-1") if e])
+        s_bad += sum([int(e) for e in tmp.split("-1") if e])
+    s_total = sum(int(n) for n in re.findall(r"(\d+)", data))
+    print(s_total, s_good, s_bad)
+    assert s_total == s_good + s_bad
+    return s_good
 
 
 for example in puzzle.examples:
@@ -63,11 +65,27 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
+
+example2 = """407..114..
+...*......
+..35..633.
+.....1#..*
+617*.....2
+.....+.58.
+..592...22
+..9...755-
+...$2*....
+.664.598.."""
+print(a(example2), 4361 - 60 + 9 + 1 + 2 + 2 + 22, "AAAAAAAAAAA")
+assert a(example2) == 4361 - 60 + 9 + 1 + 2 + 2 + 22
+breakpoint()
+
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer > 457353
 puzzle.answer_a = answer
 
-
+breakpoint()
 # Part b
 def b(data):
     print(data)
