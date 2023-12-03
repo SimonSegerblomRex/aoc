@@ -1,4 +1,3 @@
-import datetime
 import re
 from collections import defaultdict
 
@@ -15,13 +14,11 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def a(data):
-    s_good = 0
-    s_bad = 0
-    hmm = []
+    s = 0
     grid = np.vstack(
         [np.frombuffer(n.encode(), dtype=np.uint8) - ord("0") for n in data.split("\n")]
     )
-    grid = np.pad(grid, 1, constant_values=254)  # FIXME:
+    grid = np.pad(grid, 1, constant_values=254)  # FIXME: Why is this needed..?
     symbols = np.logical_and(grid != 254, grid > 9)
     kernel = np.ones((3, 3), np.uint8)
     hack = (
@@ -33,26 +30,24 @@ def a(data):
         )
         > 0
     )
-    digits = grid < 10
-    good_digits = np.logical_and(digits, hack)
-    background = grid > 9
     tmp = np.ones(grid.shape, dtype=np.uint8) * 2
+    digits = grid < 10
     tmp[digits] = 0
+    good_digits = np.logical_and(digits, hack)
     tmp[good_digits] = 1
     markers = good_digits.astype(int)
+    background = grid > 9
     markers[background] = -1
     ww = watershed_ift(
         tmp, markers
     )  # , structure=np.array([[0, 0, 0],[1, 1, 1],[0, 0, 0]]))
     good_digits = ww > 0
-    for row, good in zip(grid.copy(), good_digits):
-        tt = row.copy().astype(int)
-        tt[~good] = -1
-        tmp = "".join(str(c) for c in tt)
-        hmm.extend([int(e) for e in tmp.split("-1") if e])
-        s_good += sum([int(e) for e in tmp.split("-1") if e])
-    bad_digits = np.logical_and(digits, ~good_digits)
-    return s_good
+    grid = grid.astype(int)
+    grid[~good_digits] = -1
+    for row in grid:
+        tmp = "".join(str(c) for c in row)
+        s += sum([int(e) for e in tmp.split("-1") if e])
+    return s
 
 
 def a_alt(data):
