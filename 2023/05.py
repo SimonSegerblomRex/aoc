@@ -1,12 +1,11 @@
-import datetime
 import re
 from operator import attrgetter
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 5
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -32,7 +31,6 @@ def a(data):
                     break
         ll.append(t)
     return min(ll)
-    breakpoint()
 
 
 for example in puzzle.examples:
@@ -63,8 +61,6 @@ def b(data):
     seed_ranges = [range(r[0], r[0] + r[1]) for r in seeds]
     input_ranges = seed_ranges.copy()
     for step_name, step_ranges in big_map.items():
-        print(step_name)
-        print(input_ranges)
         mapped = []
         not_mapped = []
         for input_range in input_ranges:
@@ -88,7 +84,7 @@ def b(data):
                             - source_range.start,
                         )
                     )
-            # find ranges in input_range not mapped...
+            # Find ranges in input_range not mapped...
             curr_range = input_range
             for intersection_range in sorted(
                 intersection_ranges, key=attrgetter("start")
@@ -98,19 +94,9 @@ def b(data):
                 curr_range = range(intersection_range.stop, curr_range.stop)
             if curr_range.start < curr_range.stop:
                 not_mapped.append(range(curr_range.start, curr_range.stop))
-        """
-        print("step_ranges:", step_ranges)
-        print("input_ranges:", input_ranges)
-        print("mapped:", mapped)
-        print("not_mapped:", not_mapped)
-        """
         input_ranges = mapped.copy()
         input_ranges.extend(not_mapped)
-    tmp2 = min(r.start for r in input_ranges if r.stop > r.start)
-    return tmp2
-    breakpoint()
-    return ll
-    breakpoint()
+    return min(r.start for r in input_ranges)
 
 
 for example in puzzle.examples:
@@ -120,4 +106,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 59370572
