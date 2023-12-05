@@ -1,5 +1,6 @@
 import datetime
 import re
+from operator import attrgetter
 
 import numpy as np
 from aocd.models import Puzzle
@@ -60,18 +61,28 @@ def b(data):
         print(step_name)
         print(input_ranges)
         mapped = []
-        intersection_ranges = []
+        not_mapped = []
         for input_range in input_ranges:
+            intersection_ranges = []
             for source_range, destination_range in zip(step_ranges["source_ranges"], step_ranges["destination_ranges"]):
                 intersection_range = range(max(input_range.start, source_range.start), min(input_range.stop, source_range.stop))
                 if intersection_range.stop > intersection_range.start:
                     intersection_ranges.append(intersection_range)
-                    mapped.append(range(destination_range.start, intersection_range.stop - intersection_range.start))
+                    mapped.append(range(destination_range.start, destination_range.start + intersection_range.stop - intersection_range.start))
             # find ranges in input_range not mapped...
-            for intersection_range in sorted(intersection_ranges):
-                breakpoint()
+            curr_range = input_range
+            for intersection_range in sorted(intersection_ranges, key=attrgetter("start")):
+                if curr_range.start < intersection_range.start:
+                    not_mapped.append(range(curr_range.start, intersection_range.start))
+                curr_range = range(intersection_range.stop, curr_range.stop)
+            if curr_range.start > intersection_range.stop:
+                not_mapped.append(range(curr_range.start, curr_range.stop))
+        print("step_ranges:", step_ranges)
+        print("input_ranges:", input_ranges)
+        print("mapped:", mapped)
+        print("not_mapped:", not_mapped)
         input_ranges = mapped.copy()
-        #input_ranges.extend(not_mapped)
+        input_ranges.extend(not_mapped)
     tmp2 = min(r.start for r in input_ranges if r.stop > r.start)
     breakpoint()
     return ll
