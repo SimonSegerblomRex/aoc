@@ -71,41 +71,12 @@ assert answer == 246912307
 # Part b
 SCORES_CARDS["J"] = 10
 
-SCORES_HANDS = {
-    # Five of a kind
-    (5, 0, 0): 36,
-    (4, 0, 1): 36,
-    (3, 0, 2): 36,
-    (2, 0, 3): 36,
-    (1, 0, 4): 36,
-    (0, 0, 5): 36,
-    # Four of a kind
-    (4, 1, 0): 35,
-    (3, 1, 1): 35,
-    (2, 1, 2): 35,
-    (1, 1, 3): 35,
-    # Full house
-    (3, 2, 0): 34,
-    (2, 2, 1): 34,
-    # Three of a kind
-    (3, 1, 0): 33,
-    (2, 1, 1): 33,
-    (1, 1, 2): 33,
-    # Two pairs
-    (2, 2, 0): 32,
-    # One pair
-    (2, 1, 0): 31,
-    (1, 1, 1): 31,
-    # High card
-    (1, 1, 0): 30,
-}
-
-
 def evaluate(hand):
     counts = [hand.count(c) for c in SCORES_CARDS]
     nbr_jokers = counts.pop(3)
     counts = sorted(counts, reverse=True)
-    main_score = SCORES_HANDS[(*counts[:2], nbr_jokers)]
+    counts[0] += nbr_jokers
+    main_score = SCORES_HANDS[tuple(counts[:2])]
     card_score = (SCORES_CARDS[c] for c in hand)
     return int("".join(str(s) for s in [main_score, *card_score]))
 
@@ -117,4 +88,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = a(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 246894760
