@@ -1,63 +1,46 @@
-import datetime
-import re
 from itertools import groupby
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 7
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 SCORES_HANDS = {
-    "five": 36,
-    "four": 35,
-    "full": 34,
-    "three": 33,
-    "two-pair": 32,
-    "one-pair": 31,
-    "high": 30,
+    (5, 0): 36,
+    (4, 1): 35,
+    (3, 2): 34,
+    (3, 1): 33,
+    (2, 2): 32,
+    (2, 1): 31,
+    (1, 1): 30,
 }
 
 SCORES_CARDS = {
-    "A": 22,
-    "K": 21,
-    "Q": 20,
-    "J": 19,
-    "T": 18,
-    "9": 17,
-    "8": 16,
-    "7": 15,
-    "6": 14,
-    "5": 13,
-    "4": 12,
-    "3": 11,
-    "2": 10,
+    "A": 23,
+    "K": 22,
+    "Q": 21,
+    "J": 20,
+    "T": 19,
+    "9": 18,
+    "8": 17,
+    "7": 16,
+    "6": 15,
+    "5": 14,
+    "4": 13,
+    "3": 12,
+    "2": 11,
 }
 
 
-
 def evaluate(hand):
-    counts = np.array([hand.count(c) for c in SCORES_CARDS])
-    if counts.max() == 5:
-        return int("".join(str(s) for s in [SCORES_HANDS["five"], *(SCORES_CARDS[c] for c in hand)]))
-    if counts.max() == 4:
-        return int("".join(str(s) for s in [SCORES_HANDS["four"], *(SCORES_CARDS[c] for c in hand)]))
-    if 0:
-        g = groupby(counts, key=lambda c: c > 0)
-        g = [len(list(s)) for v, s in g if v]
-        if max(g) == 5:
-            return SCORES_HANDS["..."] + SCORES_CARDS[hand[0]]
-    if counts.max() == 3:
-        if sorted(counts)[-2] == 2:
-            return int("".join(str(s) for s in [SCORES_HANDS["full"], *(SCORES_CARDS[c] for c in hand)]))
-        return int("".join(str(s) for s in [SCORES_HANDS["three"], *(SCORES_CARDS[c] for c in hand)]))
-    if counts.max() == 2:
-        if sorted(counts)[-2] == 2:
-            return int("".join(str(s) for s in [SCORES_HANDS["two-pair"], *(SCORES_CARDS[c] for c in hand)]))
-        return int("".join(str(s) for s in [SCORES_HANDS["one-pair"], *(SCORES_CARDS[c] for c in hand)]))
-    return int("".join(str(s) for s in [SCORES_HANDS["high"], *(SCORES_CARDS[c] for c in hand)]))
+    counts = [hand.count(c) for c in SCORES_CARDS]
+    counts = sorted(counts, reverse=True)
+    main_score = SCORES_HANDS[tuple(counts[:2])]
+    card_score = (SCORES_CARDS[c] for c in hand)
+    return int("".join(str(s) for s in [main_score, *card_score]))
 
 
 # Part a
@@ -81,10 +64,8 @@ for example in puzzle.examples:
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
-print(answer)
-assert answer > 246758041
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 246912307
 
 
 # Part b
