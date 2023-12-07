@@ -27,7 +27,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy.solvers import solve
 
 
-def a(times, distances):
+def a_sympy(times, distances):
     number_of_ways = []
     # (t_r - t) * t >= d, t > 0
     t = Symbol("t")
@@ -53,6 +53,18 @@ def a(times, distances):
                 right_limit = int(relation[2])
             else:
                 raise ValueError("...")
+        number_of_ways.append(right_limit - left_limit + 1)
+    return np.prod(number_of_ways)
+
+
+def a(times, distances):
+    # (t_r - t) * t >= d, t > 0
+    # => -sqrt(t_tr^2 / 4 - d) + t_r / 2 < t < sqrt(t_tr^2 / 4 - d) + t_r / 2
+    number_of_ways = []
+    for t_r, d_r in zip(times, distances):
+        s = np.sqrt(t_r**2 / 4 - d_r)
+        left_limit = int(-s + t_r / 2 + 1)
+        right_limit = int(s + t_r / 2 + 1 - 1e-10) - 1
         number_of_ways.append(right_limit - left_limit + 1)
     return np.prod(number_of_ways)
 
