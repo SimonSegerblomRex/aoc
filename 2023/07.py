@@ -1,6 +1,6 @@
 from itertools import groupby
+from operator import itemgetter
 
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2023
@@ -48,10 +48,8 @@ def a(data):
     hands = []
     for line in data.splitlines():
         hand, bid = line.split(" ")
-        hands.append([hand, int(bid)])
-    for hand in hands:
-        hand.append(evaluate(hand[0]))
-    hands = sorted(hands, key=lambda e: e[2])
+        hands.append((hand, int(bid), evaluate(hand)))
+    hands = sorted(hands, key=itemgetter(2))
     s = 0
     for rank, hand in enumerate(hands, 1):
         s += rank * hand[1]
@@ -70,6 +68,7 @@ assert answer == 246912307
 
 # Part b
 SCORES_CARDS["J"] = 10
+
 
 def evaluate(hand):
     counts = [hand.count(c) for c in SCORES_CARDS]
