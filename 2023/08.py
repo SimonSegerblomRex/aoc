@@ -48,19 +48,22 @@ def b(data):
         r"(?P<node>\w+) = \((?P<left>\w+), (?P<right>\w+)\)", data
     ):
         nodes[match["node"]] = (match["left"], match["right"])
-    i = 0
     n = len(instructions)
     instructions = [0 if instruction == "L" else 1 for instruction in instructions]
     curr_nodes = [node for node in nodes if node[-1] == "A"]
     goal_nodes = set([node for node in nodes if node[-1] == "Z"])
-    s = 0
-    while set(curr_nodes) != goal_nodes:
-        instruction = instructions[i]
-        i += 1
-        i %= n
-        curr_nodes = [nodes[curr_node][instruction] for curr_node in curr_nodes]
-        s += 1
-    return s
+    steps = {}
+    for curr_node in curr_nodes:
+        i = 0
+        s = 0
+        while curr_node not in goal_nodes:
+            instruction = instructions[i]
+            i += 1
+            i %= n
+            s += 1
+            curr_node = nodes[curr_node][instruction]
+        steps[curr_node] = s
+    return np.lcm.reduce(list(steps.values()))
 
 
 example = """LR
@@ -80,4 +83,5 @@ assert example_answer == 6
 
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer != 274987485330670259
 puzzle.answer_b = answer
