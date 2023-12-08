@@ -1,17 +1,16 @@
-import datetime
 import re
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 8
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
+def parse_data(data):
     lines = data.splitlines()
     instructions = lines[0]
     nodes = {}
@@ -19,18 +18,27 @@ def a(data):
         r"(?P<node>\w+) = \((?P<left>\w+), (?P<right>\w+)\)", data
     ):
         nodes[match["node"]] = (match["left"], match["right"])
+    instructions = [0 if instruction == "L" else 1 for instruction in instructions]
+    return nodes, instructions
+
+
+def nbr_of_steps(nodes, instructions, start_node, goal_nodes):
     i = 0
     n = len(instructions)
-    instructions = [0 if instruction == "L" else 1 for instruction in instructions]
-    curr_node = "AAA"
+    curr_node = start_node
     s = 0
-    while curr_node != "ZZZ":
+    while curr_node not in goal_nodes:
         instruction = instructions[i]
         i += 1
         i %= n
         s += 1
         curr_node = nodes[curr_node][instruction]
     return s
+
+
+def a(data):
+    nodes, instructions = parse_data(data)
+    return nbr_of_steps(nodes, instructions, "AAA", "ZZZ")
 
 
 answer = a(puzzle.input_data)
@@ -41,47 +49,17 @@ puzzle.answer_a = answer
 
 # Part b
 def b(data):
-    lines = data.splitlines()
-    instructions = lines[0]
-    nodes = {}
-    for match in re.finditer(
-        r"(?P<node>\w+) = \((?P<left>\w+), (?P<right>\w+)\)", data
-    ):
-        nodes[match["node"]] = (match["left"], match["right"])
-    n = len(instructions)
-    instructions = [0 if instruction == "L" else 1 for instruction in instructions]
-    curr_nodes = [node for node in nodes if node[-1] == "A"]
+    nodes, instructions = parse_data(data)
+    start_nodes = [node for node in nodes if node[-1] == "A"]
     goal_nodes = set([node for node in nodes if node[-1] == "Z"])
-    steps = {}
-    for curr_node in curr_nodes:
-        i = 0
-        s = 0
-        while curr_node not in goal_nodes:
-            instruction = instructions[i]
-            i += 1
-            i %= n
-            s += 1
-            curr_node = nodes[curr_node][instruction]
-        steps[curr_node] = s
+    steps = {
+        start_node: nbr_of_steps(nodes, instructions, start_node, goal_nodes)
+        for start_node in start_nodes
+    }
     return np.lcm.reduce(list(steps.values()))
 
 
-example = """LR
-
-11A = (11B, XXX)
-11B = (XXX, 11Z)
-11Z = (11B, XXX)
-22A = (22B, XXX)
-22B = (22C, 22C)
-22C = (22Z, 22Z)
-22Z = (22B, 22B)
-XXX = (XXX, XXX)"""
-
-example_answer = b(example)
-print("example:", example_answer)
-assert example_answer == 6
-
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer != 274987485330670259
 puzzle.answer_b = answer
+assert answer == 14299763833181
