@@ -53,10 +53,11 @@ def b(data):
     start_nodes = [node for node in nodes if node[-1] == "A"]
     goal_nodes = set([node for node in nodes if node[-1] == "Z"])
     steps = {
-        start_node: nbr_of_steps(nodes, instructions, start_node, goal_nodes)
+        # Assuming that you will go back to A the same way after reaching Z...
+        start_node: 2 * nbr_of_steps(nodes, instructions, start_node, goal_nodes)
         for start_node in start_nodes
     }
-    return np.lcm.reduce(list(steps.values()))
+    return np.lcm.reduce(list(steps.values())) // 2
 
 
 answer = b(puzzle.input_data)
