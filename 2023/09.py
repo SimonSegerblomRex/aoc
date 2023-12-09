@@ -33,13 +33,16 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answerr == 1772145754
+assert answer == 1772145754
 
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    tmp = []
+    for line in data.splitlines():
+        sequence = np.fromstring(line, sep=" ", dtype=int)[::-1]
+        tmp.append(extrapolate(sequence))
+    return sum(tmp)
 
 
 for example in puzzle.examples:
