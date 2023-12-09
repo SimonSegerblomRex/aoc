@@ -1,11 +1,8 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 9
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -18,12 +15,11 @@ def extrapolate(sequence):
     return sequence[-1]
 
 def a(data):
-    tmp = []
+    s = 0
     for line in data.splitlines():
         sequence = np.fromstring(line, sep=" ", dtype=int)
-        tmp.append(extrapolate(sequence))
-    return sum(tmp)
-    breakpoint()
+        s += extrapolate(sequence)
+    return s
 
 
 for example in puzzle.examples:
@@ -38,11 +34,11 @@ assert answer == 1772145754
 
 # Part b
 def b(data):
-    tmp = []
+    s = 0
     for line in data.splitlines():
         sequence = np.fromstring(line, sep=" ", dtype=int)[::-1]
-        tmp.append(extrapolate(sequence))
-    return sum(tmp)
+        s += extrapolate(sequence)
+    return s
 
 
 for example in puzzle.examples:
@@ -52,4 +48,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 867
