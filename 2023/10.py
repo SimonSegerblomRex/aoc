@@ -127,28 +127,24 @@ def b(data):
         pos = (i, j)
         if pos == start_pos:
             break
-    tmp = np.zeros(grid.shape)
-    tmp[path_map == ord("X")] = grid[path_map == ord("X")]
-    tmp2 = np.zeros(np.array(tmp.shape) * 2)
-    tmp2[::2, ::2] = tmp
-    tmp3 = tmp2.copy()
-    for i in range(1, tmp2.shape[0] - 1):
-        for j in range(1, tmp2.shape[1] - 1):
-            if tmp2[i, j] == 0:
-                if (tmp2[i, j + 1] in [ord("-"), ord("J"), ord("7")]) or (
-                    tmp2[i, j - 1] in [ord("-"), ord("L"), ord("F")]
+    just_the_loop = np.zeros(grid.shape)
+    just_the_loop[path_map == ord("X")] = grid[path_map == ord("X")]
+    upscaled_loop = np.zeros(np.array(just_the_loop.shape) * 2)
+    upscaled_loop[::2, ::2] = just_the_loop
+    for i in range(1, upscaled_loop.shape[0] - 1):
+        for j in range(1, upscaled_loop.shape[1] - 1):
+            if upscaled_loop[i, j] == 0:
+                if (upscaled_loop[i, j + 1] in [ord("-"), ord("J"), ord("7")]) or (
+                    upscaled_loop[i, j - 1] in [ord("-"), ord("L"), ord("F")]
                 ):
-                    tmp3[i, j] = ord("-")
-                elif (tmp2[i - 1, j] in [ord("|"), ord("7"), ord("F")]) or (
-                    tmp2[i + 1, j] in [ord("|"), ord("L"), ord("J")]
+                    upscaled_loop[i, j] = ord("-")
+                elif (upscaled_loop[i - 1, j] in [ord("|"), ord("7"), ord("F")]) or (
+                    upscaled_loop[i + 1, j] in [ord("|"), ord("L"), ord("J")]
                 ):
-                    tmp3[i, j] = ord("|")
-            else:
-                tmp3[i, j] = tmp2[i, j]
-
-    tmp35 = ndimage.binary_fill_holes(tmp3)
-    tmp36 = tmp35[::2, ::2]
-    return tmp36.sum() - (tmp > 0).sum()
+                    upscaled_loop[i, j] = ord("|")
+    filled_upscaled_loop = ndimage.binary_fill_holes(upscaled_loop)
+    filled_loop = filled_upscaled_loop[::2, ::2]
+    return filled_loop.sum() - (just_the_loop > 0).sum()
 
 
 example = """...........
