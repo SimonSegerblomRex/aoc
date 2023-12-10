@@ -9,19 +9,13 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
-    grid = np.vstack(
-        [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
-    )
-    grid = np.pad(grid, 1, constant_values=ord("."))
+def get_loop_mask(grid):
     start_pos = np.where(grid == ord("S"))
     start_pos = (start_pos[0][0], start_pos[1][0])
-    s = 0
     pos = start_pos
     prev_pos = (-1, -1)
-    prev_pipe = ord("S")
+    loop = np.full(grid.shape, False, dtype=bool)
     while True:
-        s += 1
         i, j = pos
         if (
             grid[i, j + 1] in [ord("-"), ord("J"), ord("7"), ord("S")]
@@ -48,14 +42,22 @@ def a(data):
         ):
             i = i + 1
         else:
-            print(grid[i - 1 : i + 2, j - 1 : j + 2])
-            breakpoint()
+            raise RuntimeError("Shouldn't end up here...")
         prev_pos = pos
-        prev_pipe = grid[prev_pos]
+        loop[pos] = ord("X")
         pos = (i, j)
         if pos == start_pos:
             break
-    return s // 2
+    return loop
+
+
+def a(data):
+    grid = np.vstack(
+        [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
+    )
+    grid = np.pad(grid, 1, constant_values=ord("."))
+    loop_mask = get_loop_mask(grid)
+    return np.sum(loop_mask) // 2
 
 
 example = """.....
@@ -86,51 +88,11 @@ def b(data):
         [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
     )
     grid = np.pad(grid, 1, constant_values=ord("."))
-    start_pos = np.where(grid == ord("S"))
-    start_pos = (start_pos[0][0], start_pos[1][0])
-    pos = start_pos
-    prev_pos = (-1, -1)
-    prev_pipe = ord("S")
-    path_map = grid.copy()
-    while True:
-        i, j = pos
-        if (
-            grid[i, j + 1] in [ord("-"), ord("J"), ord("7"), ord("S")]
-            and prev_pos != (i, j + 1)
-            and grid[i, j] in [ord("-"), ord("L"), ord("F"), ord("S")]
-        ):
-            j = j + 1
-        elif (
-            grid[i - 1, j] in [ord("|"), ord("7"), ord("F"), ord("S")]
-            and prev_pos != (i - 1, j)
-            and grid[i, j] in [ord("|"), ord("L"), ord("J"), ord("S")]
-        ):
-            i = i - 1
-        elif (
-            grid[i, j - 1] in [ord("-"), ord("L"), ord("F"), ord("S")]
-            and prev_pos != (i, j - 1)
-            and grid[i, j] in [ord("-"), ord("J"), ord("7"), ord("S")]
-        ):
-            j = j - 1
-        elif (
-            grid[i + 1, j] in [ord("|"), ord("L"), ord("J"), ord("S")]
-            and prev_pos != (i + 1, j)
-            and grid[i, j] in [ord("|"), ord("F"), ord("7"), ord("S")]
-        ):
-            i = i + 1
-        else:
-            print(grid[i - 1 : i + 2, j - 1 : j + 2])
-            breakpoint()
-        prev_pos = pos
-        path_map[pos] = ord("X")
-        prev_pipe = grid[prev_pos]
-        pos = (i, j)
-        if pos == start_pos:
-            break
-    just_the_loop = np.zeros(grid.shape)
-    just_the_loop[path_map == ord("X")] = grid[path_map == ord("X")]
-    upscaled_loop = np.zeros(np.array(just_the_loop.shape) * 2)
-    upscaled_loop[::2, ::2] = just_the_loop
+    loop_mask = get_loop_mask(grid)
+    loop = np.zeros(grid.shape, dtype=int)
+    loop[loop_mask] = grid[loop_mask]
+    upscaled_loop = np.zeros(np.array(loop.shape) * 2)
+    upscaled_loop[::2, ::2] = loop
     for i in range(1, upscaled_loop.shape[0] - 1):
         for j in range(1, upscaled_loop.shape[1] - 1):
             if upscaled_loop[i, j] == 0:
@@ -144,7 +106,18 @@ def b(data):
                     upscaled_loop[i, j] = ord("|")
     filled_upscaled_loop = ndimage.binary_fill_holes(upscaled_loop)
     filled_loop = filled_upscaled_loop[::2, ::2]
-    return filled_loop.sum() - (just_the_loop > 0).sum()
+    if 0:
+        import matplotlib.pyplot as plt
+
+        plt.imshow(filled_loop)
+        plt.figure()
+        plt.imshow(filled_upscaled_loop)
+        plt.figure()
+        plt.imshow(upscaled_loop)
+        plt.figure()
+        plt.imshow(loop)
+        plt.show()
+    return filled_loop.sum() - (loop > 0).sum()
 
 
 example = """...........
