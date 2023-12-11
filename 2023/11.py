@@ -1,11 +1,8 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 11
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -29,11 +26,10 @@ def a(data, extra):
         if col.any():
             continue
         zero_cols.append(j)
-    #grid = np.insert(grid, zero_rows, 0, axis=0)
-    #grid = np.insert(grid, zero_cols, 0, axis=1)
     galaxies = np.nonzero(grid)
     from collections import defaultdict
-    distances = defaultdict(lambda:np.inf)
+
+    distances = defaultdict(lambda: np.inf)
     for i, galaxy_from in enumerate(zip(*galaxies)):
         for j, galaxy_to in enumerate(zip(*galaxies)):
             i_min = min(galaxy_from[0], galaxy_to[0])
@@ -53,7 +49,6 @@ def a(data, extra):
                 idx = tuple(sorted((i, j)))
                 distances[idx] = min(distances[idx], d)
     return sum(distances.values())
-    breakpoint()
 
 
 for example in puzzle.examples:
@@ -66,7 +61,7 @@ print("a:", answer)
 assert answer == 9681886
 
 # Part b
-example_answer = a(example.input_data, 10 -1)
+example_answer = a(example.input_data, 10 - 1)
 assert example_answer == 1030
 
 example_answer = a(example.input_data, 100 - 1)
