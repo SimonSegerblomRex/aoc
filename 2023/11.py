@@ -1,3 +1,6 @@
+from collections import defaultdict
+from itertools import combinations
+
 import numpy as np
 from aocd.models import Puzzle
 
@@ -14,41 +17,22 @@ def a(data, extra):
     )
     grid[grid == ord(".")] = 0
     grid[grid == ord("#")] = 1
-    zero_rows = []
-    for i, row in enumerate(range(grid.shape[0])):
-        row = grid[i, :]
-        if row.any():
-            continue
-        zero_rows.append(i)
-    zero_cols = []
-    for j, col in enumerate(range(grid.shape[1])):
-        col = grid[:, j]
-        if col.any():
-            continue
-        zero_cols.append(j)
+    zero_rows = np.flatnonzero(np.all(grid == 0, axis=1))
+    zero_cols = np.flatnonzero(np.all(grid == 0, axis=0))
     galaxies = np.nonzero(grid)
-    from collections import defaultdict
-
-    distances = defaultdict(lambda: np.inf)
-    for i, galaxy_from in enumerate(zip(*galaxies)):
-        for j, galaxy_to in enumerate(zip(*galaxies)):
-            i_min = min(galaxy_from[0], galaxy_to[0])
-            i_max = max(galaxy_from[0], galaxy_to[0])
-            extra_i = 0
-            for r in zero_rows:
-                if i_min < r < i_max:
-                    extra_i += extra
-            j_min = min(galaxy_from[1], galaxy_to[1])
-            j_max = max(galaxy_from[1], galaxy_to[1])
-            extra_j = 0
-            for c in zero_cols:
-                if j_min < c < j_max:
-                    extra_j += extra
-            d = i_max + extra_i - i_min + j_max - j_min + extra_j
-            if d:
-                idx = tuple(sorted((i, j)))
-                distances[idx] = min(distances[idx], d)
-    return sum(distances.values())
+    distances = []
+    for galaxy_from, galaxy_to in combinations(zip(*galaxies), 2):
+        i_min, i_max = sorted((galaxy_from[0], galaxy_to[0]))
+        extra_i = (
+            np.count_nonzero((i_min < zero_rows) & (zero_rows < i_max)) * extra
+        )
+        j_min, j_max = sorted((galaxy_from[1], galaxy_to[1]))
+        extra_j = (
+            np.count_nonzero((j_min < zero_cols) & (zero_cols < j_max)) * extra
+        )
+        d = i_max + extra_i - i_min + j_max - j_min + extra_j
+        distances.append(d)
+    return sum(distances)
 
 
 for example in puzzle.examples:
