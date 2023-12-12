@@ -18,10 +18,11 @@ def a(data):
         c = 0
         springs, group_sizes = line.split(" ")
         group_sizes = np.fromstring(group_sizes, sep=",", dtype=int)
-        nbr_of_springs = sum(group_sizes)
-        unknowns = springs.count("?")
-        nbr_of_missing_springs = nbr_of_springs - springs.count("#")
-        for combo in itertools.permutations("#" * nbr_of_missing_springs + "." * (unknowns - nbr_of_missing_springs), unknowns):
+        nbr_damaged = sum(group_sizes)
+        nbr_unknowns = springs.count("?")
+        nbr_damaged_in_unknowns = nbr_damaged - springs.count("#")
+        nbr_operational_in_unknowns = nbr_unknowns - nbr_damaged_in_unknowns
+        for combo in set(itertools.permutations("#" * nbr_damaged_in_unknowns + "." * nbr_operational_in_unknowns, nbr_unknowns)):
             tmp = np.array(list(springs))
             tmp[tmp == "?"] = combo
             tmp = "".join(tmp)
@@ -31,7 +32,8 @@ def a(data):
                 #print(combo, tmp)
                 c += 1
         total += c
-        breakpoint()
+    return total
+    breakpoint()
 
 
 example = """???.### 1,1,3
