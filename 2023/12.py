@@ -4,6 +4,7 @@ import itertools
 
 import numpy as np
 from aocd.models import Puzzle
+from more_itertools import distinct_permutations
 
 YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day
@@ -22,7 +23,7 @@ def a(data):
         nbr_unknowns = springs.count("?")
         nbr_damaged_in_unknowns = nbr_damaged - springs.count("#")
         nbr_operational_in_unknowns = nbr_unknowns - nbr_damaged_in_unknowns
-        for combo in set(itertools.permutations("#" * nbr_damaged_in_unknowns + "." * nbr_operational_in_unknowns, nbr_unknowns)):
+        for combo in distinct_permutations("#" * nbr_damaged_in_unknowns + "." * nbr_operational_in_unknowns):
             tmp = np.array(list(springs))
             tmp[tmp == "?"] = combo
             tmp = "".join(tmp)
@@ -44,7 +45,7 @@ example_answer = a(example)
 
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
+puzzle.answer_a = answer
 
 
 # Part b
