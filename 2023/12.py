@@ -98,14 +98,16 @@ def b_old(data):
 
 
 def combos(springs, sizes, curr_size, curr_target):
-    for i, c in enumerate(springs):
+    while springs and (c := springs.pop(0)):
         if c == ".":
             if curr_size:
                 if curr_size == curr_target:
                     if not sizes:
-                        break
-                    curr_target = sizes.pop(0)
-                    curr_size = 0
+                        curr_target = 0
+                        curr_size = 0
+                    else:
+                        curr_target = sizes.pop(0)
+                        curr_size = 0
                 else:
                     return 0
         elif c == "#":
@@ -113,16 +115,18 @@ def combos(springs, sizes, curr_size, curr_target):
         elif c == "?":
             # case .: combos("." + springs[i + 1:], sizes, curr_size)
             # case #: combos(springs[i + 1:], sizes, curr_size + 1)
-            c1 = combos("." + springs[i + 1:], sizes, curr_size, curr_target)
-            c2 = combos(springs[i + 1:], sizes, curr_size + 1, curr_target)
-            print(c1, c2)
+            #c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
+            ss = springs.copy()
+            ss.insert(0, "#")
+            #print(ss, curr_size, curr_target)
+            #breakpoint()
+            c2 = combos(ss.copy(), sizes.copy(), curr_size, curr_target)
+            tt = springs.copy()
+            tt.insert(0, ".")
+            c1 = combos(tt.copy(), sizes.copy(), curr_size, curr_target)
             return c1 + c2
             return combos("." + springs[i + 1:], sizes, curr_size, curr_target) + combos(springs[i + 1:], sizes, curr_size + 1, curr_target)
-    if sizes:
-        return 0
     if curr_size != curr_target:
-        return 0
-    if "?" in springs:
         return 0
     return 1
 
@@ -134,8 +138,9 @@ def b(data):
         springs = "?".join([springs] * 5)
         group_sizes = ",".join([group_sizes] * 5)
         group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
-        print("AA:", springs, group_sizes)
-        total += combos(springs, group_sizes, 0, group_sizes[0])
+        target = group_sizes.pop(0)
+        hmm = combos(list(springs), group_sizes, 0, target)
+        total += hmm
     return total
 
 
