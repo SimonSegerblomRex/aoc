@@ -19,16 +19,20 @@ def find_reflection_cols(grid):
         cols_to_check = min(col + 1, width - 1 - col)
         if col + 1 < cols_to_check:
             if (
-                grid[:, :cols_to_check]
-                + grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
-                == grid[:, :cols_to_check] *  2
+                np.abs(
+                    grid[:, :cols_to_check]
+                    - grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                ).sum()
+                == 0
             ).all():
                 out.append(col + 1)
         else:
             if (
-                grid[:, col + 1 - cols_to_check : col + 1]
-                + grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
-                == grid[:, col + 1 - cols_to_check : col + 1] * 2
+                np.abs(
+                    grid[:, col + 1 - cols_to_check : col + 1]
+                    - grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                ).sum()
+                == 0
             ).all():
                 out.append(col + 1)
     if len(out) > 0:
@@ -45,8 +49,9 @@ def a(data):
         grid[grid == ord(".")] = 0
         grid[grid == ord("#")] = 1
         height, width = grid.shape
-        print(grid.shape, find_reflection_cols(grid), find_reflection_cols(grid.T))
-        total += sum(find_reflection_cols(grid)) + 100 * sum(find_reflection_cols(grid.T))
+        total += sum(find_reflection_cols(grid)) + 100 * sum(
+            find_reflection_cols(grid.T)
+        )
     return total
 
 
@@ -57,13 +62,55 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answer > 27612
-puzzle.answer_a = answer
+assert answer == 33728
 
 
 # Part b
+def find_smudge_reflection_cols(grid):
+    cols = np.flatnonzero(np.abs(np.diff(grid, axis=1)).sum(axis=0) <= 1)
+    if len(cols) == 0:
+        return [0]
+    print(cols)
+    out = []
+    for col in cols:
+        height, width = grid.shape
+        cols_to_check = min(col + 1, width - 1 - col)
+        if col + 1 < cols_to_check:
+            if (
+                np.abs(
+                    grid[:, :cols_to_check]
+                    - grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                ).sum()
+                == 1
+            ).all():
+                out.append(col + 1)
+        else:
+            if (
+                np.abs(
+                    grid[:, col + 1 - cols_to_check : col + 1]
+                    - grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                ).sum()
+                == 1
+            ).all():
+                out.append(col + 1)
+    if len(out) > 0:
+        return out
+    return [0]
+
+
 def b(data):
-    breakpoint()
+    total = 0
+    for subdata in data.split("\n\n"):
+        grid = np.vstack(
+            [np.frombuffer(row.encode(), dtype=np.int8) for row in subdata.splitlines()]
+        )
+        grid[grid == ord(".")] = 0
+        grid[grid == ord("#")] = 1
+        height, width = grid.shape
+        total += sum(find_smudge_reflection_cols(grid)) + 100 * sum(
+            find_smudge_reflection_cols(grid.T)
+        )
+    return total
 
 
 for example in puzzle.examples:
