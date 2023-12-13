@@ -9,19 +9,31 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def find_reflection_cols(grid):
-    try:
-        col = np.flatnonzero((np.diff(grid, axis=1) == 0).all(axis=0))[0]
-    except IndexError:
-        return 0
-    height, width = grid.shape
-    cols_to_check = min(col + 1, width - 1 - col)
-    if col + 1 < cols_to_check:
-        if (grid[:, :cols_to_check] * grid[:, col+1:col+1+cols_to_check][:,::-1] == grid[:, :cols_to_check]).all():
-            return col + 1
-    else:
-        if (grid[:, col+1-cols_to_check:col+1] * grid[:, col+1:col+1+cols_to_check][:,::-1] == grid[:, col+1-cols_to_check:col+1]).all():
-            return col + 1
-    return 0
+    cols = np.flatnonzero((np.diff(grid, axis=1) == 0).all(axis=0))
+    if len(cols) == 0:
+        return [0]
+    print(cols)
+    out = []
+    for col in cols:
+        height, width = grid.shape
+        cols_to_check = min(col + 1, width - 1 - col)
+        if col + 1 < cols_to_check:
+            if (
+                grid[:, :cols_to_check]
+                + grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                == grid[:, :cols_to_check] *  2
+            ).all():
+                out.append(col + 1)
+        else:
+            if (
+                grid[:, col + 1 - cols_to_check : col + 1]
+                + grid[:, col + 1 : col + 1 + cols_to_check][:, ::-1]
+                == grid[:, col + 1 - cols_to_check : col + 1] * 2
+            ).all():
+                out.append(col + 1)
+    if len(out) > 0:
+        return out
+    return [0]
 
 
 def a(data):
@@ -33,7 +45,8 @@ def a(data):
         grid[grid == ord(".")] = 0
         grid[grid == ord("#")] = 1
         height, width = grid.shape
-        total += find_reflection_cols(grid)  + 100 * find_reflection_cols(grid.T)
+        print(grid.shape, find_reflection_cols(grid), find_reflection_cols(grid.T))
+        total += sum(find_reflection_cols(grid)) + 100 * sum(find_reflection_cols(grid.T))
     return total
 
 
