@@ -58,43 +58,6 @@ if 0:
 
 
 # Part b
-def b_old(data):
-    total = 0
-    for i, line in enumerate(data.splitlines()):
-        print(i)
-        c = 1
-        springs, group_sizes = line.split(" ")
-        springs = "?".join([springs] * 5)
-        group_sizes = ",".join([group_sizes] * 5)
-        group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
-        #print(springs, group_sizes)
-        for group in springs.split("."):
-            print(group, group_sizes)
-            if not group:
-                continue
-            if len(group) < group_sizes[0]:
-                continue
-            size = 0
-            subgroup_sizes = []
-            while True:
-                if size + group_sizes[0] > len(group):
-                    break
-                subgroup_size = group_sizes.pop(0)
-                subgroup_sizes.append(subgroup_size)
-                size += subgroup_size
-                if size + 1 >= len(group):
-                    break
-                if not group_sizes:
-                    break
-                size += 1
-            if not group_sizes:
-                break
-            print("!!!")
-            c *= a(f"{group} {','.join(str(i) for i in subgroup_sizes)}")
-        total += c
-    return total
-
-
 @cache
 def combos(springs, sizes, curr_size, curr_target):
     springs = list(springs)
@@ -120,9 +83,7 @@ def combos(springs, sizes, curr_size, curr_target):
         elif c == "?":
             # case: .
             if (curr_size == 0) or (curr_size == curr_target):
-                tt = springs.copy()
-                tt.insert(0, ".")
-                c1 = combos(tuple(tt), tuple(sizes), curr_size, curr_target)
+                c1 = combos((".", *springs), tuple(sizes), curr_size, curr_target)
             else:
                 c1 = 0
             # case: #
@@ -141,11 +102,9 @@ def combos(springs, sizes, curr_size, curr_target):
 def b(data):
     total = 0
     for i, line in enumerate(data.splitlines()):
-        print(i)
         springs, group_sizes = line.split(" ")
         springs = "?".join([springs] * 5)
-        group_sizes = ",".join([group_sizes] * 5)
-        group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
+        group_sizes = list(map(int, group_sizes.split(","))) * 5
         target = group_sizes.pop(0)
         total += combos(tuple(springs), tuple(group_sizes), 0, target)
     return total
@@ -166,4 +125,5 @@ for example, example_answer_b in zip(examples, example_answers_b):
     assert example_answer == example_answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer == 60681419004564
 puzzle.answer_b = answer
