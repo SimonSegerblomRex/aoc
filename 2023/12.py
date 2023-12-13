@@ -60,7 +60,7 @@ if 0:
 
 
 # Part b
-def b(data):
+def b_old(data):
     total = 0
     for i, line in enumerate(data.splitlines()):
         print(i)
@@ -71,7 +71,7 @@ def b(data):
         group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
         #print(springs, group_sizes)
         for group in springs.split("."):
-            #print(group, group_sizes)
+            print(group, group_sizes)
             if not group:
                 continue
             if len(group) < group_sizes[0]:
@@ -91,24 +91,67 @@ def b(data):
                 size += 1
             if not group_sizes:
                 break
+            print("!!!")
             c *= a(f"{group} {','.join(str(i) for i in subgroup_sizes)}")
         total += c
     return total
 
 
+def combos(springs, sizes, curr_size, curr_target):
+    for i, c in enumerate(springs):
+        if c == ".":
+            if curr_size:
+                if curr_size == curr_target:
+                    if not sizes:
+                        break
+                    curr_target = sizes.pop(0)
+                    curr_size = 0
+                else:
+                    return 0
+        elif c == "#":
+            curr_size += 1
+        elif c == "?":
+            # case .: combos("." + springs[i + 1:], sizes, curr_size)
+            # case #: combos(springs[i + 1:], sizes, curr_size + 1)
+            c1 = combos("." + springs[i + 1:], sizes, curr_size, curr_target)
+            c2 = combos(springs[i + 1:], sizes, curr_size + 1, curr_target)
+            print(c1, c2)
+            return c1 + c2
+            return combos("." + springs[i + 1:], sizes, curr_size, curr_target) + combos(springs[i + 1:], sizes, curr_size + 1, curr_target)
+    if sizes:
+        return 0
+    if curr_size != curr_target:
+        return 0
+    if "?" in springs:
+        return 0
+    return 1
+
+
+def b(data):
+    total = 0
+    for i, line in enumerate(data.splitlines()):
+        springs, group_sizes = line.split(" ")
+        springs = "?".join([springs] * 5)
+        group_sizes = ",".join([group_sizes] * 5)
+        group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
+        print("AA:", springs, group_sizes)
+        total += combos(springs, group_sizes, 0, group_sizes[0])
+    return total
+
+
 examples = [
     "???.### 1,1,3",
-    ".??..??...?## 1,1,3",  # FIXME: Removed trailing dot...
-    # "?#?#?#?#?#?#?#? 1,3,1,6",
+    ".??..??...?##. 1,1,3",  # 4*8**4
+    "?#?#?#?#?#?#?#? 1,3,1,6",
     "????.#...#... 4,1,1",
-    "????.######..#####. 1,6,5",
-    "?###???????? 3,2,1",
+    "????.######..#####. 1,6,5", # 4*5**4
+    "?###???????? 3,2,1",  # Note: 10*15**4
 ]
-example_answers_b = [1, 16384, 16, 2500, 506250]
+example_answers_b = [1, 16384, 1, 16, 2500, 506250]
 for example, example_answer_b in zip(examples, example_answers_b):
     example_answer = b(example)
     print(f"Example answer: {example_answer} (expecting: {example_answer_b})")
-    # assert example_answer == example_answer_b
+    assert example_answer == example_answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
 # puzzle.answer_b = answer
