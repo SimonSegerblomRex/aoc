@@ -113,20 +113,16 @@ def combos(springs, sizes, curr_size, curr_target):
         elif c == "#":
             curr_size += 1
         elif c == "?":
-            # case .: combos("." + springs[i + 1:], sizes, curr_size)
-            # case #: combos(springs[i + 1:], sizes, curr_size + 1)
-            #c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
-            ss = springs.copy()
-            ss.insert(0, "#")
-            #print(ss, curr_size, curr_target)
-            #breakpoint()
-            c2 = combos(ss.copy(), sizes.copy(), curr_size, curr_target)
+            # case: .
             tt = springs.copy()
             tt.insert(0, ".")
             c1 = combos(tt.copy(), sizes.copy(), curr_size, curr_target)
+            # case: #
+            c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
             return c1 + c2
-            return combos("." + springs[i + 1:], sizes, curr_size, curr_target) + combos(springs[i + 1:], sizes, curr_size + 1, curr_target)
     if curr_size != curr_target:
+        return 0
+    if sizes:
         return 0
     return 1
 
@@ -134,6 +130,7 @@ def combos(springs, sizes, curr_size, curr_target):
 def b(data):
     total = 0
     for i, line in enumerate(data.splitlines()):
+        print(i)
         springs, group_sizes = line.split(" ")
         springs = "?".join([springs] * 5)
         group_sizes = ",".join([group_sizes] * 5)
