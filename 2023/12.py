@@ -1,3 +1,5 @@
+from functools import cache
+
 import numpy as np
 from aocd.models import Puzzle
 from more_itertools import distinct_permutations
@@ -93,7 +95,10 @@ def b_old(data):
     return total
 
 
+@cache
 def combos(springs, sizes, curr_size, curr_target):
+    springs = list(springs)
+    sizes = list(sizes)
     while springs and (c := springs.pop(0)):
         if curr_size > curr_target:
             return 0
@@ -114,12 +119,15 @@ def combos(springs, sizes, curr_size, curr_target):
             curr_size += 1
         elif c == "?":
             # case: .
-            tt = springs.copy()
-            tt.insert(0, ".")
-            c1 = combos(tt.copy(), sizes.copy(), curr_size, curr_target)
+            if (curr_size == 0) or (curr_size == curr_target):
+                tt = springs.copy()
+                tt.insert(0, ".")
+                c1 = combos(tuple(tt), tuple(sizes), curr_size, curr_target)
+            else:
+                c1 = 0
             # case: #
             if curr_size != curr_target:
-                c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
+                c2 = combos(tuple(springs), tuple(sizes), curr_size + 1, curr_target)
             else:
                 c2 = 0
             return c1 + c2
@@ -139,7 +147,7 @@ def b(data):
         group_sizes = ",".join([group_sizes] * 5)
         group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
         target = group_sizes.pop(0)
-        total += combos(list(springs), group_sizes, 0, target)
+        total += combos(tuple(springs), tuple(group_sizes), 0, target)
     return total
 
 
