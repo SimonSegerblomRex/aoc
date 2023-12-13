@@ -1,13 +1,9 @@
-import datetime
-import re
-import itertools
-
 import numpy as np
 from aocd.models import Puzzle
 from more_itertools import distinct_permutations
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 12
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -99,12 +95,16 @@ def b_old(data):
 
 def combos(springs, sizes, curr_size, curr_target):
     while springs and (c := springs.pop(0)):
+        if curr_size > curr_target:
+            return 0
         if c == ".":
             if curr_size:
                 if curr_size == curr_target:
                     if not sizes:
-                        curr_target = 0
-                        curr_size = 0
+                        if not "#" in springs:
+                            return 1
+                        else:
+                            return 0
                     else:
                         curr_target = sizes.pop(0)
                         curr_size = 0
@@ -118,7 +118,10 @@ def combos(springs, sizes, curr_size, curr_target):
             tt.insert(0, ".")
             c1 = combos(tt.copy(), sizes.copy(), curr_size, curr_target)
             # case: #
-            c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
+            if curr_size != curr_target:
+                c2 = combos(springs.copy(), sizes.copy(), curr_size + 1, curr_target)
+            else:
+                c2 = 0
             return c1 + c2
     if curr_size != curr_target:
         return 0
@@ -136,8 +139,7 @@ def b(data):
         group_sizes = ",".join([group_sizes] * 5)
         group_sizes = np.fromstring(group_sizes, sep=",", dtype=int).tolist()
         target = group_sizes.pop(0)
-        hmm = combos(list(springs), group_sizes, 0, target)
-        total += hmm
+        total += combos(list(springs), group_sizes, 0, target)
     return total
 
 
@@ -156,4 +158,4 @@ for example, example_answer_b in zip(examples, example_answers_b):
     assert example_answer == example_answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-# puzzle.answer_b = answer
+puzzle.answer_b = answer
