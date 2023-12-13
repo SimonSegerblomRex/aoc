@@ -62,27 +62,25 @@ if 0:
 def combos(springs, sizes, curr_size, curr_target):
     springs = list(springs)
     sizes = list(sizes)
-    while springs and (c := springs.pop(0)):
-        if curr_size > curr_target:
-            return 0
+    while springs:
+        c = springs.pop(0)
         if c == ".":
             if curr_size:
-                if curr_size == curr_target:
-                    if not sizes:
-                        if not "#" in springs:
-                            return 1
-                        else:
-                            return 0
-                    else:
-                        curr_target = sizes.pop(0)
-                        curr_size = 0
-                else:
+                if curr_size != curr_target:
                     return 0
+                if not sizes:
+                    if "#" not in springs:
+                        return 1
+                    return 0
+                curr_target = sizes.pop(0)
+                curr_size = 0
         elif c == "#":
             curr_size += 1
+            if curr_size > curr_target:
+                return 0
         elif c == "?":
             # case: .
-            if (curr_size == 0) or (curr_size == curr_target):
+            if curr_size in (0, curr_target):
                 c1 = combos((".", *springs), tuple(sizes), curr_size, curr_target)
             else:
                 c1 = 0
@@ -92,16 +90,14 @@ def combos(springs, sizes, curr_size, curr_target):
             else:
                 c2 = 0
             return c1 + c2
-    if curr_size != curr_target:
-        return 0
-    if sizes:
+    if curr_size != curr_target or sizes:
         return 0
     return 1
 
 
 def b(data):
     total = 0
-    for i, line in enumerate(data.splitlines()):
+    for line in data.splitlines():
         springs, group_sizes = line.split(" ")
         springs = "?".join([springs] * 5)
         group_sizes = list(map(int, group_sizes.split(","))) * 5
@@ -115,7 +111,7 @@ examples = [
     ".??..??...?##. 1,1,3",  # 4*8**4
     "?#?#?#?#?#?#?#? 1,3,1,6",
     "????.#...#... 4,1,1",
-    "????.######..#####. 1,6,5", # 4*5**4
+    "????.######..#####. 1,6,5",  # 4*5**4
     "?###???????? 3,2,1",  # Note: 10*15**4
 ]
 example_answers_b = [1, 16384, 1, 16, 2500, 506250]
