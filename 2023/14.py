@@ -1,5 +1,4 @@
 import re
-from functools import cache
 
 import numpy as np
 from aocd.models import Puzzle
@@ -18,23 +17,20 @@ def text_to_numpy(text):
     return grid
 
 
-@cache
 def tilt_row(row):
-    hmm = re.finditer(r"([O.]+)", row)
-    s = 0
-    l = len(row)
+    matches = re.finditer(r"([O.]+)", row)
     out = np.array(list(row.replace("O", ".")))
-    for m in hmm:
+    for m in matches:
         n = m.group(1).count("O")
         if n:
-            out[m.start():m.start() + n] = "O"
+            out[m.start() : m.start() + n] = "O"
     return "".join(out)
 
 
 def rotate_grid(grid, k):
     grid = text_to_numpy(grid)
     grid = np.rot90(grid, k)
-    return "\n".join(row.tostring().decode() for row in grid)
+    return "\n".join(row.tobytes().decode() for row in grid)
 
 
 def tilt_grid(grid):
@@ -80,8 +76,7 @@ def b(data, rotations, cache=True):
                 to_go = (rotations - i) % (i - grid_cache[curr_grid])
                 tmp = b(curr_grid, to_go, cache=False)
                 return tmp
-            else:
-                grid_cache[curr_grid] = i
+            grid_cache[curr_grid] = i
             if 0:
                 # Debug prints
                 print(i)
@@ -92,9 +87,9 @@ def b(data, rotations, cache=True):
     return score_grid(curr_grid)
 
 
-example_answer = b(example.input_data, 1000000000*4)
+example_answer = b(example.input_data, 1000000000 * 4)
 print(f"Example answer: {example_answer} (expecting: {64})")
 assert example_answer == 64
-answer = b(puzzle.input_data, 1000000000*4)
+answer = b(puzzle.input_data, 1000000000 * 4)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 89089
