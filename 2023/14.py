@@ -11,15 +11,15 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-@cache
 def text_to_numpy(text):
     grid = np.vstack(
         [np.frombuffer(row.encode(), dtype="|S1") for row in text.splitlines()]
     )
     return grid
 
+
 @cache
-def compute_row(row):
+def tilt_row(row):
     hmm = re.finditer(r"([O.]+)", row)
     s = 0
     l = len(row)
@@ -27,40 +27,74 @@ def compute_row(row):
     for m in hmm:
         n = m.group(1).count("O")
         if n:
-            s += sum(range(l - m.start(), l - m.start() - n, -1))
             out[m.start():m.start() + n] = "O"
-    return s, "".join(out)
+    return "".join(out)
 
-def a(data, rotations):
-    grid = text_to_numpy(data)
-    total = 0
-    curr_grid = grid
-    for rotation in range(rotations):
-        new_rows = []
-        for row in np.rot90(curr_grid):
-            s, new_row = compute_row(row.tostring().decode())
-            total += s
-            new_rows.append(new_row)
-        curr_grid = text_to_numpy("\n".join(new_rows))
-    return total
+
+def rotate_grid(grid, k):
+    grid = text_to_numpy(grid)
+    grid = np.rot90(grid, k)
+    return "\n".join(row.tostring().decode() for row in grid)
+
+
+def tilt_grid(grid):
+    grid = rotate_grid(grid, 1)
+    new_rows = []
+    for row in grid.splitlines():
+        new_row = tilt_row(row)
+        new_rows.append(new_row)
+    new_grid = "\n".join(new_rows)
+    return rotate_grid(new_grid, -1)
+
+
+def score_grid(grid):
+    rows = grid.splitlines()
+    scores = range(len(rows), 0, -1)
+    return sum(r.count("O") * s for r, s in zip(rows, scores))
+
+
+def a(data):
+    grid = tilt_grid(data)
+    return score_grid(grid)
 
 
 for example in puzzle.examples:
     if example.answer_a:
-        example_answer = a(example.input_data, 1)
+        example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-answer = a(puzzle.input_data, 1)
+answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 108759
 
 
 # Part b
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = a(example.input_data, 1000000000*4)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = a(puzzle.input_data, 1000000000*4)
+def b(data, rotations, cache=True):
+    grid_cache = {}
+    curr_grid = data
+    for i in range(rotations):
+        curr_grid = tilt_grid(curr_grid)
+        if cache and not (i + 1) % 4:
+            if curr_grid in grid_cache:
+                print(i - grid_cache[curr_grid])
+                to_go = (rotations - i) % (i - grid_cache[curr_grid])
+                tmp = b(curr_grid, to_go, cache=False)
+                return tmp
+            else:
+                grid_cache[curr_grid] = i
+            if 0:
+                # Debug prints
+                print(i)
+                tmp_grid = rotate_grid(curr_grid, i % 4)
+                print(tmp_grid)
+                breakpoint()
+        curr_grid = rotate_grid(curr_grid, -1)
+    return score_grid(curr_grid)
+
+
+example_answer = b(example.input_data, 1000000000*4)
+print(f"Example answer: {example_answer} (expecting: {64})")
+assert example_answer == 64
+answer = b(puzzle.input_data, 1000000000*4)
 print("b:", answer)
 puzzle.answer_b = answer
