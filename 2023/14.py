@@ -4,33 +4,16 @@ import re
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 14
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
 def a(data):
-    #grid = np.vstack(
-    #    [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
-    #)
-    #grid[grid == ord(".")] = 0
-    #grid[grid == ord("O")] = 1
-    #grid[grid == ord("#")] = 1
-    if 0:
-        first_square_rock = np.argmax(grid==ord("#"), axis=0)
-        for j in range(grid.shape[1]):
-            grid[first_square_rock[j]:, j] = 0
-        rocks = grid.sum(axis=0)
-        height, width = grid.shape
-        total = 0
-        for j in range(grid.shape[1]):
-            tmp = int(rocks[j])
-            total += sum(range(height, height - tmp, -1))
-        return total
     grid = np.vstack(
-        [np.frombuffer(row.encode(), dtype='|S1') for row in data.splitlines()]
+        [np.frombuffer(row.encode(), dtype="|S1") for row in data.splitlines()]
     )
     total = 0
     for row in grid.T:
@@ -51,7 +34,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 108759
 
 
 # Part b
