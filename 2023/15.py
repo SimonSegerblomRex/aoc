@@ -1,11 +1,7 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 15
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -31,12 +27,29 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 516804
 
 
 # Part b
+from collections import defaultdict
+
+
 def b(data):
-    breakpoint()
+    boxes = defaultdict(dict)
+    for step in data.split(","):
+        if "-" in step:
+            label = step.split("-")[0]
+            for _, box in boxes.items():
+                if label in box:
+                    del box[label]
+        elif "=" in step:
+            label, focal_length = step.split("=")
+            boxes[a(label)][label] = int(focal_length)
+    s = 0
+    for box_number, box in boxes.items():
+        for slot_number, lens in enumerate(box.items(), 1):
+            s += (box_number + 1) * slot_number * lens[1]
+    return s
 
 
 for example in puzzle.examples:
