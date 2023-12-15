@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from aocd.models import Puzzle
 
 YEAR = 2023
@@ -7,17 +9,18 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
+def holiday_hash(s):
+    v = 0
+    for c in s:
+        v += ord(c)
+        v *= 17
+        v %= 256
+    return v
+
+
 def a(data):
     steps = data.split(",")
-    t = 0
-    for s in steps:
-        v = 0
-        for c in s:
-            v += ord(c)
-            v *= 17
-            v %= 256
-        t += v
-    return t
+    return sum(holiday_hash(s) for s in steps)
 
 
 for example in puzzle.examples:
@@ -31,9 +34,6 @@ assert answer == 516804
 
 
 # Part b
-from collections import defaultdict
-
-
 def b(data):
     boxes = defaultdict(dict)
     for step in data.split(","):
@@ -44,7 +44,7 @@ def b(data):
                     del box[label]
         elif "=" in step:
             label, focal_length = step.split("=")
-            boxes[a(label)][label] = int(focal_length)
+            boxes[holiday_hash(label)][label] = int(focal_length)
     s = 0
     for box_number, box in boxes.items():
         for slot_number, lens in enumerate(box.items(), 1):
@@ -59,4 +59,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 231844
