@@ -47,8 +47,8 @@ def b(data):
             boxes[holiday_hash(label)][label] = int(focal_length)
     s = 0
     for box_number, box in boxes.items():
-        for slot_number, lens in enumerate(box.items(), 1):
-            s += (box_number + 1) * slot_number * lens[1]
+        for slot_number, (_, focal_length) in enumerate(box.items(), 1):
+            s += (box_number + 1) * slot_number * focal_length
     return s
 
 
