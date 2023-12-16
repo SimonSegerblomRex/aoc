@@ -1,6 +1,5 @@
 import re
 
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2023
@@ -10,47 +9,41 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def text_to_numpy(text):
-    grid = np.vstack(
-        [np.frombuffer(row.encode(), dtype="|S1") for row in text.splitlines()]
-    )
-    return grid
-
-
 def tilt_row(row):
+    row = "".join(row)
     matches = re.finditer(r"([O.]+)", row)
-    out = np.array(list(row.replace("O", ".")))
+    out = list(row.replace("O", "."))
     for m in matches:
         n = m.group(1).count("O")
         if n:
-            out[m.start() : m.start() + n] = "O"
-    return "".join(out)
+            out[m.start() : m.start() + n] = "O" * n
+    return out
 
 
 def rotate_grid(grid, k):
-    grid = text_to_numpy(grid)
-    grid = np.rot90(grid, k)
-    return "\n".join(row.tobytes().decode() for row in grid)
+    if k == -1:
+        return list(zip(*reversed(grid)))
+    if k == 1:
+        return list(zip(*grid))[::-1]
+    raise ValueError
 
 
 def tilt_grid(grid):
     grid = rotate_grid(grid, 1)
-    new_rows = []
-    for row in grid.splitlines():
+    new_grid = []
+    for row in grid:
         new_row = tilt_row(row)
-        new_rows.append(new_row)
-    new_grid = "\n".join(new_rows)
+        new_grid.append(new_row)
     return rotate_grid(new_grid, -1)
 
 
 def score_grid(grid):
-    rows = grid.splitlines()
-    scores = range(len(rows), 0, -1)
-    return sum(r.count("O") * s for r, s in zip(rows, scores))
+    scores = range(len(grid), 0, -1)
+    return sum(r.count("O") * s for r, s in zip(grid, scores))
 
 
 def a(data):
-    grid = tilt_grid(data)
+    grid = tilt_grid([list(line) for line in data.splitlines()])
     return score_grid(grid)
 
 
@@ -67,22 +60,15 @@ assert answer == 108759
 # Part b
 def b(data, rotations, cache=True):
     grid_cache = {}
-    curr_grid = data
+    curr_grid = [list(line) for line in data.splitlines()]
     for i in range(rotations):
         curr_grid = tilt_grid(curr_grid)
         if cache and not (i + 1) % 4:
-            if curr_grid in grid_cache:
-                print(i - grid_cache[curr_grid])
-                to_go = (rotations - i) % (i - grid_cache[curr_grid])
-                tmp = b(curr_grid, to_go, cache=False)
-                return tmp
-            grid_cache[curr_grid] = i
-            if 0:
-                # Debug prints
-                print(i)
-                tmp_grid = rotate_grid(curr_grid, i % 4)
-                print(tmp_grid)
-                breakpoint()
+            grid_hash = tuple(curr_grid)
+            if grid_hash in grid_cache:
+                to_go = (rotations - i) % (i - grid_cache[grid_hash])
+                return b("\n".join("".join(row) for row in curr_grid), to_go, cache=False)
+            grid_cache[grid_hash] = i
         curr_grid = rotate_grid(curr_grid, -1)
     return score_grid(curr_grid)
 
