@@ -1,18 +1,12 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 16
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-
-
 def get_new_beams(pos, dir, kind):
     if kind == ".":
         return [(pos + dir, dir)]
@@ -33,29 +27,19 @@ def get_new_beams(pos, dir, kind):
     raise ValueError
 
 
-def a(data):
+def create_grid(rows):
     grid = {}
     dirs = (0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j)
-    rows = data.splitlines()
-    height, width = len(rows), len(rows[0])
     for i, row in enumerate(rows):
         for j, c in enumerate(row):
             pos = complex(i, j)
             for dir in dirs:
                 grid[(pos, dir)] = get_new_beams(pos, dir, c)
-    # Add border
-    if 0:
-        for i in range(-1, height + 1):
-            for j in (-1, width):
-                pos = complex(i, j)
-                for dir in dirs:
-                    grid[pos, dir] = []
-        for i in (-1, height):
-            for j in range(-1, width + 1):
-                pos = complex(i, j)
-                for dir in dirs:
-                    grid[pos, dir] = []
-    beams = set([(0 + 0j, 0 + 1j)])
+    return grid
+
+
+def count_visited(grid, height, width, start):
+    beams = set([start])
     visited = set()
     while beams:
         pos, dir = beams.pop()
@@ -65,16 +49,15 @@ def a(data):
         new_beams = grid[(pos, dir)]
         beams.update(new_beams)
         beams.difference_update(visited)
-    # Debug print
-    if 0:
-        for i in range(height):
-            print("")
-            for j in range(width):
-                if complex(i, j) in visited:
-                    print("#", end="")
-                else:
-                    print(".", end="")
     return len(set(p for p, _ in visited))
+
+
+def a(data):
+    rows = data.splitlines()
+    height, width = len(rows), len(rows[0])
+    grid = create_grid(rows)
+    start = (0 + 0j, 0 + 1j)
+    return count_visited(grid, height, width, start)
 
 
 for example in puzzle.examples:
@@ -84,12 +67,22 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 8116
 
 
 # Part b
 def b(data):
-    breakpoint()
+    rows = data.splitlines()
+    height, width = len(rows), len(rows[0])
+    grid = create_grid(rows)
+    counts = []
+    for i in range(0, height):
+        counts.append(count_visited(grid, height, width, (complex(i, 0), 0 + 1j)))
+        counts.append(count_visited(grid, height, width, (complex(i, width - 1), 0 - 1j)))
+    for j in range(0, width):
+        counts.append(count_visited(grid, height, width, (complex(0, j), 1 + 0j)))
+        counts.append(count_visited(grid, height, width, (complex(height - 1, j), -1 + 0j)))
+    return max(counts)
 
 
 for example in puzzle.examples:
