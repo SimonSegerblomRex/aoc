@@ -30,15 +30,15 @@ def create_grid(rows):
     return grid
 
 
-def count_visited(grid, height, width, start):
+def count_visited(grid, start):
     beams = set([start])
     visited = set()
     while beams:
-        pos, dir = beams.pop()
-        if not ((0 <= pos.real < height) and (0 <= pos.imag < width)):
+        beam = beams.pop()
+        if beam not in grid:
             continue
-        visited.add((pos, dir))
-        new_beams = grid[(pos, dir)]
+        visited.add(beam)
+        new_beams = grid[beam]
         beams.update(new_beams)
         beams -= visited
     return len(set(p for p, _ in visited))
@@ -46,10 +46,9 @@ def count_visited(grid, height, width, start):
 
 def a(data):
     rows = data.splitlines()
-    height, width = len(rows), len(rows[0])
     grid = create_grid(rows)
     start = (0 + 0j, 0 + 1j)
-    return count_visited(grid, height, width, start)
+    return count_visited(grid, start)
 
 
 for example in puzzle.examples:
@@ -69,15 +68,11 @@ def b(data):
     grid = create_grid(rows)
     counts = []
     for i in range(0, height):
-        counts.append(count_visited(grid, height, width, (complex(i, 0), 0 + 1j)))
-        counts.append(
-            count_visited(grid, height, width, (complex(i, width - 1), 0 - 1j))
-        )
+        counts.append(count_visited(grid, (complex(i, 0), 0 + 1j)))
+        counts.append(count_visited(grid, (complex(i, width - 1), 0 - 1j)))
     for j in range(0, width):
-        counts.append(count_visited(grid, height, width, (complex(0, j), 1 + 0j)))
-        counts.append(
-            count_visited(grid, height, width, (complex(height - 1, j), -1 + 0j))
-        )
+        counts.append(count_visited(grid, (complex(0, j), 1 + 0j)))
+        counts.append(count_visited(grid, (complex(height - 1, j), -1 + 0j)))
     return max(counts)
 
 
