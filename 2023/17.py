@@ -21,14 +21,6 @@ def create_grid(rows):
     return grid
 
 
-def reconstruct_path(came_from, current):
-    total_path = [current]
-    while current in came_from:
-        current = came_from[current]
-        total_path.append(current)
-    return total_path[::-1]
-
-
 def a_star(start, end, grid, hist=3):
     def h(node):
         return int(abs(end.real - node.real) + abs(end.imag - node.imag))
@@ -36,9 +28,6 @@ def a_star(start, end, grid, hist=3):
     open_set = queue.PriorityQueue()
     open_set.put((0, 0, start, 0 + 1j, 1))
     open_set.put((0, 1, start, 1 + 0j, 1))
-
-    came_from = {}
-    #came_from[(start, 0 + 0j, 0)] = None
 
     g_score = defaultdict(lambda: 1 << 30)
     g_score[(start, 0 + 1j, 1)] = 0
@@ -52,8 +41,6 @@ def a_star(start, end, grid, hist=3):
     while not open_set.empty():
         _, _, current, prev_dir, count = open_set.get()
         if current == end:
-            #print(int(g_score[(current, prev_nodes)]))
-            #return reconstruct_path(came_from, current)
             return int(g_score[(current, prev_dir, count)])
 
         dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
@@ -69,13 +56,11 @@ def a_star(start, end, grid, hist=3):
             if next_count > 3:
                 continue
             tentative_g_score = g_score[(current, prev_dir, count)] + grid[next_node]
-            if tentative_g_score <= g_score[(next_node, dir, next_count)]:
-                #came_from[(current, dir, next_count)] = current
+            if tentative_g_score < g_score[(next_node, dir, next_count)]:
                 g_score[(next_node, dir, next_count)] = tentative_g_score
                 f_score[(next_node, dir, next_count)] = tentative_g_score + h(next_node)
                 open_set.put((f_score[(next_node, dir, next_count)], i, next_node, dir, next_count))
                 i += 1
-                #print(i)
 
 
 def a(data):
