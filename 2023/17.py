@@ -1,7 +1,5 @@
-from ast import Attribute
 import queue
 from collections import defaultdict
-from telnetlib import TM
 
 from aocd.models import Puzzle
 
@@ -59,7 +57,15 @@ def a_star(start, end, grid):
             if tentative_g_score < g_score[(next_node, dir, next_count)]:
                 g_score[(next_node, dir, next_count)] = tentative_g_score
                 f_score[(next_node, dir, next_count)] = tentative_g_score + h(next_node)
-                open_set.put((f_score[(next_node, dir, next_count)], i, next_node, dir, next_count))
+                open_set.put(
+                    (
+                        f_score[(next_node, dir, next_count)],
+                        i,
+                        next_node,
+                        dir,
+                        next_count,
+                    )
+                )
                 i += 1
 
 
@@ -76,10 +82,10 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-if 0:
-    answer = a(puzzle.input_data)
-    print("a:", answer)
-    assert answer == 959
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 959
+
 
 # Part b
 def a_star_b(start, end, grid):
@@ -123,7 +129,15 @@ def a_star_b(start, end, grid):
             if tentative_g_score < g_score[(next_node, dir, next_count)]:
                 g_score[(next_node, dir, next_count)] = tentative_g_score
                 f_score[(next_node, dir, next_count)] = tentative_g_score + h(next_node)
-                open_set.put((f_score[(next_node, dir, next_count)], i, next_node, dir, next_count))
+                open_set.put(
+                    (
+                        f_score[(next_node, dir, next_count)],
+                        i,
+                        next_node,
+                        dir,
+                        next_count,
+                    )
+                )
                 i += 1
 
 
@@ -142,4 +156,4 @@ for example in puzzle.examples:
         assert example_answer == 94
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1135
