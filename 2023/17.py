@@ -34,45 +34,48 @@ def a_star(start, end, grid, hist=3):
         return int(abs(end.real - node.real) + abs(end.imag - node.imag))
 
     open_set = queue.PriorityQueue()
-    open_set.put((0, 0, start, (None,)*hist))
+    open_set.put((0, 0, start, 0 + 1j, 1))
+    open_set.put((0, 1, start, 1 + 0j, 1))
 
     came_from = {}
-    came_from[(start, (None,)*hist)] = None
+    #came_from[(start, 0 + 0j, 0)] = None
 
     g_score = defaultdict(lambda: 1 << 30)
-    g_score[(start, (None,)*hist)] = 0
+    g_score[(start, 0 + 1j, 1)] = 0
+    g_score[(start, 1 + 0j, 1)] = 0
 
     f_score = defaultdict(lambda: 1 << 30)
-    f_score[(start, (None,)*hist)] = h(start)
+    f_score[(start, 0 + 1j, 1)] = h(start)
+    f_score[(start, 1 + 0j, 1)] = h(start)
 
-    i = 1
+    i = 2
     while not open_set.empty():
-        _, _, current, prev_nodes = open_set.get()
+        _, _, current, prev_dir, count = open_set.get()
         if current == end:
             #print(int(g_score[(current, prev_nodes)]))
             #return reconstruct_path(came_from, current)
-            return int(g_score[(current, prev_nodes)])
+            return int(g_score[(current, prev_dir, count)])
 
-        neighbours = set((current + 1j, current - 1, current - 1j, current + 1))
-
-        try:
-            if len(set((current.real, *(n.real for n in prev_nodes)))) == 1:
-                neighbours = neighbours.intersection((current + 1, current - 1))
-            if len(set((current.imag, *(n.imag for n in prev_nodes)))) == 1:
-                neighbours = neighbours.intersection((current + 1j, current - 1j))
-        except AttributeError:
-            pass
-
-        neighbours = neighbours.intersection(grid)
-        for next_node in neighbours:
-            tentative_g_score = g_score[(current, prev_nodes)] + grid[next_node]
-            next_prev_nodes = (*prev_nodes[1:], current)
-            if tentative_g_score < g_score[(next_node, next_prev_nodes)]:
-                came_from[(next_node, next_prev_nodes)] = current
-                g_score[(next_node, next_prev_nodes)] = tentative_g_score
-                f_score[(next_node, next_prev_nodes)] = tentative_g_score + h(next_node)
-                open_set.put((f_score[(next_node, next_prev_nodes)], i, next_node, next_prev_nodes))
+        dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+        dirs.remove(-prev_dir)
+        for dir in dirs:
+            next_node = current + dir
+            if next_node not in grid:
+                continue
+            if prev_dir == dir:
+                next_count = count + 1
+            else:
+                next_count = 1
+            if next_count > 3:
+                continue
+            tentative_g_score = g_score[(current, prev_dir, count)] + grid[next_node]
+            if tentative_g_score <= g_score[(next_node, dir, next_count)]:
+                #came_from[(current, dir, next_count)] = current
+                g_score[(next_node, dir, next_count)] = tentative_g_score
+                f_score[(next_node, dir, next_count)] = tentative_g_score + h(next_node)
+                open_set.put((f_score[(next_node, dir, next_count)], i, next_node, dir, next_count))
                 i += 1
+                #print(i)
 
 
 def a(data):
@@ -89,6 +92,7 @@ for example in puzzle.examples:
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
+assert answer > 956
 print("a:", answer)
 puzzle.answer_a = answer
 
