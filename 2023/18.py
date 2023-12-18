@@ -1,10 +1,3 @@
-import datetime
-import re
-
-from scipy.ndimage import binary_fill_holes
-from skimage.draw import polygon_perimeter
-
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2023
@@ -16,14 +9,11 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 # Part a
 def calculate_area(corners):
     edge = 0
-    for i in range(1, len(corners)):
-        edge +=abs(corners[i - 1] - corners[i])
-
     area = 0
     for i in range(1, len(corners)):
-        area += int(corners[i].real) * (int(corners[i].imag) - int(corners[i-1].imag))
+        edge += abs(corners[i - 1] - corners[i])
+        area += int(corners[i].real) * (int(corners[i].imag) - int(corners[i - 1].imag))
     area = abs(area)
-
     return area + int(edge) // 2 + 1
 
 
@@ -81,4 +71,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 72811019847283
