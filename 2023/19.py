@@ -43,6 +43,7 @@ def a(data):
                         break
                 else:
                     curr_workflow = rule
+                    break
             if curr_workflow == "A":
                 s += sum(part_spec.values())
                 break
@@ -62,76 +63,55 @@ assert answer == 350678
 
 
 # Part b
+def score(min_limits, max_limits):
+    tmp = []
+    for l, u in zip(min_limits.values(), max_limits.values()):
+        tmp.append((u - l + 1))
+    if (np.array(tmp) <= 0).any():
+        return 0
+    return np.array(tmp).prod()
+
+
+def number_of_combinations(workflows, curr_workflow, min_limits, max_limits):
+    s = 0
+    while True:
+        if curr_workflow == "R":
+            return s
+        if curr_workflow == "A":
+            return s + score(min_limits, max_limits)
+        rules = workflows[curr_workflow]
+        print(curr_workflow, min_limits, max_limits)
+        for rule in rules:
+            if "<" in rule:
+                c, v = rule.split("<")
+                v, dest = v.split(":")
+                if min_limits[c] < int(v):
+                    s += number_of_combinations(workflows, dest, min_limits.copy(), {**max_limits, c: min(max_limits[c], int(v) - 1)})
+                    min_limits[c] = int(v)
+            elif ">" in rule:
+                c, v = rule.split(">")
+                v, dest = v.split(":")
+                if max_limits[c] > int(v):
+                    s += number_of_combinations(workflows, dest, {**min_limits, c: max(min_limits[c], int(v) + 1)}, max_limits.copy())
+                    max_limits[c] = int(v)
+            else:
+                curr_workflow = rule
+                break
+
+
 def b(data):
-    workflows_input, ratings_input = data.split("\n\n")
+    workflows_input, _ = data.split("\n\n")
     workflows = {}
     for line in workflows_input.splitlines():
         name, rules = line.split("{")
         rules = rules.strip("}").split(",")
         workflows[name] = rules
-    s = 0
-    for line in ratings_input.splitlines():
-        curr_workflow = "in"
-        hard_min_limits = {"x": 1, "m": 1, "a": 1, "s": 1}
-        hard_max_limits = {"x": 4000, "m": 4000, "a": 4000, "s": 4000}
-        soft_min_limits = defaultdict(lambda: 0)
-        soft_max_limits = defaultdict(lambda: 0)
-        while True:
-            rules = workflows[curr_workflow]
-            for rule in rules:
-                if "<" in rule:
-                    c, v = rule.split("<")
-                    v, dest = v.split(":")
-                    print(dest)
-                    if dest == "R":
-                        hard_max_limits[c] = min(hard_max_limits[c], int(v) - 1)
-                        continue
-                    elif dest == "A":
-                        soft_max_limits[c] = max(soft_max_limits[c] or int(v) - 1, int(v) - 1)
-                        continue
-                    curr_workflow = dest
-                    break
-                elif ">" in rule:
-                    c, v = rule.split(">")
-                    v, dest = v.split(":")
-                    if dest == "R":
-                        hard_min_limits[c] = max(hard_min_limits[c], int(v) + 1)
-                        continue
-                    elif dest == "A":
-                        soft_min_limits[c] = min(soft_min_limits[c] or int(v) + 1, int(v) + 1)
-                        continue
-                    curr_workflow = dest
-                    break
-                else:
-                    curr_workflow = rule
-            if curr_workflow == "A":
-                print("!!!!!!!!!!!!!!!!!!!!!")
-                #breakpoint()
-                break
-            elif curr_workflow == "R":
-                tmp = []
-                print(list(reversed(soft_min_limits.items())))
-                print(list(reversed(soft_max_limits.items())))
-                #breakpoint()
-                for l, u in zip(soft_min_limits.values(), soft_max_limits.values()):
-                    if not l and not u:
-                        continue
-                    print(soft_min_limits, soft_min_limits)
-                    l = l or 1
-                    u = u or 4000
-                    if u >= l:
-                        tmp.append((u - l + 1))
-                s += np.array(tmp).prod()
-                break
-            """
-                tmp = []
-                for l, u in zip(min_limits.values(), max_limits.values()):
-                    if u >= l:
-                        tmp.append((u - l + 1))
-                print(tmp)
-                s += np.array(tmp).prod()
-            """
-    return s
+    min_limits = {"x": 1, "m": 1, "a": 1, "s": 1}
+    max_limits = {"x": 4000, "m": 4000, "a": 4000, "s": 4000}
+    return number_of_combinations(workflows, "in", min_limits, max_limits)
+    #return number_of_combinations(workflows, "in", min_limits, max_limits)
+    #soft_min_limits = defaultdict(lambda: 0)
+    #soft_max_limits = defaultdict(lambda: 0)
 
 
 for example in puzzle.examples:
@@ -140,4 +120,5 @@ for example in puzzle.examples:
     assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer > 0
 puzzle.answer_b = answer
