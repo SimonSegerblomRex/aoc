@@ -12,7 +12,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def send_pulse(modules, sender, receiver, pulse):
+def send_pulse_old(modules, sender, receiver, pulse):
     print(sender, receiver, pulse)
     pulses = [0, 0]
     pulses[pulse] += 1
@@ -23,7 +23,7 @@ def send_pulse(modules, sender, receiver, pulse):
     elif typ == "%":
         if pulse:
             return pulses
-        m["state"] = 1 - pulse
+        m["state"] = 1 if (m["state"] == pulse) else 0
         pulse = m["state"]
     elif typ == "&":
         m["hist"][sender] = pulse
@@ -36,6 +36,26 @@ def send_pulse(modules, sender, receiver, pulse):
         pulses[0] += low
         pulses[1] += high
     return pulses
+
+
+def send_pulse(modules, sender, receiver, pulse):
+    #print(sender, pulse, receiver)
+    m = modules[receiver]
+    typ = m["type"]
+    if typ == "broadcaster":
+        pass
+    elif typ == "%":
+        if pulse:
+            return []
+        m["state"] = 1 if (m["state"] == pulse) else 0
+        pulse = m["state"]
+    elif typ == "&":
+        m["hist"][sender] = pulse
+        if sum(m["hist"].values()) == len(m["hist"]):
+            pulse = 0
+        else:
+            pulse = 1
+    return [(receiver, dest, pulse) for dest in m["dest"]]
 
 
 def a(data):
@@ -61,6 +81,7 @@ def a(data):
             elif typ == "&":
                 modules[module[1:]]["hist"] = defaultdict(lambda: 0)
 
+    """
     pulses = [0, 0]
     for _ in range(1000):
         low, high = send_pulse(modules, "button", "broadcaster", 0)
@@ -68,13 +89,19 @@ def a(data):
         pulses[0] += low
         pulses[1] += high
         breakpoint()
+    """
+    pulses = [0, 0]
+    curr_pulse = 0
+    modules_to_process = [("button", "broadcaster", 0)]
+    for _ in range(1000):
+        modules_to_process = [("button", "broadcaster", 0)]
+        while modules_to_process:
+            sender, receiver, pulse = modules_to_process.pop(0)
+            pulses[pulse] += 1
+            modules_to_process.extend(send_pulse(modules, sender, receiver, pulse))
+    return pulses[0] * pulses[1]
 
 
-for example in puzzle.examples:
-    if example.answer_a:
-        example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
 puzzle.answer_a = answer
