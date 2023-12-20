@@ -38,9 +38,10 @@ def send_pulse_old(modules, sender, receiver, pulse):
     return pulses
 
 
-def send_pulse(modules, sender, receiver, pulse):
+def send_pulse(modules, sender, receiver, pulse, i):
     #print(sender, pulse, receiver)
     if receiver == "rx" and pulse == 0:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return [8]
     if receiver not in modules:
         return []
@@ -59,6 +60,8 @@ def send_pulse(modules, sender, receiver, pulse):
             pulse = 0
         else:
             pulse = 1
+            if len(m["period"][sender]) < 3:
+                m["period"][sender].append(i)
     return [(receiver, dest, pulse) for dest in m["dest"]]
 
 
@@ -85,9 +88,11 @@ def a(data):
     for module in modules:
         if modules[module]["type"] == "&":
             modules[module]["hist"] = {}
+            modules[module]["period"] = {}
             for m in modules:
                 if module in modules[m]["dest"]:
                     modules[module]["hist"][m] = 0
+                    modules[module]["period"][m] = [0]
     """
     pulses = [0, 0]
     for _ in range(1000):
@@ -105,19 +110,19 @@ def a(data):
         while modules_to_process:
             sender, receiver, pulse = modules_to_process.pop(0)
             pulses[pulse] += 1
-            modules_to_process.extend(send_pulse(modules, sender, receiver, pulse))
+            modules_to_process.extend(send_pulse(modules, sender, receiver, pulse, 0))
     print(pulses)
     return pulses[0] * pulses[1]
 
 
-example = """broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output"""
-example_answer = a(example)
-print(f"Example answer: {example_answer} (expecting: {11687500})")
-assert example_answer == 11687500
+# example = """broadcaster -> a
+# %a -> inv, con
+# &inv -> b
+# %b -> con
+# &con -> output"""
+# example_answer = a(example)
+# print(f"Example answer: {example_answer} (expecting: {11687500})")
+# assert example_answer == 11687500
 
 
 answer = a(puzzle.input_data)
@@ -150,9 +155,11 @@ def b(data):
     for module in modules:
         if modules[module]["type"] == "&":
             modules[module]["hist"] = {}
+            modules[module]["period"] = {}
             for m in modules:
                 if module in modules[m]["dest"]:
                     modules[module]["hist"][m] = 0
+                    modules[module]["period"][m] = [0]
     """
     pulses = [0, 0]
     for _ in range(1000):
@@ -171,11 +178,26 @@ def b(data):
         while modules_to_process:
             sender, receiver, pulse = modules_to_process.pop(0)
             pulses[pulse] += 1
-            tmp = send_pulse(modules, sender, receiver, pulse)
-            if 8 in tmp:
-                return i
-            i += 1
+            tmp = send_pulse(modules, sender, receiver, pulse, i)
             modules_to_process.extend(tmp)
+        i += 1
+        """
+        for m in modules:
+            if modules[m]["type"] == "&":
+                for tmp2 in modules[m]["period"]:
+                    if sum(modules[m]["hist"].values()) != len(modules[m]["hist"]):
+                        modules[m]["period"][tmp2].append(0)
+                        breakpoint()
+        """
+        if i > 100000:
+            break
+    lists = []
+    for m in modules:
+        if modules[m]["type"] == "&" and "bn" in modules[m]["dest"]:
+            lists.append(modules[m]["period"])
+    return np.prod([list(d.values())[0][1] for d in lists])
+    return 3797*3881*4003*3823
+
 
 
 answer = b(puzzle.input_data)
