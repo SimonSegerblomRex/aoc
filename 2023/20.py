@@ -40,6 +40,8 @@ def send_pulse_old(modules, sender, receiver, pulse):
 
 def send_pulse(modules, sender, receiver, pulse):
     #print(sender, pulse, receiver)
+    if receiver not in modules:
+        return []
     m = modules[receiver]
     typ = m["type"]
     if typ == "broadcaster":
@@ -78,9 +80,12 @@ def a(data):
             }
             if typ == "%":
                 modules[module[1:]]["state"] = 0
-            elif typ == "&":
-                modules[module[1:]]["hist"] = defaultdict(lambda: 0)
-
+    for module in modules:
+        if modules[module]["type"] == "&":
+            modules[module]["hist"] = {}
+            for m in modules:
+                if module in modules[m]["dest"]:
+                    modules[module]["hist"][m] = 0
     """
     pulses = [0, 0]
     for _ in range(1000):
@@ -99,11 +104,23 @@ def a(data):
             sender, receiver, pulse = modules_to_process.pop(0)
             pulses[pulse] += 1
             modules_to_process.extend(send_pulse(modules, sender, receiver, pulse))
+    print(pulses)
     return pulses[0] * pulses[1]
+
+
+example = """broadcaster -> a
+%a -> inv, con
+&inv -> b
+%b -> con
+&con -> output"""
+example_answer = a(example)
+print(f"Example answer: {example_answer} (expecting: {11687500})")
+assert example_answer == 11687500
 
 
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer < 850401079
 puzzle.answer_a = answer
 
 
