@@ -64,7 +64,6 @@ def send_pulse(modules, sender, receiver, pulse, i):
 def a(data):
     modules = parse_modules(data)
     pulses = [0, 0]
-    curr_pulse = 0
     modules_to_process = [("button", "broadcaster", 0)]
     for _ in range(1000):
         modules_to_process = [("button", "broadcaster", 0)]
@@ -91,17 +90,12 @@ assert answer == 825167435
 # Part b
 def b(data):
     modules = parse_modules(data)
-    pulses = [0, 0]
-    curr_pulse = 0
-    modules_to_process = [("button", "broadcaster", 0)]
     i = 1
     while True:
         modules_to_process = [("button", "broadcaster", 0)]
         while modules_to_process:
             sender, receiver, pulse = modules_to_process.pop(0)
-            pulses[pulse] += 1
-            tmp = send_pulse(modules, sender, receiver, pulse, i)
-            modules_to_process.extend(tmp)
+            modules_to_process.extend(send_pulse(modules, sender, receiver, pulse, i))
         i += 1
         answer = 1
         for m in modules.values():
@@ -109,8 +103,7 @@ def b(data):
                 if len(list(m["period"].values())[0]) < 2:
                     answer = 0
                     break
-                else:
-                    answer *= list(m["period"].values())[0][1]
+                answer *= list(m["period"].values())[0][1]
         if answer:
             return answer
 
