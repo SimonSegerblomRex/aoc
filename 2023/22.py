@@ -65,7 +65,7 @@ def a(data):
     for n, neigh in neighbours.items():
         others = neighbours.copy()
         del others[n]
-        only_supporter_of_bricks = neigh.difference(*others)
+        only_supporter_of_bricks = neigh.difference(*others.values())
         if not only_supporter_of_bricks:
             s += 1
     return s
@@ -83,6 +83,7 @@ assert answer == 482
 
 # Part b
 def disintegrate(blocks, neighbours):
+    neighbours = neighbours.copy()
     s = set()
     neigh = set()
     for n in blocks:
@@ -92,7 +93,7 @@ def disintegrate(blocks, neighbours):
     neigh ^= neigh.intersection(set.union(*neighbours.values()))
     if neigh:
         s |= neigh
-        s |= disintegrate(neigh, neighbours.copy())
+        s |= disintegrate(neigh, neighbours)
     return s
 
 
@@ -100,7 +101,7 @@ def b(data):
     neighbours = get_neighbours(data)
     s = 0
     for n in neighbours:
-        s += len(disintegrate(set([n]), neighbours.copy()))
+        s += len(disintegrate(set([n]), neighbours))
     return s
 
 
