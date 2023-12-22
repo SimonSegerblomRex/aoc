@@ -65,8 +65,8 @@ def a(data):
     for n, neigh in neighbours.items():
         others = neighbours.copy()
         del others[n]
-        tmp = neigh.difference(*(list(s) for s in others.values()))
-        if not tmp:
+        only_supporter_of_bricks = neigh.difference(*others)
+        if not only_supporter_of_bricks:
             s += 1
     return s
 
@@ -89,7 +89,7 @@ def disintegrate(blocks, neighbours):
         neigh |= neighbours.pop(n)
     if not neigh:
         return s
-    neigh ^= neigh.intersection(set.union(*(s for s in neighbours.values())))
+    neigh ^= neigh.intersection(set.union(*neighbours.values()))
     if neigh:
         s |= neigh
         s |= disintegrate(neigh, neighbours.copy())
