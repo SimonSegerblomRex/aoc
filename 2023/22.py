@@ -24,7 +24,7 @@ def a(data):
         max_z = max(max_z, c0[2])
         max_z = max(max_z, c1[2])
 
-    z = np.zeros((12,12,max_z+10), dtype=int)
+    z = np.zeros((12+10,12+10,max_z+10), dtype=int)
     z[:,:,0] = 1 #ground
     bricks = sorted(bricks, key=lambda b: min(b[0][2], b[1][2]))
 
@@ -32,7 +32,7 @@ def a(data):
     for c0, c1 in bricks:
         n += 1
         lowest_z = z.argmax(axis=2)[c0[0]:c1[0]+1,c0[1]:c1[1]+1].max() + 1
-        if 0:
+        if 1:
             print(lowest_z)
             while True:
                 if z[c0[0]:c1[0]+1,c0[1]:c1[1]+1,lowest_z:lowest_z+c1[2]-c0[2]+1].sum() > 0:
@@ -45,18 +45,6 @@ def a(data):
         c0[2] = lowest_z
         c1[2] = lowest_z + c1[2] - c0[2]
 
-    if 0:
-        kernel = np.dstack((np.array([[0, 0, 0], [0, 1, 0],[0,0,0]],dtype=int),np.zeros((3,3),dtype=int),np.array([[0, 0, 0], [0, 1, 0],[0,0,0]],dtype=int)))
-        s = 0
-        for n in range(2, n + 1):
-            tmp = convolve(z == n, kernel, mode="same", method="direct") > 0
-            neigh = set(z[tmp])
-            neigh = neigh.difference([0,1])
-            if neigh:
-                print(neigh, n)
-                continue
-            s += 1
-
     neighbours = {}
     for n in range(2, n + 1):
         neigh = set()
@@ -65,13 +53,17 @@ def a(data):
             if z[c] > n:
                 neigh.add(z[c])
         neighbours[n] = neigh
+
     s = 0
     for n, neigh in neighbours.items():
         others = neighbours.copy()
         del others[n]
         tmp = neigh.difference(*(list(s) for s in others.values()))
         if not tmp:
+            print(n)
             s += 1
+
+    breakpoint()
     return s
 
 
@@ -82,7 +74,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answer < 504
+assert answer < 503
 puzzle.answer_a = answer
 
 
