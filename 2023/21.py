@@ -1,26 +1,21 @@
-import datetime
 import re
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 21
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data, max_steps):
+def a(data, max_steps, start=(65+65j)):
     rocks = []
-    start = None
     for i, line in enumerate(data.splitlines()):
         for m in re.finditer("#", line):
             j = m.start()
             rocks.append(complex(i, j))
-        if start is None:
-            if (m := re.search("S", line)) is not None:
-                start = complex(i, m.start())
 
     lines = data.splitlines()
     height, width = len(lines), len(lines[0])
@@ -48,15 +43,34 @@ def a(data, max_steps):
         else:
             visited[pos] = min(steps, visited[pos])
         #print(len(visited), len(curr_pos), steps)
-    visited = set([pos for pos, s in visited.items() if not s % 2])
-    breakpoint()
+    if not max_steps % 2:
+        visited = set([pos for pos, s in visited.items() if not s % 2])
+    else:
+        visited = set([pos for pos, s in visited.items() if s % 2])
+
+    def manhattan(n0, n1):
+        return int(abs(n1.real - n0.real) + abs(n1.imag - n0.imag))
+
+    center_rocks = [r for r in rocks if manhattan(r, start) < 65]
+
+    center_rocks = [r for r in rocks if manhattan(r, start) <= 65]
+
+    if not max_steps % 2:
+        center_rocks_relevant = [r for r in center_rocks if not (r.real + r.imag) % 2]
+    else:
+        center_rocks_relevant = [r for r in center_rocks if (r.real + r.imag) % 2]
+
     if 1:
         # Debug print
 
         s = 0
         for i in range(height):
             for j in range(width):
-                if complex(i, j) in rocks:
+                if complex(i, j) in center_rocks_relevant:
+                    print("R", end="")
+                elif complex(i, j) in center_rocks:
+                    print("C", end="")
+                elif complex(i, j) in rocks:
                     print("#", end="")
                 elif complex(i, j) in visited:
                     print("O", end="")
@@ -77,6 +91,17 @@ def a(data, max_steps):
         tmp.ravel()[::2] = 1
         tmp[grid2 == 2] = 2
 
+        stones = grid2.copy()
+        stones[stones == 1] = 0
+        stones[stones == 2] = 1
+
+        s_ul = np.triu(np.rot90(stones[:height//2,:width//2], -1), 1).sum()
+        s_ur = np.triu(stones[:height//2,width//2:], 1).sum()
+        s_ll = np.tril(stones[height//2:,:width//2], -1).sum()
+        s_lr = np.triu(np.rot90(stones[height//2:, width//2:], 1), 1).sum()
+        print(s_ul, s_ur, s_ll, s_lr, s_ul+s_ur+s_ll+s_lr)
+        # len(rocks) = 2273, stones 1120
+        breakpoint()
 
         tmp2 = grid2.copy()
         tmp2.ravel()[1::2] = 1
@@ -116,59 +141,18 @@ def a(data, max_steps):
 #a(example.input_data, max_steps=1000)
 #a(example.input_data, max_steps=25)
 
-#answer = a(puzzle.input_data, max_steps=65)
-answer = a(puzzle.input_data, max_steps=10)#131+65)
+#answer = a(puzzle.input_data, max_steps=196)#, start=130+130j)
+#answer = a(puzzle.input_data, max_steps=10)#131+65)
 #answer = a(puzzle.input_data, max_steps=65)
 
 # Part b
 def b(data):
-    #26501365 % 131 = 65
-    #len(visited) a med input 131 innanför rutan: 16054
-    #len(rocks) 2273
-    #
-    #
-    # len(visited) a med input 131: 7474
-    #
-    # 7474-3682=3792
-    # 7479 - 3682 = 3797
-    # 7474
-    #
-    #len(rocks) 2273
-    #26501365//131 = 202300
-    # .O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.
-    #print(".O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O.O".count("O")) 65
-    #202300 *
-    #   (26501365 * 2 + 1)**2
-    #return (26501365//131*2+1)*3682+(26501365//131*2-1)*12372
-    #>>> (26501365-65)/131
-    #202300.0
-    #(202300*2+1)**2//2
-    #((26501365*2+1)//131)**2//2=81850984600
-    #print(data)
-    #return 81850984601*3682 + 81850984600*3792 + 1
-    #return 81850984601*7479
-    #return 81850984601*7479+1
-    #return 81850984601*3682 + 81850984600*3797 + 1
-    #return ((26501365//131*2+1)**2//2+1)*7479+1
-    #return ((26501365//131*2+1)**2//2+1)*7474+1
-    #
-    #a(puzzle.input_data, max_steps=131+65)
-    #(Pdb) len(visited)
-    #33564 (exklusive S)
-    #
-    #(Pdb) tmp[tmp == 1].sum()
-    #7479
-    #(Pdb) tmp2[tmp2 == 1].sum()
-    #7409
-    breakpoint()
+    #max_steps=65: visited= 3742len(center_rocks_relevant): 613
+    steps = 26501365
+    return (steps//131+1)**2*3742+(steps//131)**2*3682+(steps//131*2+1)**2//2//2*3709+(steps//131*2+1)**2//2//2*3748
 
 
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer > 6495439710
-#assert answer < 1314035706768400
-#assert answer < 913129584201282
-#                611754258907874
 assert answer < 26501365**2
-assert answer != 612163513830880
 puzzle.answer_b = answer
