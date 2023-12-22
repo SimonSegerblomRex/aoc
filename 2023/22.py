@@ -1,13 +1,10 @@
 import ast
-import datetime
-import re
-from scipy.signal import convolve
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 22
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -32,15 +29,11 @@ def a(data):
     for c0, c1 in bricks:
         n += 1
         lowest_z = z.argmax(axis=2)[c0[0]:c1[0]+1,c0[1]:c1[1]+1].max() + 1
-        if 1:
-            print(lowest_z)
-            while True:
-                if z[c0[0]:c1[0]+1,c0[1]:c1[1]+1,lowest_z:lowest_z+c1[2]-c0[2]+1].sum() > 0:
-                    lowest_z += 1
-                else:
-                    break
-            print(lowest_z)
-            print("")
+        while True:
+            if z[c0[0]:c1[0]+1,c0[1]:c1[1]+1,lowest_z:lowest_z+c1[2]-c0[2]+1].sum() > 0:
+                lowest_z += 1
+            else:
+                break
         z[c0[0]:c1[0]+1,c0[1]:c1[1]+1,lowest_z:lowest_z+c1[2]-c0[2]+1] = n
         c0[2] = lowest_z
         c1[2] = lowest_z + c1[2] - c0[2]
@@ -60,7 +53,6 @@ def a(data):
         del others[n]
         tmp = neigh.difference(*(list(s) for s in others.values()))
         if not tmp:
-            print(n)
             s += 1
 
     return s
@@ -71,10 +63,9 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-if 0:
-    answer = a(puzzle.input_data)
-    print("a:", answer)
-    assert answer == 482
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 482
 
 
 # Part b
@@ -117,58 +108,24 @@ def b(data):
                 neigh.add(z[c])
         neighbours[n] = neigh
 
-
-    if 1:
-        def disintegrate(blocks, neighbours):
-            s = set()
-            neigh = set()
-            for n in blocks:
-                neigh |= neighbours.pop(n)
-            if not neigh:
-                return s
-            neigh = neigh.copy()
-            neigh ^= neigh.intersection(set.union(*(s for s in neighbours.values())))
-            if neigh:
-                s |= neigh
-                s |= disintegrate(neigh, neighbours.copy())
+    def disintegrate(blocks, neighbours):
+        s = set()
+        neigh = set()
+        for n in blocks:
+            neigh |= neighbours.pop(n)
+        if not neigh:
             return s
-
-        s = 0
-        print(neighbours)
-        for n, neigh in neighbours.items():
-            tmp = disintegrate(set([n]), neighbours.copy())
-            #breakpoint()
-            print(n, (np.array(list(tmp)) > n).sum())
-            s += (np.array(list(tmp)) > n).sum()
+        neigh = neigh.copy()
+        neigh ^= neigh.intersection(set.union(*(s for s in neighbours.values())))
+        if neigh:
+            s |= neigh
+            s |= disintegrate(neigh, neighbours.copy())
         return s
-        breakpoint()
-
-    if 0:
-        tower_height = z.shape[2]
-        for n in range(2, nn + 1):
-            zz = z.copy()
-            zz[:, :, 0] = 0
-            z2 = z.copy()
-            z2[z2!=n] = 0
-            hmm = z2.argmax(axis=2).max()
-            zz[zz == n] = 0
-            hmm2 = zz[:,:,::-1].argmax(axis=2).max()
-            if (tower_height - hmm2) - hmm > 1:
-                print(n)
-            #cc = np.nonzero(zz == n)
-        breakpoint()
 
     s = 0
     for n, neigh in neighbours.items():
-        others = neighbours.copy()
-        del others[n]
-        tmp = neigh.difference(*(list(s) for s in others.values()))
-        breakpoint()
-        if not tmp:
-            print(n)
-            s += 1
-
-    breakpoint()
+        tmp = disintegrate(set([n]), neighbours.copy())
+        s += (np.array(list(tmp)) > n).sum()
     return s
 
 
@@ -177,4 +134,4 @@ print(f"Example answer: {example_answer} (expecting: {7})")
 assert example_answer == 7
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 103010
