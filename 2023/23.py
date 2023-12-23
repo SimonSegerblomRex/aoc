@@ -3,6 +3,7 @@ import re
 import queue
 from collections import defaultdict
 import sys
+from functools import cache
 
 import numpy as np
 from aocd.models import Puzzle
@@ -13,7 +14,7 @@ DAY = datetime.datetime.today().day
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 
 # Part a
@@ -102,30 +103,96 @@ for example in puzzle.examples:
 
 
 # Part b
-def c_star(paths, end, forest, slopes):
-    if sum(p[-1] == end for p in paths) == len(paths):
-        return paths
-    new_paths = []
-    for path in paths:
-        current = path[-1]
-        if current == end:
-            new_paths.append(path)
+def c_star(path, end, forest, slopes):
+    if path[-1] == end:
+        return path
+    current = path[-1]
+    candidates = []
+    dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+    for dir in dirs:
+        next_node = current + dir
+        if next_node in forest:
             continue
-        dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
-        for dir in dirs:
-            next_node = current + dir
-            if next_node in forest:
-                continue
-            if next_node in path:
-                continue
-            #if next_node in slopes:
-            #    if dir != slopes[next_node]:
-            #        continue
-            new_paths.append([*path, next_node])
-    return c_star(new_paths, end, forest, slopes)
+        if next_node in path:
+            continue
+        candidate = c_star([*path, next_node], end, forest, slopes)
+        candidates.append(candidate)
+    best_path = []
+    max_length = 0
+    for p in candidates:
+        if p and p[-1] == end:
+            if len(p) > max_length:
+                best_path = p
+    return best_path
 
+
+forest = []
+
+@cache
+def d_star(path, end):
+    if path[-1] == end:
+        return path
+    current = path[-1]
+    candidates = []
+    dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+    for dir in dirs:
+        next_node = current + dir
+        if next_node in forest:
+            continue
+        if next_node in path:
+            continue
+        candidate = d_star((*path, next_node), end)
+        candidates.append(candidate)
+    best_path = []
+    max_length = 0
+    for p in candidates:
+        if p and p[-1] == end:
+            if len(p) > max_length:
+                best_path = p
+    return best_path
 
 def b(data):
+    grid = np.vstack(
+        [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
+    )
+    height, width = grid.shape
+    grid[grid != ord("#")] = 0
+    grid[grid == ord("#")] = 3
+    grid[0, 1] = 3
+    grid[0, 1] = 3
+    grid[height-1, width-2] = 3
+
+    if 0:
+        if 0:
+            from scipy.ndimage import watershed_ift
+            markers = grid.copy().astype(int)
+            markers[markers == 2] = -1
+            markers[1,2] = 1
+            markers[height-2,width-2] = 2
+            grid = watershed_ift(grid, markers)
+        elif 1:
+            from skimage.segmentation import watershed
+            markers = grid.copy().astype(int)
+            markers[markers == 2] = -1
+            markers[1,2] = 1
+            markers[height-2,width-2] = 2
+            grid = watershed(grid, markers)
+
+        for i in range(height):
+            for j in range(width):
+                if grid[i, j] == 3:
+                    print("#", end="")
+                elif grid[i, j] == 1:
+                    print("O", end="")
+                elif grid[i, j] == 2:
+                    print("X", end="")
+                else:
+                    print(".", end="")
+            print("")
+
+        breakpoint()
+
+    global forest
     forest = []
     slopes = {}
     dirs = {
@@ -151,8 +218,8 @@ def b(data):
     forest.append(start - 1)
     forest.append(goal + 1)
 
-    paths = c_star([[start]], goal, forest, slopes)
-    return max(len(p) for p in paths) - 1
+    path = d_star((start,), goal)
+    return len(path) - 1
 
 
 
@@ -161,4 +228,5 @@ print(f"Example answer: {example_answer} (expecting: {154})")
 assert example_answer == 154
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer > 2000
 puzzle.answer_b = answer
