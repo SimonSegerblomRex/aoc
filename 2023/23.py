@@ -2,6 +2,7 @@ import datetime
 import re
 import queue
 from collections import defaultdict
+import sys
 
 import numpy as np
 from aocd.models import Puzzle
@@ -10,6 +11,9 @@ YEAR = datetime.datetime.today().year
 DAY = datetime.datetime.today().day
 
 puzzle = Puzzle(year=YEAR, day=DAY)
+
+
+sys.setrecursionlimit(10000)
 
 
 # Part a
@@ -34,57 +38,27 @@ def debug_print(forest, path):
         print("")
 
 
-def a_star(start, end, forest, slopes):
-    def h(node):
-        return int(abs(end.real - node.real) + abs(end.imag - node.imag))
-
-    open_set = queue.PriorityQueue()
-    open_set.put((0, 0, start))
-
-    g_score = defaultdict(lambda: 0)
-    g_score[start] = 0
-
-    f_score = defaultdict(lambda: 0)
-    f_score[start] = -h(start)
-
-    came_from = {}
-    came_from[start] = -1 + 1j # FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    i = 2
-
-    while not open_set.empty():
-        _, _, current = open_set.get()
+def b_star(paths, end, forest, slopes):
+    if sum(p[-1] == end for p in paths) == len(paths):
+        return paths
+    new_paths = []
+    for path in paths:
+        current = path[-1]
         if current == end:
-            tmp = reconstruct_path(came_from, current)
-            debug_print(forest, tmp)
-            print(len(tmp))
-            breakpoint()
-
-            return int(g_score[current])
-
+            new_paths.append(path)
+            continue
         dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
         for dir in dirs:
             next_node = current + dir
             if next_node in forest:
                 continue
-            if came_from[current] == next_node:
+            if next_node in path:
                 continue
             if next_node in slopes:
                 if dir != slopes[next_node]:
                     continue
-            tentative_g_score = g_score[current] + h(next_node)
-            if tentative_g_score > g_score[next_node]:
-                g_score[next_node] = tentative_g_score
-                f_score[next_node] = tentative_g_score + h(next_node)
-                came_from[next_node] = current
-                open_set.put(
-                    (
-                        -f_score[next_node],
-                        i,
-                        next_node,
-                    )
-                )
-                i += 1
+            new_paths.append([*path, next_node])
+    return b_star(new_paths, end, forest, slopes)
 
 
 def a(data):
@@ -103,7 +77,6 @@ def a(data):
         for m in re.finditer("\^|>|v|<", line):
             j = m.start()
             slopes[complex(i, j)] = dirs[m.group(0)]
-
     height, width = i + 1, j + 1
 
     start = 0 + 1j
@@ -111,15 +84,18 @@ def a(data):
 
     goal = complex(height - 1, width - 2)
 
-    tmp =  a_star(start, goal, forest, slopes)
-    breakpoint()
+    forest.append(start - 1)
+    forest.append(goal + 1)
+
+    paths =  b_star([[start]], goal, forest, slopes)
+    return max(len(p) for p in paths) - 1
 
 
 for example in puzzle.examples:
     if example.answer_a:
         example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        assert str(example_answer) == example.answer_a
+        print(f"Example answer: {example_answer} (expecting: {94})")
+        assert example_answer == 94
 answer = a(puzzle.input_data)
 print("a:", answer)
 puzzle.answer_a = answer
