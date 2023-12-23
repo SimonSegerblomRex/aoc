@@ -1,20 +1,17 @@
-import datetime
 import re
-import queue
-from collections import defaultdict
 import sys
-from functools import cache
+from collections import defaultdict
 
+import networkx as nx
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 23
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-
-sys.setrecursionlimit(100000)
+sys.setrecursionlimit(10000)
 
 
 # Part a
@@ -97,59 +94,11 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {94})")
         assert example_answer == 94
-#answer = a(puzzle.input_data)
-#print("a:", answer)
-#puzzle.answer_a = answer
-
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 2086
 
 # Part b
-def c_star(path, end, forest, slopes):
-    if path[-1] == end:
-        return path
-    current = path[-1]
-    candidates = []
-    dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
-    for dir in dirs:
-        next_node = current + dir
-        if next_node in forest:
-            continue
-        if next_node in path:
-            continue
-        candidate = c_star([*path, next_node], end, forest, slopes)
-        candidates.append(candidate)
-    best_path = []
-    max_length = 0
-    for p in candidates:
-        if p and p[-1] == end:
-            if len(p) > max_length:
-                best_path = p
-    return best_path
-
-
-@cache
-def d_star(path, end):
-    if path[-1] == end:
-        return path
-    current = path[-1]
-    candidates = []
-    dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
-    for dir in dirs:
-        next_node = current + dir
-        if next_node in forest:
-            continue
-        if next_node in path:
-            continue
-        candidate = d_star((*path, next_node), end)
-        candidates.append(candidate)
-    best_path = []
-    max_length = 0
-    for p in candidates:
-        if p and p[-1] == end:
-            if len(p) > max_length:
-                best_path = p
-    return best_path
-
-
 def find_connections(node, forest):
     dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
     connections = set()
@@ -205,49 +154,6 @@ def e_star(paths, goal, graph):
     return e_star(new_paths, goal, graph)
 
 
-global graph
-@cache
-def f_star(paths, goal):
-    if sum(p[-1] == goal for (p, _) in paths) == len(paths):
-        return paths
-    new_paths = []
-    for (path, steps) in paths:
-        current = path[-1]
-        if current == goal:
-            new_paths.append((path, steps))
-            continue
-        for (next_node, s) in graph[current]:
-            if next_node in path:
-                continue
-            new_paths.append(((*path, next_node), steps + s))
-    return f_star(tuple(new_paths), goal)
-
-
-
-def a_star(start, goal, graph):
-    def h(node):
-        return int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
-
-    open_set = queue.PriorityQueue()
-    open_set.put((0, 0, start))
-
-    g_score = defaultdict(lambda: 0)
-    g_score[start] = 0
-    f_score = defaultdict(lambda: 0)
-    f_score[start] = 0
-
-    i = 1
-    while not open_set.empty():
-        _, _,current = open_set.get()
-        for node, s in graph[current]:
-            tentative_g_score = g_score[current] + s
-            if tentative_g_score >  g_score[node]:
-                g_score[node] = tentative_g_score
-                f_score[node] = tentative_g_score + 1#h(node)
-                open_set.put((-f_score[node],i,node))
-                i += 1
-    breakpoint()
-
 def b(data):
     forest = []
     for i, line in enumerate(data.splitlines()):
@@ -263,86 +169,21 @@ def b(data):
     forest.append(start - 1)
     forest.append(goal + 1)
 
-    #graph = create_dag(start, goal, forest)
-    #tmp = a_star(start, goal, graph)
-    global graph
     graph = create_graph(start, goal, forest)
-    import networkx as nx
     G = nx.Graph()
     for from_node, to_nodes in graph.items():
         for to_node, step in to_nodes:
             G.add_edge(from_node, to_node, weight=step)
-    t2 = nx.all_simple_paths(G, source=start, target=goal)
+
     m = 0
-    for path in t2:
+    for path in nx.all_simple_paths(G, source=start, target=goal):
         m = max(m, nx.path_weight(G, path, weight="weight"))
     return m
-    #t3 = next(t2)
-
-    breakpoint()
-    #add_edge("A", "B", weight=4)
-
-    paths = f_star((((start,), 0),), goal)
-    breakpoint()
-    #paths = e_star([([start], 0)], goal, graph)
-    return max(s for _, s in paths)
-    #print(max(len(p) for p in paths) - 1)
-    breakpoint()
-    tmp = a_star(goal, start, graph)
-    breakpoint()
-
-    #path = d_star((start,), goal)
-    #return len(path) - 1
-
 
 
 example_answer = b(example.input_data)
 print(f"Example answer: {example_answer} (expecting: {154})")
-#assert example_answer == 154
+assert example_answer == 154
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer > 2000
-puzzle.answer_b = answer
-
-
-"""
-   if 0:
-        grid = np.vstack(
-            [np.frombuffer(row.encode(), dtype=np.uint8) for row in data.splitlines()]
-        )
-        height, width = grid.shape
-        grid[grid != ord("#")] = 0
-        grid[grid == ord("#")] = 3
-        grid[0, 1] = 3
-        grid[0, 1] = 3
-        grid[height-1, width-2] = 3
-
-        if 0:
-            from scipy.ndimage import watershed_ift
-            markers = grid.copy().astype(int)
-            markers[markers == 2] = -1
-            markers[1,2] = 1
-            markers[height-2,width-2] = 2
-            grid = watershed_ift(grid, markers)
-        elif 1:
-            from skimage.segmentation import watershed
-            markers = grid.copy().astype(int)
-            markers[markers == 2] = -1
-            markers[1,2] = 1
-            markers[height-2,width-2] = 2
-            grid = watershed(grid, markers)
-
-        for i in range(height):
-            for j in range(width):
-                if grid[i, j] == 3:
-                    print("#", end="")
-                elif grid[i, j] == 1:
-                    print("O", end="")
-                elif grid[i, j] == 2:
-                    print("X", end="")
-                else:
-                    print(".", end="")
-            print("")
-
-        breakpoint()
-"""
+assert answer == 6526
