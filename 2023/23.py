@@ -96,21 +96,69 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {94})")
         assert example_answer == 94
-answer = a(puzzle.input_data)
-print("a:", answer)
-puzzle.answer_a = answer
+#answer = a(puzzle.input_data)
+#print("a:", answer)
+#puzzle.answer_a = answer
 
 
 # Part b
+def c_star(paths, end, forest, slopes):
+    if sum(p[-1] == end for p in paths) == len(paths):
+        return paths
+    new_paths = []
+    for path in paths:
+        current = path[-1]
+        if current == end:
+            new_paths.append(path)
+            continue
+        dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+        for dir in dirs:
+            next_node = current + dir
+            if next_node in forest:
+                continue
+            if next_node in path:
+                continue
+            #if next_node in slopes:
+            #    if dir != slopes[next_node]:
+            #        continue
+            new_paths.append([*path, next_node])
+    return c_star(new_paths, end, forest, slopes)
+
+
 def b(data):
-    breakpoint()
+    forest = []
+    slopes = {}
+    dirs = {
+        "^": -1 + 0j,
+        ">": 0 + 1j,
+        "v": 1 + 0j,
+        "<": 0 - 1j,
+    }
+    for i, line in enumerate(data.splitlines()):
+        for m in re.finditer("#", line):
+            j = m.start()
+            forest.append(complex(i, j))
+        for m in re.finditer("\^|>|v|<", line):
+            j = m.start()
+            slopes[complex(i, j)] = dirs[m.group(0)]
+    height, width = i + 1, j + 1
+
+    start = 0 + 1j
+    dir = 1 + 0j
+
+    goal = complex(height - 1, width - 2)
+
+    forest.append(start - 1)
+    forest.append(goal + 1)
+
+    paths = c_star([[start]], goal, forest, slopes)
+    return max(len(p) for p in paths) - 1
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
+
+example_answer = b(example.input_data)
+print(f"Example answer: {example_answer} (expecting: {154})")
+assert example_answer == 154
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
