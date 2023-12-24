@@ -2,6 +2,8 @@ import ast
 
 import numpy as np
 from aocd.models import Puzzle
+from sympy import solve, symbols
+
 
 YEAR = 2023
 DAY = 24
@@ -89,22 +91,15 @@ def b(data):
     velocities = np.array(velocities, dtype=int)
     velocities.shape = (-1, 3)
 
-    from sympy import solve
-    from sympy import symbols
     t_symbols = symbols(f"t:{5}", integer=True, positive=True)
     s_x, s_y, s_z = symbols("s_x,s_y,s_z", integer=True)
     v_x, v_y, v_z = symbols("v_x,v_y,v_z", integer=True)
     equations = []
-    i = 0
     for t, p, v in zip(t_symbols, positions, velocities):
         equations.append(s_x + t * v_x - p[0] - t * v[0])
         equations.append(s_y + t * v_y - p[1] - t * v[1])
         equations.append(s_z + t * v_z - p[2] - t * v[2])
-        i += 1
-        if i > 4:
-            break
     solution = solve(equations, [s_x, s_y, s_z, v_x, v_y, v_z, *t_symbols], dict=True)
-    breakpoint()
     return solution[0][s_x] + solution[0][s_y] + solution[0][s_z]
 
 
@@ -113,4 +108,4 @@ print(f"Example answer: {example_answer} (expecting: {47})")
 assert example_answer == 47
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 948485822969419
