@@ -15,14 +15,9 @@ def a(data):
         name, others = line.split(":")
         components[name] = others.strip().split()
 
-    G = nx.DiGraph()
-    for from_node, to_nodes in components.items():
-        for to_node in to_nodes:
-            G.add_edge(from_node, to_node)
-
+    G = nx.DiGraph(components)
     UG = G.to_undirected()
     UG.remove_edges_from(nx.minimum_edge_cut(UG))
-
     sizes = [len(c) for c in nx.connected_components(UG)]
     return sizes[0] * sizes[1]
 
