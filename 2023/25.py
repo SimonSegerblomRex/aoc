@@ -1,11 +1,9 @@
-import datetime
-import re
-
+import networkx as nx
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2023
+DAY = 25
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -17,26 +15,16 @@ def a(data):
         name, others = line.split(":")
         components[name] = others.strip().split()
 
-    import networkx as nx
     G = nx.DiGraph()
     for from_node, to_nodes in components.items():
         for to_node in to_nodes:
             G.add_edge(from_node, to_node)
 
     UG = G.to_undirected()
+    UG.remove_edges_from(nx.minimum_edge_cut(UG))
 
-    if 1:
-        UG.remove_edge("mrd", "rjs")
-        UG.remove_edge("gmr", "ntx")
-        UG.remove_edge("ncg", "gsk")
-
-    if 0:
-        nx.draw_networkx(UG)
-        import matplotlib.pyplot as plt
-        plt.show()
-
-    subgraphs = [UG.subgraph(c).copy() for c in nx.connected_components(UG)]
-    return len(subgraphs[0].nodes) * len(subgraphs[1].nodes)
+    sizes = [len(c) for c in nx.connected_components(UG)]
+    return sizes[0] * sizes[1]
 
 
 example = """jqt: rhn xhk nvd
@@ -53,24 +41,9 @@ lsr: lhk
 rzs: qnr cmg lsr rsh
 frs: qnr lhk lsr"""
 
-#example_answer = a(example)
-#print(f"Example answer: {example_answer} (expecting: {54})")
-#assert example_answer == 54
+example_answer = a(example)
+print(f"Example answer: {example_answer} (expecting: {54})")
+assert example_answer == 54
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-
-
-# Part b
-def b(data):
-    breakpoint()
-
-
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
-print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 580800
