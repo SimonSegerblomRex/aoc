@@ -21,15 +21,16 @@ assert answer == 2080
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    image = np.array(list(map(int, data)))
+    image.shape = (-1, 6, 25)
+    import matplotlib.pyplot as plt
+    out = np.zeros((6, 25))
+    layer_idx = (image < 2).argmax(axis=0)
+    for i in range(6):
+        for j in range(25):
+            out[i, j] = image[layer_idx[i, j], i, j]
+    plt.imshow(out)
+    plt.show()
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
-print("b:", answer)
-puzzle.answer_b = answer
+b(puzzle.input_data)
