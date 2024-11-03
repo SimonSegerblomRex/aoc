@@ -34,20 +34,34 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 979
 
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    min_lim, max_lim = map(int, data.split("-"))
+    s = 0
+    for n in range(min_lim, max_lim + 1):
+        digits = list(map(int, (str(n))))
+        doubles = []
+        increasing = True
+        for i, (d0, d1) in enumerate(pairwise(digits)):
+            if d1 < d0:
+                increasing = False
+                break
+            if d0 == d1:
+                doubles.append((i, d0))
+        if doubles and increasing:
+            vals = set(v for _, v in doubles)
+            counts = []
+            for val in vals:
+                counts.append(sum(v == val for _, v in doubles))
+            if min(counts) > 1:
+                continue
+            s += 1
+    return s
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 635
