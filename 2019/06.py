@@ -33,7 +33,22 @@ assert answer == 315757
 
 # Part b
 def b(data):
-    breakpoint()
+    orbits = data.splitlines()
+    orbit_map = {}
+    for orbit in orbits:
+        a, b = orbit.split(")")
+        orbit_map[b] = a
+    def parents(o):
+        p = []
+        if o in orbit_map:
+            p.append(orbit_map[o])
+            p.extend(parents(orbit_map[o]))
+        return p
+    you = parents("YOU")
+    san = parents("SAN")
+    for i, p in enumerate(you):
+        if p in san:
+            return i + san.index(p)
 
 
 for example in puzzle.examples:
@@ -43,4 +58,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 481
