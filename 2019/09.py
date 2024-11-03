@@ -109,10 +109,11 @@ assert answer == 3429606717
 # Part b
 def b(data):
     codes = list(map(int, data.split(",")))
-    breakpoint()
+    codes.extend([0]*1000)
+    out, *_ = run(codes.copy(), [2])
+    return out
 
 
 answer = b(puzzle.input_data)
-breakpoint()
-#print("b:", answer)
-#assert answer == 8271623
+print("b:", answer)
+assert answer == 33679
