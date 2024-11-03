@@ -10,11 +10,11 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def run(codes, inputs):
-    pos = 0
+def run(codes, inputs, pos=0):
     while True:
         instruction = codes[pos]
         opcode = instruction % 100
+        finished = False
         if opcode == 1:
             idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
             idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
@@ -35,6 +35,7 @@ def run(codes, inputs):
             idx0 =  pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
             inputs.append(codes[idx0])
             pos += 2
+            break
         elif opcode == 5:
             idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
             idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
@@ -68,11 +69,13 @@ def run(codes, inputs):
                 codes[idx2] = 0
             pos += 4
         elif opcode == 99:
+            pos += 1
+            finished = True
             break
         else:
             print(f"Unknown {opcode=}")
             breakpoint()
-    return inputs.pop()
+    return inputs.pop(), pos, finished
 
 
 def a(data):
@@ -82,7 +85,7 @@ def a(data):
     for phases in phases_permutations:
         input0 = 0
         for phase in phases:
-            input0 = run(codes.copy(), [phase, input0])
+            input0, *_ = run(codes.copy(), [phase, input0])
         scores.append(input0)
     return max(scores)
 
@@ -91,11 +94,29 @@ answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 24405
 
+
 # Part b
 def b(data):
-    breakpoint()
+    codes = list(map(int, data.split(",")))
+    phases_permutations = permutations(range(5, 10), 5)
+    scores = []
+    for phases in phases_permutations:
+        codes_copies = [codes.copy() for _ in range(5)]
+        pos_cache = [0] * 5
+        input0 = 0
+        finished = False
+        for i, phase in enumerate(phases):
+            input0, pos, finished = run(codes_copies[i], [phase, input0])
+            pos_cache[i] = pos
+        while not finished:
+            for i in range(5):
+                input0, pos, finished = run(codes_copies[i], [input0], pos=pos_cache[i])
+                pos_cache[i] = pos
+        scores.append(input0)
+    return max(scores)
 
 
 answer = b(puzzle.input_data)
+assert answer < 9065837
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 8271623
