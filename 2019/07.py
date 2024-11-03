@@ -15,54 +15,65 @@ def run(codes, inputs, pos=0):
         instruction = codes[pos]
         opcode = instruction % 100
         finished = False
+        def get_mode(instruction, i):
+            return instruction // 10**(i + 2) & 0b11
+        def get_idx(instruction, i):
+            mode = get_mode(instruction, i)
+            if mode == 0:
+                return codes[pos + i + 1]
+            if mode == 1:
+                return pos + i + 1
+            if mode == 2:
+                return codes[pos + i + 1]  # hmm
+            raise NotImplementedError(f"Unsupported {mode=}")
         if opcode == 1:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
-            idx2 = pos + 3 if (instruction // 10000) % 2 else codes[pos + 3]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
+            idx2 = get_idx(instruction, 2)
             codes[idx2] = codes[idx0] + codes[idx1]
             pos += 4
         elif opcode == 2:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
-            idx2 = pos + 3 if (instruction // 10000) % 2 else codes[pos + 3]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
+            idx2 = get_idx(instruction, 2)
             codes[idx2] = codes[idx0] * codes[idx1]
             pos += 4
         elif opcode == 3:
-            idx0 =  pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
+            idx0 = get_idx(instruction, 0)
             codes[idx0] = inputs.pop(0)
             pos += 2
         elif opcode == 4:
-            idx0 =  pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
+            idx0 = get_idx(instruction, 0)
             inputs.append(codes[idx0])
             pos += 2
             break
         elif opcode == 5:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
             if codes[idx0] != 0:
                 pos = codes[idx1]
             else:
                 pos += 3
         elif opcode == 6:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
             if codes[idx0] == 0:
                 pos = codes[idx1]
             else:
                 pos += 3
         elif opcode == 7:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
-            idx2 = pos + 3 if (instruction // 10000) % 2 else codes[pos + 3]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
+            idx2 = get_idx(instruction, 2)
             if codes[idx0] < codes[idx1]:
                 codes[idx2] = 1
             else:
                 codes[idx2] = 0
             pos += 4
         elif opcode == 8:
-            idx0 = pos + 1 if (instruction // 100) % 2 else codes[pos + 1]
-            idx1 = pos + 2 if (instruction // 1000) % 2 else codes[pos + 2]
-            idx2 = pos + 3 if (instruction // 10000) % 2 else codes[pos + 3]
+            idx0 = get_idx(instruction, 0)
+            idx1 = get_idx(instruction, 1)
+            idx2 = get_idx(instruction, 2)
             if codes[idx0] == codes[idx1]:
                 codes[idx2] = 1
             else:
