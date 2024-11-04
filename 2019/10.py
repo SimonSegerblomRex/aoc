@@ -1,3 +1,5 @@
+from functools import cache
+
 import numpy as np
 from sympy import Abs, I, im, re
 from aocd.models import Puzzle
@@ -6,6 +8,15 @@ YEAR = 2019
 DAY = 10
 
 puzzle = Puzzle(year=YEAR, day=DAY)
+
+@cache
+def norm(x):
+    tmp = x / Abs(x)
+    # sympy doesn't simplify the fractions
+    # if we don't do anything special...
+    # using re + im seems to be the
+    # cheapest way of achieving this
+    return re(tmp), im(tmp)
 
 
 # Part a
@@ -21,8 +32,7 @@ def a(data):
         for b in asteroids:
             if a == b:
                 continue
-            nn = (b - a) / Abs(b - a)
-            tmp.add((re(nn), im(nn)))
+            tmp.add(norm(b - a))
         best = tmp if len(tmp) > len(best) else best
     return len(best)
 
