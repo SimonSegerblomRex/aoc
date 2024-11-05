@@ -11,11 +11,10 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def run(codes, inputs, pos=0):
-    relative_base = 0
+def run(codes, inputs, pos=0, relative_base=0):
     while True:
         instruction = codes[pos]
-        opcode = instruction % 100
+        opcode = abs(instruction) % 100
         finished = False
         def get_mode(instruction, i):
             return int(("0000" + str(instruction))[-3 - i])
@@ -92,7 +91,7 @@ def run(codes, inputs, pos=0):
         else:
             print(f"Unknown {opcode=}")
             breakpoint()
-    return inputs.pop(), pos, finished
+    return inputs.pop(), pos, finished, relative_base
 
 
 def a(data):
@@ -102,13 +101,14 @@ def a(data):
     pos = 0 + 0j
     dir = 0 + 1j
     cpos = 0
+    relative_base = 0
     finished = False
     while not finished:
         inp = coords[pos]
-        col, cpos, finished = run(codes, [inp], cpos)
+        col, cpos, finished, relative_base = run(codes, [inp], cpos, relative_base)
         if finished:
             break
-        right, cpos, finished = run(codes, [inp], cpos)
+        right, cpos, finished, relative_base = run(codes, [], cpos, relative_base)
         dir = dir * (-1j if right else 1j)
         coords[pos] = col
         pos += dir
@@ -117,12 +117,41 @@ def a(data):
 
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 2184
 
 
 # Part b
 def b(data):
-    breakpoint()
+    codes = list(map(int, data.split(",")))
+    codes.extend([0]*1000)
+    coords = defaultdict(int)  # default to 0, black
+    pos = 0 + 0j
+    coords[pos] = 1  # start panel white
+    dir = 0 + 1j
+    cpos = 0
+    relative_base = 0
+    finished = False
+    while not finished:
+        inp = coords[pos]
+        col, cpos, finished, relative_base = run(codes, [inp], cpos, relative_base)
+        if finished:
+            break
+        right, cpos, finished, relative_base = run(codes, [], cpos, relative_base)
+        dir = dir * (-1j if right else 1j)
+        coords[pos] = col
+        pos += dir
+    min_x = int(min(n.real for n in coords))
+    min_y = int(min(n.imag for n in coords))
+    max_x = int(max(n.real for n in coords))
+    max_y = int(max(n.imag for n in coords))
+    for i in range(max_y, min_y - 1, -1):
+        for j in range(min_x, max_x + 1):
+            if coords[j + i*1j]:
+                print("#", end="")
+            else:
+                print(" ", end="")
+        print()
+
 
 
 answer = b(puzzle.input_data)
