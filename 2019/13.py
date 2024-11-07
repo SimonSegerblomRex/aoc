@@ -123,59 +123,87 @@ def b(data):
     codes_orig = list(map(int, data.split(",")))
     codes_orig.extend([0]*1000)
     codes_orig[0] = 2
-    codes = codes_orig.copy()
-    cpos = 0
-    relative_base = 0
-    finished = False
-    inp = 0
-    tmp = []
-    score = 0
-    wall = []
-    blocks = []
-    paddle = 24 + 24j
-    ball = 0 + 0j
-    all_set = False
-    dir = 5
-    while not finished:
-        out, cpos, finished, relative_base = run(codes, [inp], cpos, relative_base)
-        tmp.append(out)
-        if len(tmp) == 3:
-            if tmp[0] == -1 and tmp[1] == 0:
-                score = tmp[2]
-            elif tmp[2] == 0:
-                pass
-            elif tmp[2] == 1:
-                wall.append(tmp[0] + tmp[1] * 1j)
-            elif tmp[2] == 2:
-                blocks.append(tmp[0] + tmp[1] * 1j)
-            elif tmp[2] == 3:
-                paddle = tmp[0] + tmp[1] * 1j
-                wall_x_max = int(max(n.real for n in wall))
-                wall_y_max = int(max(n.imag for n in wall))
-            elif tmp[2] == 4:
-                ball_new_pos = tmp[0] + tmp[1] * 1j
-                dir = ball_new_pos -ball
-                ball = ball_new_pos
-                if abs(dir) < 2:
-                    image = np.zeros((wall_y_max + 2, wall_x_max + 1))
-                    image[[int(n.imag) for n in wall], [int(n.real) for n in wall]] = 1
-                    image[[int(n.imag) for n in blocks], [int(n.real) for n in blocks]] = 2
-                    image[int(paddle.imag), int(paddle.real)] = 3
-                    image[int(ball.imag), int(ball.real)] = 4
-                    plt.imshow(image)
-                    plt.title(f"score: {score}")
-                    plt.draw()
-                    plt.pause(0.5)
-                    inp = -2
-                    while inp < -1:
-                        k = input("k: ")
-                        if k == "a":
-                            inp = -1
-                        elif k == "d":
-                            inp = 1
-                        else:
-                            inp = 0
-            tmp = []
+    where_to_go_orig = [24]
+    while True:
+        codes = codes_orig.copy()
+        cpos = 0
+        relative_base = 0
+        finished = False
+        where_to_go = where_to_go_orig.copy()
+        inp = 0
+        tmp = []
+        score = 0
+        wall = []
+        blocks = []
+        paddle = 24 + 24j
+        ball = 0 + 0j
+        all_set = False
+        first_run = True
+        dir = 5
+        goal = where_to_go.pop(0)
+        next_goal = None
+        while not finished:
+            diff = goal - int(paddle.real)
+            if diff > 0:
+                inp = 1
+            elif diff < 0:
+                inp = -1
+            else:
+                inp = 0
+            if next_goal is not None:
+                goal = next_goal
+            out, cpos, finished, relative_base = run(codes, [inp], cpos, relative_base)
+            tmp.append(out)
+            if len(tmp) == 3:
+                if tmp[0] == -1 and tmp[1] == 0:
+                    score = tmp[2]
+                elif tmp[2] == 0:
+                    pass
+                elif tmp[2] == 1:
+                    wall.append(tmp[0] + tmp[1] * 1j)
+                elif tmp[2] == 2:
+                    blocks.append(tmp[0] + tmp[1] * 1j)
+                elif tmp[2] == 3:
+                    paddle = tmp[0] + tmp[1] * 1j
+                    wall_x_max = int(max(n.real for n in wall))
+                    wall_y_max = int(max(n.imag for n in wall))
+                elif tmp[2] == 4:
+                    ball_new_pos = tmp[0] + tmp[1] * 1j
+                    dir = ball_new_pos -ball
+                    ball = ball_new_pos
+                    if abs(dir) < 2:
+                        if first_run:
+                            image = np.zeros((wall_y_max + 2, wall_x_max + 1))
+                            image[[int(n.imag) for n in wall], [int(n.real) for n in wall]] = 1
+                        image[[int(n.imag) for n in blocks], [int(n.real) for n in blocks]] = 2
+                        image[int(paddle.imag), int(paddle.real)] = 3
+                        image[int(ball.imag), int(ball.real)] = 4
+                        if first_run:
+                            pp = plt.imshow(image)
+                        plt.title(f"score: {score}, goal pos: {goal}")
+                        pp.set_data(image)
+                        plt.draw()
+                        plt.pause(0.5)
+                        if 0:
+                            inp = -2
+                            while inp < -1:
+                                k = input("k: ")
+                                if k == "a":
+                                    inp = -1
+                                elif k == "d":
+                                    inp = 1
+                                else:
+                                    inp = 0
+                    if int(ball.imag + 1) == int(paddle.imag) and dir.imag > 0:
+                        try:
+                            next_goal = where_to_go.pop(0)
+                        except IndexError:
+                            goal = -1
+                tmp = []
+        if len(blocks):
+            if goal == -1:
+                where_to_go_orig.append(int((ball - 2*dir + 1j).real))
+            print(where_to_go_orig)
     breakpoint()
 
 
