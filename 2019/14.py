@@ -25,6 +25,13 @@ def calc_tot_needed(reactions, needed, used, stock):
 def spend_min_ores(reactions, sstock):
     best_score = [-1]
 
+    max_needed = defaultdict(int)
+    for _, (_, needed) in reactions.items():
+        for q, n in needed.items():
+            max_needed[q] = max(max_needed[q], n)
+    del max_needed["ORE"]
+    max_needed["FUEL"] = 1
+
     @cache
     def tmp(**stock):
         possible_to_buy = []
@@ -33,7 +40,10 @@ def spend_min_ores(reactions, sstock):
                 if qq not in stock or stock[qq] < nn:
                     break
             else:
-                possible_to_buy.append(q)
+                if not (q in stock and stock[q] >= max_needed[q]):
+                    possible_to_buy.append(q)
+        if "FUEL" in possible_to_buy:
+            possible_to_buy = ["FUEL"]
         for q in possible_to_buy:
             n, needed = reactions[q]
             new_stock = defaultdict(int)
@@ -53,6 +63,31 @@ def spend_min_ores(reactions, sstock):
     return max(tmp(**sstock))
 
 
+def max_ores_stock(reactions, wwanted, sstock):
+    def tmp(wanted, stock):
+        to_buy = []
+        for q, (n, needed) in reactions.items():
+            for qq, nn in needed.items():
+                if qq not in stock or stock[qq] < nn:
+                    break
+            else:
+                if q in wanted and wanted[q] >= stock[q] and wanted[q] >= n:
+                    to_buy.append(q)
+        for q in to_buy:
+            n, needed = reactions[q]
+            new_stock = defaultdict(int)
+            new_stock |= stock
+            new_stock[q] += n
+            for qq, nn in needed.items():
+                new_stock[qq] -= nn
+            new_wanted = wanted.copy()
+            new_wanted[q] -= n
+            yield from tmp(new_wanted, new_stock)
+        yield stock["ORE"]
+
+    return min(tmp(wwanted, sstock))
+
+
 # Part a
 def a(data):
     reactions = {}
@@ -66,21 +101,24 @@ def a(data):
     stock = defaultdict(int)
     used, stock = calc_tot_needed(reactions, needed, used, stock)
     stock = {k: v for k, v in stock.items() if v > 0}
-    # used["ORE"] is an upper limit of how much ORE we might need
     new_stock = defaultdict(int)
     new_stock["ORE"] = used["ORE"]
     del reactions["ORE"]
-    return used["ORE"] - spend_min_ores(reactions, new_stock)
+    if 1:
+        # used["ORE"] is an upper limit of how much ORE we might need
+        return used["ORE"] - spend_min_ores(reactions, new_stock)
+    return max_ores_stock(reactions, stock, new_stock)
 
 
 for example in puzzle.examples:
     if example.answer_a:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        #assert str(example_answer) == example.answer_a
+        assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
+breakpoint()
+puzzle.answer_a = answer
 
 
 # Part b
