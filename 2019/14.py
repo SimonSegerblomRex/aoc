@@ -11,12 +11,9 @@ DAY = 14
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
-def calc_needed(reactions):
-    reactions["ORE"] = (1, {"ORE": 1})
-    needed = defaultdict(int, reactions["FUEL"][1])
-    stock = defaultdict(int)
-    stock["ORE"] = 1e90
+def calc_needed(reactions, stock, needed):
     used = defaultdict(int)
+    flag = 0
     while needed:
         q = list(needed)[0]
         n = needed.pop(q)
@@ -32,19 +29,31 @@ def calc_needed(reactions):
             stock[q] += chunk * multiplier - n
             for k, v in reactions[q][1].items():
                 needed[k] += max(v * multiplier, 0)
-            needed = defaultdict(int, {k: v for k, v in needed.items() if v >0})
-    return used["ORE"]
+            needed = defaultdict(int, {k: v for k, v in needed.items() if v > 0})
+            if needed["ORE"] > stock["ORE"]:
+                flag = 1
+                break
+    return used, stock, flag
 
 
-# Part a
-def a(data):
+def get_reactions(data):
     reactions = {}
     for line in data.splitlines():
         in_ = re.findall("(\d+) ([A-Z]+)", line)
         out = in_.pop(-1)
         reactions[out[1]] = int(out[0]), {q: int(n) for n, q in in_}
-    reactions["ORE"] = (1, {})
-    return calc_needed(reactions)
+    reactions["ORE"] = (1, {"ORE": 1})
+    return reactions
+
+
+
+# Part a
+def a(data):
+    reactions = get_reactions(data)
+    stock = defaultdict(int)
+    stock["ORE"] = int(1e12)
+    needed = defaultdict(int, {"FUEL": 1})
+    return calc_needed(reactions, stock, needed)[0]["ORE"]
 
 
 for example in puzzle.examples:
@@ -54,12 +63,30 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 202617
 
 
 # Part b
 def b(data):
-    breakpoint()
+    reactions = get_reactions(data)
+    stock = defaultdict(int)
+    stock["ORE"] = int(1e12)
+    fuel_chunk = int(1e11)
+    fuel = 0
+    while True:
+        needed = defaultdict(int, {"FUEL": fuel_chunk})
+        stock["FUEL"] = 0
+        backup_stock = stock.copy()
+        used, stock, flag = calc_needed(reactions, stock, needed)
+        if flag > 0:
+            stock = backup_stock
+            if fuel_chunk > 1:
+                fuel_chunk //= 10
+            else:
+                break
+        else:
+            fuel += fuel_chunk
+    return fuel
 
 
 for example in puzzle.examples:
@@ -67,6 +94,8 @@ for example in puzzle.examples:
         example_answer = b(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
         assert str(example_answer) == example.answer_b
+
+
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 7863863
