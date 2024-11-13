@@ -1,3 +1,4 @@
+import queue
 from collections import defaultdict
 from itertools import permutations
 from operator import itemgetter
@@ -125,7 +126,8 @@ def plot(*args):
 
 def a(data):
     codes = list(map(int, data.split(",")))
-    codes.extend([0]*1000)
+    codes.extend([0]*10)
+    codes_orig = codes.copy()
     cpos = 0
     relative_base = 0
     finished = False
@@ -169,10 +171,61 @@ def a(data):
             dist = [(abs(p - start), p) for p in candidates]
             new_pos = dist[0][1]
         dir = new_pos - pos
-        if i == 0:
+        if 0:#i == 0:
             plot(wall, path, [pos])
-        print(pos)
-    # find path from start to oxygen
+        #print(pos)
+    if 0:
+        # find shortest path back to start...(A*, copied from 2023/17)
+        goal = start
+        start = pos
+        # ...does't work, maybe the program exited..? try from start to pos instead
+    else:
+        goal = pos
+        codes = codes_orig.copy()
+        cpos = 0
+        relative_base = 0
+        pos = start
+
+    def h(node):
+        return int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
+
+    g_score = defaultdict(lambda: 1e12)
+    g_score[start] = 0
+
+    f_score = defaultdict(lambda: 1e12)
+    f_score[start] = h(start)
+
+    open_set = queue.PriorityQueue()
+    open_set.put((f_score[start], 0, start))
+
+    intcode_state = {}
+    intcode_state[start] = (codes.copy(), cpos, relative_base)
+
+    i = 1
+    while not open_set.empty():
+        _, _, current = open_set.get()
+        if current == goal:
+            return int(g_score[current])
+
+        dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+        for dir in dirs:
+            pos = current
+            codestmp, cpos, relative_base = intcode_state[current]
+            codes = codestmp.copy()
+            move = dir2move_map[dir]
+            status, cpos, finished, relative_base = run(codes, [move], cpos, relative_base)
+            if status == 0:
+                # hit wall
+                continue
+            pos += dir
+            tentative_g_score = g_score[current] + 1
+            if tentative_g_score < g_score[pos]:
+                g_score[pos] = tentative_g_score
+                f_score[pos] = tentative_g_score + h(pos)
+                open_set.put((f_score[pos], i, pos))
+                intcode_state[pos] = (codes.copy(), cpos, relative_base)
+                i += 1
+
     breakpoint()
 
 
