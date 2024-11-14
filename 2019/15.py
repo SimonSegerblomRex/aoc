@@ -162,7 +162,7 @@ def a(data):
         neigh = neighbours(pos)
         candidates = [n for n in neigh if n not in wall and n not in path]
         if not candidates:
-            # FIXME: no candidate...dead end... find way out
+            # no candidate...dead end... find way out
             candidates = [n for n in neigh if n not in wall]
             new_pos = candidates[0]
             wall.append(pos)
@@ -174,17 +174,10 @@ def a(data):
         if 0:#i == 0:
             plot(wall, path, [pos])
         #print(pos)
-    if 0:
-        # find shortest path back to start...(A*, copied from 2023/17)
-        goal = start
-        start = pos
-        # ...does't work, maybe the program exited..? try from start to pos instead
-    else:
-        goal = pos
-        codes = codes_orig.copy()
-        cpos = 0
-        relative_base = 0
-        pos = start
+
+    # find shortest path back to start...(A*, copied from 2023/17)
+    goal = start
+    start = pos
 
     def h(node):
         return int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
@@ -229,15 +222,9 @@ def a(data):
     breakpoint()
 
 
-for example in puzzle.examples:
-    if example.answer_a:
-        example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-
+assert answer == 366
 
 # Part b
 def b(data):
