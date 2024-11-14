@@ -228,19 +228,19 @@ def ab(data, a=False):
     codes, cpos, relative_base = intcode_state[pos]
 
     # spawn robots in all directions
-    robot_cache = {}
+    robots = {}
 
     dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
     for dir in dirs:
-        robot_cache[(pos, dir)] = codes.copy(), cpos, relative_base
+        robots[(pos, dir)] = codes.copy(), cpos, relative_base
 
     i = 0
-    while robot_cache:
-        for pos, dir in robot_cache.copy():
-            codes, cpos, relative_base = robot_cache[(pos, dir)]
+    while robots:
+        for pos, dir in robots.copy():
+            codes, cpos, relative_base = robots[(pos, dir)]
             move = dir2move_map[dir]
             status, cpos, finished, relative_base = run(codes, [move], cpos, relative_base)
-            del robot_cache[(pos, dir)]
+            del robots[(pos, dir)]
             if status == 0:
                 wall.add(pos + dir)
                 continue
@@ -249,7 +249,7 @@ def ab(data, a=False):
             neigh = neighbours(pos)
             candidates = [n for n in neigh if n not in oxygen and n not in wall]
             for new_pos in candidates:
-                robot_cache[(pos, new_pos - pos)] = codes.copy(), cpos, relative_base
+                robots[(pos, new_pos - pos)] = codes.copy(), cpos, relative_base
         i += 1
     #plot(list(wall), oxygen)
     return i
