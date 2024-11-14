@@ -132,7 +132,6 @@ def ab(data, a=False):
     relative_base = 0
     finished = False
     move = 1
-    #move2dir_map = {1: 1j, 2: -1j, 3: -1, 4: 1}
     dir2move_map = {1j: 1, -1j: 2, -1: 3, 1: 4}
     start = 0 + 0j
     pos = start
@@ -174,7 +173,6 @@ def ab(data, a=False):
         dir = new_pos - pos
         if 0:#i == 0:
             plot(list(wall), path, [pos])
-        #print(pos)
 
     # find shortest path back to start...(A*, copied from 2023/17)
     goal = start
@@ -236,7 +234,7 @@ def ab(data, a=False):
     for dir in dirs:
         robot_cache[(pos, dir)] = codes.copy(), cpos, relative_base
 
-    i = 1
+    i = 0
     while robot_cache:
         for pos, dir in robot_cache.copy():
             codes, cpos, relative_base = robot_cache[(pos, dir)]
@@ -254,8 +252,7 @@ def ab(data, a=False):
                 robot_cache[(pos, new_pos - pos)] = codes.copy(), cpos, relative_base
         i += 1
     #plot(list(wall), oxygen)
-    #breakpoint()
-    return i - 1
+    return i
 
 
 answer = ab(puzzle.input_data, a=True)
