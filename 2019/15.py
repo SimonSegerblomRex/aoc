@@ -124,7 +124,7 @@ def plot(*args):
     plt.show()
 
 
-def a(data):
+def ab(data, a=False):
     codes = list(map(int, data.split(",")))
     codes.extend([0]*10)
     codes_orig = codes.copy()
@@ -138,7 +138,8 @@ def a(data):
     pos = start
     dir = 1j
     path = []
-    wall = []
+    wall = set()
+    dead_end = []
     oxygen = []
     def neighbours(p):
         return [p + 1, p + 1j, p - 1, p -1j]
@@ -149,7 +150,7 @@ def a(data):
         status, cpos, finished, relative_base = run(codes, [move], cpos, relative_base)
         if status == 0:
             # hit wall
-            wall.append(pos + dir)
+            wall.add(pos + dir)
         elif status == 1:
             # moved one step
             pos += dir
@@ -160,19 +161,19 @@ def a(data):
             oxygen.append(pos)
             break
         neigh = neighbours(pos)
-        candidates = [n for n in neigh if n not in wall and n not in path]
+        candidates = [n for n in neigh if n not in wall and n not in dead_end and n not in path]
         if not candidates:
             # no candidate...dead end... find way out
-            candidates = [n for n in neigh if n not in wall]
+            candidates = [n for n in neigh if n not in wall and n not in dead_end]
             new_pos = candidates[0]
-            wall.append(pos)
+            dead_end.append(pos)
         else:
             # go to neighbour closest to start not in path
             dist = [(abs(p - start), p) for p in candidates]
             new_pos = dist[0][1]
         dir = new_pos - pos
         if 0:#i == 0:
-            plot(wall, path, [pos])
+            plot(list(wall), path, [pos])
         #print(pos)
 
     # find shortest path back to start...(A*, copied from 2023/17)
@@ -198,7 +199,8 @@ def a(data):
     while not open_set.empty():
         _, _, current = open_set.get()
         if current == goal:
-            return int(g_score[current])
+            answer_a = int(g_score[current])
+            break
 
         dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
         for dir in dirs:
@@ -219,18 +221,47 @@ def a(data):
                 intcode_state[pos] = (codes.copy(), cpos, relative_base)
                 i += 1
 
-    breakpoint()
+    if a:
+        return answer_a
+
+    # b...
+    # back to oxygen pos
+    pos = oxygen[0]
+    codes, cpos, relative_base = intcode_state[pos]
+
+    # spawn robots in all directions
+    robot_cache = {}
+
+    dirs = [0 + 1j, -1 + 0j, 0 - 1j, 1 + 0j]
+    for dir in dirs:
+        robot_cache[(pos, dir)] = codes.copy(), cpos, relative_base
+
+    i = 1
+    while robot_cache:
+        for pos, dir in robot_cache.copy():
+            codes, cpos, relative_base = robot_cache[(pos, dir)]
+            move = dir2move_map[dir]
+            status, cpos, finished, relative_base = run(codes, [move], cpos, relative_base)
+            del robot_cache[(pos, dir)]
+            if status == 0:
+                wall.add(pos + dir)
+                continue
+            pos += dir
+            oxygen.append(pos)
+            neigh = neighbours(pos)
+            candidates = [n for n in neigh if n not in oxygen and n not in wall]
+            for new_pos in candidates:
+                robot_cache[(pos, new_pos - pos)] = codes.copy(), cpos, relative_base
+        i += 1
+    #plot(list(wall), oxygen)
+    #breakpoint()
+    return i - 1
 
 
-answer = a(puzzle.input_data)
+answer = ab(puzzle.input_data, a=True)
 print("a:", answer)
 assert answer == 366
 
-# Part b
-def b(data):
-    breakpoint()
-
-
-answer = b(puzzle.input_data)
+answer = ab(puzzle.input_data)
 print("b:", answer)
-assert answer == 15957
+assert answer == 384
