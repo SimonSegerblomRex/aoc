@@ -21,8 +21,8 @@ def a(data, phases=100):
             for i, d in enumerate(inp[e - 1:], e):
                 idx = (i % (4 * e)) // e
                 s += d * pattern[idx]
-            out[e - 1] = s
-        inp = [abs(n) % 10 for n in out]
+            out[e - 1] = abs(s) % 10
+        inp = out
     return int("".join(str(n) for n in inp[:8]))
 
 
