@@ -12,13 +12,14 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 # Part a
 def a(data, phases=100):
     inp = list(map(int, data))
-    sz = len(inp)
+    inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
-    for p in range(phases):
-        for e in range(1 , sz + 1):
+    pat_sz = len(pattern)
+    for _ in range(phases):
+        for e in range(1 , inp_sz + 1):
             s = 0
             for i, d in enumerate(islice(inp, e - 1, None), e):
-                idx = (i % (4 * e)) // e
+                idx = (i % (pat_sz * e)) // e
                 s += d * pattern[idx]
             inp[e - 1] = abs(s) % 10
     return int("".join(str(n) for n in inp[:8]))
@@ -35,8 +36,7 @@ assert answer == 61149209
 
 
 # Part b
-def b(data):
-    print(data)
+def b(data, phases=100):
     breakpoint()
 
 
