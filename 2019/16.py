@@ -14,15 +14,13 @@ def a(data, phases=100):
     inp = list(map(int, data))
     sz = len(inp)
     pattern = [0, 1, 0, -1]
-    out = [0] * sz
     for p in range(phases):
         for e in range(1 , sz + 1):
             s = 0
-            for i, d in enumerate(inp[e - 1:], e):
+            for i, d in enumerate(islice(inp, e - 1, None), e):
                 idx = (i % (4 * e)) // e
                 s += d * pattern[idx]
-            out[e - 1] = abs(s) % 10
-        inp = out
+            inp[e - 1] = abs(s) % 10
     return int("".join(str(n) for n in inp[:8]))
 
 
