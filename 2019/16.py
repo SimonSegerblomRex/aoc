@@ -10,8 +10,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data, phases=100):
+def a_orig(data, phases=100):
     inp = list(map(int, data))
+    orig = inp.copy()
     inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
     pat_sz = len(pattern)
@@ -22,6 +23,27 @@ def a(data, phases=100):
                 idx = (i % (pat_sz * e)) // e
                 s += d * pattern[idx]
             inp[e - 1] = abs(s) % 10
+    return int("".join(str(n) for n in inp[:8]))
+
+
+def a(data, phases=100):
+    inp = list(map(int, data))
+    orig = inp.copy()
+    inp_sz = len(inp)
+    pattern = [0, 1, 0, -1]
+    pat_sz = len(pattern)
+    out = [0] * len(inp)
+    out[-1] = inp[-1]
+    for p in range(phases):
+        for e in range(inp_sz // 2):
+            s = 0
+            for i, d in enumerate(islice(inp, e, None), e):
+                idx = ((i + 1) % (pat_sz * (e + 1))) // (e + 1)
+                s += d * pattern[idx]
+            inp[e] = abs(s) % 10
+        for i in range(inp_sz - 2, inp_sz // 2 - 1, -1):
+            # no need to check pattern, always 1
+            inp[i] = (inp[i + 1] + inp[i]) % 10
     return int("".join(str(n) for n in inp[:8]))
 
 
@@ -37,6 +59,23 @@ assert answer == 61149209
 
 # Part b
 def b(data, phases=100):
+    data = "12345678"
+    inp = list(map(int, data))
+    tmp = np.array(inp* 2)
+    breakpoint
+    inp_sz = len(inp)
+    pattern = [0, 1, 0, -1]
+    pat_sz = len(pattern)
+    rep = np.lcm.reduce([inp_sz, pat_sz]) // inp_sz
+    inp *= rep
+    inp_sz *= rep
+    for p in range(phases):
+        for e in range(1 , inp_sz + 1):
+            s = 0
+            for i, d in enumerate(islice(inp, e - 1, None), e):
+                idx = (i % (pat_sz * e)) // e
+                s += d * pattern[idx]
+            inp[e - 1] = abs(s * 8) % 10
     breakpoint()
 
 
