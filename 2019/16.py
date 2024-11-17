@@ -32,7 +32,7 @@ def a(data, phases=100):
     inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
     pat_sz = len(pattern)
-    for p in range(phases):
+    for _ in range(phases):
         for e in range(inp_sz // 2):
             s = 0
             for i, d in enumerate(islice(inp, e, None), e):
@@ -58,23 +58,20 @@ assert answer == 61149209
 # Part b
 def b(data, phases=100):
     inp = list(map(int, data))
-
     offset = int(data[:7])
 
     if offset < len(inp) * 10000 // 2:
-        # this will be tough...
+        # this will be tougher...
         breakpoint()
 
+    # no need to check pattern, always 1
+
     inp *= 10000
-    inp_sz = len(inp)
-    pattern = [0, 1, 0, -1]
-    pat_sz = len(pattern)
-    for p in range(phases):
-        for i in range(inp_sz - 2, offset - 1, -1):
-            # no need to check pattern, always 1
+    for _ in range(phases):
+        for i in range(len(inp) - 2, offset - 1, -1):
             inp[i] = (inp[i + 1] + inp[i]) % 10
 
-    return int("".join(str(n) for n in inp[offset:offset +8]))
+    return int("".join(str(n) for n in inp[offset:offset + 8]))
 
 
 for example in puzzle.examples:
