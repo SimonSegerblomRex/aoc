@@ -59,24 +59,26 @@ assert answer == 61149209
 
 # Part b
 def b(data, phases=100):
-    data = "12345678"
     inp = list(map(int, data))
-    tmp = np.array(inp* 2)
-    breakpoint
+
+    offset = int(data[:7])
+
+    if offset < len(inp) * 10000 // 2:
+        # this will be tough...
+        breakpoint()
+
+    inp *= 10000
     inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
     pat_sz = len(pattern)
-    rep = np.lcm.reduce([inp_sz, pat_sz]) // inp_sz
-    inp *= rep
-    inp_sz *= rep
+    out = [0] * len(inp)
+    out[-1] = inp[-1]
     for p in range(phases):
-        for e in range(1 , inp_sz + 1):
-            s = 0
-            for i, d in enumerate(islice(inp, e - 1, None), e):
-                idx = (i % (pat_sz * e)) // e
-                s += d * pattern[idx]
-            inp[e - 1] = abs(s * 8) % 10
-    breakpoint()
+        for i in range(inp_sz - 2, offset - 1, -1):
+            # no need to check pattern, always 1
+            inp[i] = (inp[i + 1] + inp[i]) % 10
+
+    return int("".join(str(n) for n in inp[offset:offset +8]))
 
 
 for example in puzzle.examples:
