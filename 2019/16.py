@@ -32,8 +32,6 @@ def a(data, phases=100):
     inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
     pat_sz = len(pattern)
-    out = [0] * len(inp)
-    out[-1] = inp[-1]
     for p in range(phases):
         for e in range(inp_sz // 2):
             s = 0
@@ -71,8 +69,6 @@ def b(data, phases=100):
     inp_sz = len(inp)
     pattern = [0, 1, 0, -1]
     pat_sz = len(pattern)
-    out = [0] * len(inp)
-    out[-1] = inp[-1]
     for p in range(phases):
         for i in range(inp_sz - 2, offset - 1, -1):
             # no need to check pattern, always 1
@@ -88,4 +84,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 16178430
