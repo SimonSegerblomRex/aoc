@@ -163,3 +163,64 @@ for example in puzzle.examples:
 answer = a(puzzle.input_data)
 print("a:", answer)
 puzzle.answer_a = answer
+
+
+def b(data):
+    codes = list(map(int, data.split(",")))
+    codes.extend([0]*1000000)
+    cpos = 0
+    relative_base = 0
+    finished = False
+    output = []
+    path = set()
+    x = 0
+    y = 0
+    while not finished:
+        code, cpos, finished, relative_base = run(codes, [0], cpos, relative_base)
+        if chr(code) == "#":
+            path.add(x + y*1j)
+        if chr(code) in ">^<v":
+            start = x + y*1j
+            dir_map = {">": 1, "^": -1j, "<": -1, "v": 1j}
+            dir = dir_map[chr(code)]
+        x = x + 1
+        if chr(code) == "\n":
+            x = 0
+            y += 1
+        output.append(code)
+    for c in output:
+        print(chr(c), end="")
+    def get_neighborus(p):
+        neighbours = set((p + 1, p + 1j, p - 1, p - 1j))
+        return neighbours & path
+    pos = start
+    def dir_to_rot(new_dir, dir):
+        if dir * 1j == new_dir:
+            return "R"
+        return "L"
+    c = 0
+    instructions = []
+    while True:
+        if (pos + dir) not in path:
+            neigh = get_neighborus(pos)
+            if pos - dir in neigh:
+                neigh.remove(pos - dir)
+            if not neigh:
+                instructions.append(str(c))
+                break
+            new_dir = list(neigh)[0] - pos
+            rot = dir_to_rot(new_dir, dir)
+            if c > 0:
+                instructions.append(str(c))
+            instructions.append(rot)
+            c = 0
+            dir = new_dir
+        c += 1
+        pos += dir
+    instructions = "".join(instructions)
+    breakpoint()
+
+
+answer = b(puzzle.input_data)
+print("b:", answer)
+puzzle.answer_b = answer
