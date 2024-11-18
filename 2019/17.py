@@ -1,9 +1,5 @@
-import queue
 from collections import defaultdict
-from itertools import permutations
-from operator import itemgetter
 
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2019
@@ -217,10 +213,44 @@ def b(data):
             dir = new_dir
         c += 1
         pos += dir
-    instructions = "".join(instructions)
+    instructions = ["".join(instructions[i:i + 2]) for i in range(0, len(instructions), 2)]
+    instructions_all = "".join(instructions)
+    # pdb print debug manually finding substrings...
+    if 0:
+        aa = "L6R12R8"
+        bb = "R8R12L12"
+        cc = "L6R12R8R12L12L4L4"
+        assert aa + bb + bb + aa + cc + cc + cc + bb == instructions_all
+        tmp = ...
+    else:
+        aa = "L6R12R8"
+        bb = "R8R12L12"
+        cc = "R12L12L4L4"
+        assert aa + bb + bb + aa + cc + aa + cc + aa + cc + bb == instructions_all
+        tmp = "A;,;B;,;B;,;A;,;C;,;A;,;C;,;A;,;C;,;B;\n;L;,;6;,;R;,;12;,;R;,;8;\n;R;,;8;,;R;,;12;,;L;,;12;\n;R;,;12;,;L;,;12;,;L;,;4;,;L;,;4;\n;n;\n"
+    # run program
+    codes = list(map(int, data.split(",")))
+    codes.extend([0]*1000000)
+    codes[0] = 2
+    cpos = 0
+    relative_base = 0
+    finished = False
+    inp = []
+    for c in tmp.split(";"):
+        if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
+            c = ord(c)
+        else:
+            c = int(c)
+        inp.append(c)
+    while not finished:
+        score, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
+        print(score)
+        breakpoint()
     breakpoint()
+    return s
 
 
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer > 74530
 puzzle.answer_b = answer
