@@ -230,7 +230,6 @@ def b(data):
         main = "ABBACACACB"
         inp = list(",".join(main))
         inp.append("\n")
-        inp2 = [inp.copy()]
         import re
         for ll in (aa, bb, cc):
             mm = re.findall("([RL])(\d+)", ll)
@@ -242,7 +241,6 @@ def b(data):
                 tt.append(",")
             tt[-1] = "\n"
             inp.extend(tt)
-            inp2.append(tt)
     # run program
     codes = list(map(int, data.split(",")))
     codes.extend([0]*1000000)
@@ -251,59 +249,29 @@ def b(data):
     relative_base = 0
     finished = False
     inp.extend(["n", "\n"])
-    inp2.append(["n", "\n"])
-    if 1:
-        oorig = inp.copy()
-        pp = []
-        for i, c in enumerate(inp):
-            if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
-                c = ord(c)
-                inp[i] = c
-                pp.append(c)
-            else:
-                c = str(c)
-                if len(c) > 1:
-                    pp.append(ord(c[0]))
-                    pp.append(ord(c[1]))
-                else:
-                    pp.append(ord(c[0]))
+    pp = []
+    for i, c in enumerate(inp):
+        if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
+            c = ord(c)
             inp[i] = c
-        orig = inp.copy()
-        inp = pp
-
-        while not finished:
-            out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
-            print(out)
-            print(chr(out), end="")
-        breakpoint()
-    elif 0:
-        oorig = inp.copy()
-        for i, c in enumerate(inp):
-            if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
-                c = ord(c)
+            pp.append(c)
+        else:
+            c = str(c)
+            if len(c) > 1:
+                pp.append(ord(c[0]))
+                pp.append(ord(c[1]))
             else:
-                c = int(c)
-            inp[i] = c
-        orig = inp.copy()
-
-        while not finished:
-            out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
-            print(chr(out), end="")
-        breakpoint()
-    else:
-        for inp in inp2:
-            for i, c in enumerate(inp):
-                if c in ["A", "B", "C", "R", "L", "n", "y", ",", "P", "\n"]:
-                    c = ord(c)
-                else:
-                    c = int(c)
-                inp[i] = c
-            score, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
-    breakpoint()
-    return s
+                pp.append(ord(c[0]))
+        inp[i] = c
+    inp = pp
+    inp.append(10)
+    while not finished:
+        out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
+        if out > 1000:
+            break
+    return out
 
 
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer > 74530
-puzzle.answer_b = answer
+assert answer == 742673
