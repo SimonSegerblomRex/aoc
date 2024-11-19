@@ -254,8 +254,32 @@ def b(data):
     inp2.append(["n", "\n"])
     if 1:
         oorig = inp.copy()
+        pp = []
         for i, c in enumerate(inp):
-            if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
+            if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
+                c = ord(c)
+                inp[i] = c
+                pp.append(c)
+            else:
+                c = str(c)
+                if len(c) > 1:
+                    pp.append(ord(c[0]))
+                    pp.append(ord(c[1]))
+                else:
+                    pp.append(ord(c[0]))
+            inp[i] = c
+        orig = inp.copy()
+        inp = pp
+
+        while not finished:
+            out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
+            print(out)
+            print(chr(out), end="")
+        breakpoint()
+    elif 0:
+        oorig = inp.copy()
+        for i, c in enumerate(inp):
+            if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
                 c = ord(c)
             else:
                 c = int(c)
@@ -269,7 +293,7 @@ def b(data):
     else:
         for inp in inp2:
             for i, c in enumerate(inp):
-                if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
+                if c in ["A", "B", "C", "R", "L", "n", "y", ",", "P", "\n"]:
                     c = ord(c)
                 else:
                     c = int(c)
