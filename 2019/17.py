@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 
 from aocd.models import Puzzle
@@ -216,31 +217,21 @@ def b(data):
     instructions = ["".join(instructions[i:i + 2]) for i in range(0, len(instructions), 2)]
     instructions_all = "".join(instructions)
     # pdb print debug manually finding substrings...
-    if 0:
-        aa = "L6R12R8"
-        bb = "R8R12L12"
-        cc = "L6R12R8R12L12L4L4"
-        assert aa + bb + bb + aa + cc + cc + cc + bb == instructions_all
-        tmp = ...
-    else:
-        aa = "L6R12R8"
-        bb = "R8R12L12"
-        cc = "R12L12L4L4"
-        assert aa + bb + bb + aa + cc + aa + cc + aa + cc + bb == instructions_all
-        main = "ABBACACACB"
-        inp = list(",".join(main))
-        inp.append("\n")
-        import re
-        for ll in (aa, bb, cc):
-            mm = re.findall("([RL])(\d+)", ll)
-            tt = []
-            for m in mm:
-                tt.append(m[0])
-                tt.append(",")
-                tt.append(int(m[1]))
-                tt.append(",")
-            tt[-1] = "\n"
-            inp.extend(tt)
+    aa = "L6R12R8"
+    bb = "R8R12L12"
+    cc = "R12L12L4L4"
+    assert aa + bb + bb + aa + cc + aa + cc + aa + cc + bb == instructions_all
+    main = "ABBACACACB"
+    inp = list(",".join(main))
+    inp.append("\n")
+    for ll in (aa, bb, cc):
+        mm = re.findall("([RL])(\d+)", ll)
+        for m in mm:
+            inp.append(m[0])
+            inp.append(",")
+            inp.append(m[1])
+            inp.append(",")
+        inp[-1] = "\n"
     # run program
     codes = list(map(int, data.split(",")))
     codes.extend([0]*1000000)
@@ -249,22 +240,8 @@ def b(data):
     relative_base = 0
     finished = False
     inp.extend(["n", "\n"])
-    pp = []
-    for i, c in enumerate(inp):
-        if c in ["A", "B", "C", "R", "L", "n", "y", "P", ",", "\n"]:
-            c = ord(c)
-            inp[i] = c
-            pp.append(c)
-        else:
-            c = str(c)
-            if len(c) > 1:
-                pp.append(ord(c[0]))
-                pp.append(ord(c[1]))
-            else:
-                pp.append(ord(c[0]))
-        inp[i] = c
-    inp = pp
-    inp.append(10)
+    inp = "".join(inp)
+    inp = list(map(int, inp.encode("ascii")))
     while not finished:
         out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
         if out > 1000:
