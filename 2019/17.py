@@ -227,7 +227,22 @@ def b(data):
         bb = "R8R12L12"
         cc = "R12L12L4L4"
         assert aa + bb + bb + aa + cc + aa + cc + aa + cc + bb == instructions_all
-        tmp = "A;,;B;,;B;,;A;,;C;,;A;,;C;,;A;,;C;,;B;\n;L;,;6;,;R;,;12;,;R;,;8;\n;R;,;8;,;R;,;12;,;L;,;12;\n;R;,;12;,;L;,;12;,;L;,;4;,;L;,;4;\n;n;\n"
+        main = "ABBACACACB"
+        inp = list(",".join(main))
+        inp.append("\n")
+        inp2 = [inp.copy()]
+        import re
+        for ll in (aa, bb, cc):
+            mm = re.findall("([RL])(\d+)", ll)
+            tt = []
+            for m in mm:
+                tt.append(m[0])
+                tt.append(",")
+                tt.append(int(m[1]))
+                tt.append(",")
+            tt[-1] = "\n"
+            inp.extend(tt)
+            inp2.append(tt)
     # run program
     codes = list(map(int, data.split(",")))
     codes.extend([0]*1000000)
@@ -235,17 +250,31 @@ def b(data):
     cpos = 0
     relative_base = 0
     finished = False
-    inp = []
-    for c in tmp.split(";"):
-        if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
-            c = ord(c)
-        else:
-            c = int(c)
-        inp.append(c)
-    while not finished:
-        score, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
-        print(score)
+    inp.extend(["n", "\n"])
+    inp2.append(["n", "\n"])
+    if 1:
+        oorig = inp.copy()
+        for i, c in enumerate(inp):
+            if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
+                c = ord(c)
+            else:
+                c = int(c)
+            inp[i] = c
+        orig = inp.copy()
+
+        while not finished:
+            out, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
+            print(chr(out), end="")
         breakpoint()
+    else:
+        for inp in inp2:
+            for i, c in enumerate(inp):
+                if c in ["A", "B", "C", "R", "L", "n", "y", ",", "\n"]:
+                    c = ord(c)
+                else:
+                    c = int(c)
+                inp[i] = c
+            score, cpos, finished, relative_base = run(codes, inp, cpos, relative_base)
     breakpoint()
     return s
 
