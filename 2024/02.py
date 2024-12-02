@@ -11,29 +11,33 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
+def safe_a(numbers):
+    prev = numbers[0]
+    for n in numbers[1:]:
+        if n >= prev:
+            break
+        if n < prev - 3:
+            break
+        prev = n
+    else:
+        return True
+    prev = numbers[0]
+    for n in numbers[1:]:
+        if n <= prev:
+            break
+        if n > prev + 3:
+            break
+        prev = n
+    else:
+        return True
+    return False
+
+
 def a(data):
     s = 0
-    for i, line in enumerate(data.splitlines()):
+    for line in data.splitlines():
         numbers = [int(n) for n in line.split(" ")]
-        prev = numbers[0]
-        for n in numbers[1:]:
-            if n >= prev:
-                break
-            if n < prev - 3:
-                break
-            prev = n
-        else:
-            s += 1
-    for i, line in enumerate(data.splitlines()):
-        numbers = [int(n) for n in line.split(" ")]
-        prev = numbers[0]
-        for n in numbers[1:]:
-            if n <= prev:
-                break
-            if n > prev + 3:
-                break
-            prev = n
-        else:
+        if safe_a(numbers):
             s += 1
     return s
 
@@ -49,36 +53,47 @@ puzzle.answer_a = answer
 
 
 # Part b
+def safe_b(numbers):
+    prev = numbers[0]
+    hp = 1
+    for n in numbers[1:]:
+        if n >= prev:
+            hp -= 1
+            continue
+        if n < prev - 3:
+            hp -= 1
+            continue
+        prev = n
+    if hp >= 0:
+        return True
+    prev = numbers[0]
+    hp = 1
+    for n in numbers[1:]:
+        if n <= prev:
+            hp -= 1
+            continue
+        if n > prev + 3:
+            hp -= 1
+            continue
+        prev = n
+    if hp >= 0:
+        return True
+    return False
+
+
 def b(data):
     s = 0
-    for i, line in enumerate(data.splitlines()):
+    for line in data.splitlines():
         numbers = [int(n) for n in line.split(" ")]
-        prev = numbers[0]
-        hp = 1
-        for n in numbers[1:]:
-            if n >= prev:
-                hp -= 1
-                continue
-            if n < prev - 3:
-                hp -= 1
-                continue
-            prev = n
-        if hp >= 0:
+        if safe_a(numbers):
             s += 1
-    for i, line in enumerate(data.splitlines()):
-        numbers = [int(n) for n in line.split(" ")]
-        prev = numbers[0]
-        hp = 1
-        for n in numbers[1:]:
-            if n <= prev:
-                hp -= 1
-                continue
-            if n > prev + 3:
-                hp -= 1
-                continue
-            prev = n
-        if hp >= 0:
-            s += 1
+            continue
+        for i in range(len(numbers)):
+            tmp = numbers.copy()
+            tmp.pop(i)
+            if safe_a(tmp):
+                s += 1
+                break
     return s
 
 
