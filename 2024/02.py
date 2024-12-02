@@ -1,11 +1,7 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 2
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -49,38 +45,10 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 407
 
 
 # Part b
-def safe_b(numbers):
-    prev = numbers[0]
-    hp = 1
-    for n in numbers[1:]:
-        if n >= prev:
-            hp -= 1
-            continue
-        if n < prev - 3:
-            hp -= 1
-            continue
-        prev = n
-    if hp >= 0:
-        return True
-    prev = numbers[0]
-    hp = 1
-    for n in numbers[1:]:
-        if n <= prev:
-            hp -= 1
-            continue
-        if n > prev + 3:
-            hp -= 1
-            continue
-        prev = n
-    if hp >= 0:
-        return True
-    return False
-
-
 def b(data):
     s = 0
     for line in data.splitlines():
@@ -104,4 +72,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 459
