@@ -1,11 +1,9 @@
-import datetime
 import re
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 3
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -21,8 +19,7 @@ def a(data):
 
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-
+assert answer == 157621318
 
 # Part b
 def b(data):
@@ -43,4 +40,4 @@ def b(data):
 
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 79845780
