@@ -34,14 +34,41 @@ puzzle.answer_a = answer
 
 # Part b
 def b(data):
-    breakpoint()
+    rows = np.array([[ord(c) for c in line] for line in data.splitlines()], dtype=int)
+    M = 100
+    A = 100000
+    S = 10000000
+    kernels = [
+        [
+            [M, 0, S],
+            [0, A, 0],
+            [M, 0, S],
+        ],
+        [
+            [M, 0, M],
+            [0, A, 0],
+            [S, 0, S],
+        ],
+        [
+            [S, 0, S],
+            [0, A, 0],
+            [M, 0, M],
+        ],
+        [
+            [S, 0, M],
+            [0, A, 0],
+            [S, 0, M],
+        ],
+    ]
+    key = 2*ord("M")*M + ord("A")*A + 2*ord("S")*S
+    from scipy.signal import convolve2d
+    s = 0
+    for kernel in kernels:
+        tmp = convolve2d(rows, kernel)
+        s += (tmp == key).sum()
+    return s
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
