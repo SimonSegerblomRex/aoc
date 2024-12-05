@@ -1,11 +1,8 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 5
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -26,7 +23,6 @@ def a(data):
     for update in in_order:
         s += update[len(update) // 2]
     return s
-    breakpoint()
 
 
 for example in puzzle.examples:
@@ -36,8 +32,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-
+assert answer == 4957
 
 # Part b
 def b(data):
@@ -75,4 +70,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 6938
