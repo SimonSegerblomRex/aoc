@@ -1,38 +1,33 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 6
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
 def a(data):
-    obstacles = []
+    obstacles = set()
     for i, line in enumerate(data.splitlines()):
         width = len(line)
         for j, c in enumerate(line):
             if c == "#":
-                obstacles.append(j + i*1j)
+                obstacles.add(j + i*1j)
             if c == "^":
                 pos = j + i*1j
     height = i + 1
     dir = -1j
     c = 0
     visited = set()
-    while (0 <= pos.real <= width) and (0 <= pos.imag <= height):
+    while (0 <= pos.real < width) and (0 <= pos.imag < height):
         visited.add(pos)
         if pos + dir in obstacles:
             dir *= 1j
             continue
         pos += dir
-        c += 1
     return len(visited)
-    breakpoint()
+
 
 example = """....#.....
 .........#
@@ -45,30 +40,28 @@ example = """....#.....
 #.........
 ......#..."""
 answer = a(example)
-#assert answer == 41
+assert answer == 41
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+puzzle.answer_a = 5444
 
 
 # Part b
 def b(data):
-    obstacles = []
+    obstacles = set()
     for i, line in enumerate(data.splitlines()):
         width = len(line)
         for j, c in enumerate(line):
             if c == "#":
-                obstacles.append(j + i*1j)
+                obstacles.add(j + i*1j)
             if c == "^":
                 pos = j + i*1j
     height = i + 1
-
     orig_pos = pos
-
 
     dir = -1j
     visited = set()
-    while (0 <= pos.real <= width) and (0 <= pos.imag <= height):
+    while (0 <= pos.real < width) and (0 <= pos.imag < height):
         visited.add(pos)
         if pos + dir in obstacles:
             dir *= 1j
@@ -77,24 +70,20 @@ def b(data):
 
     c = 0
     for tmp in visited:
-        j = tmp.real
-        i = tmp.imag
-        if j + i * 1j in obstacles:
-            continue
-        obst = obstacles.copy()
-        obst.append(j + i * 1j)
+        obstacles.add(tmp)
         prev_state = set()
         pos = orig_pos
         dir = -1j
-        while (0 <= pos.real <= width) and (0 <= pos.imag <= height):
+        while (0 <= pos.real < width) and (0 <= pos.imag < height):
             if (pos, dir) in prev_state:
                 c += 1
                 break
             prev_state.add((pos, dir))
-            if pos + dir in obst:
+            if pos + dir in obstacles:
                 dir *= 1j
                 continue
             pos += dir
+        obstacles.remove(tmp)
     return c
 
 
@@ -103,4 +92,4 @@ print(answer)
 assert answer == 6
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1946
