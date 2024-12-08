@@ -1,13 +1,10 @@
-import datetime
-import re
 from collections import defaultdict
 
-import numpy as np
 from aocd.models import Puzzle
 from itertools import permutations
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 8
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -45,39 +42,21 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 344
 
 
-def get_antinodes_b(c0, c1):
+
+
+# Part b
+def get_antinodes(c0, c1):
     d = c1 - c0
     out = set()
-    for i in range(1000):
+    for i in range(100):
         out.add(c0 - i * d)
         out.add(c1 + i * d)
     return out
 
 
-# Part b
-def b(data):
-    antennas = defaultdict(list)
-    for i, line in enumerate(data.splitlines()):
-        width = len(line)
-        for j, c in enumerate(line):
-            if c != ".":
-                antennas[c].append(j + i * 1j)
-    height = i + 1
-    antinodes = set()
-    for _, coords in antennas.items():
-        for c0, c1 in permutations(coords, 2):
-            aa = get_antinodes_b(c0, c1)
-            tmp = set()
-            for a in aa:
-                if (0 <= a.real < width) and (0 <= a.imag < height):
-                    tmp.add(a)
-            antinodes |= tmp
-    return len(antinodes)
-
-
-answer = b(puzzle.input_data)
+answer = a(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1182
