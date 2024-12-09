@@ -47,15 +47,40 @@ if 1:
             example_answer = a(example.input_data)
             print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
             assert str(example_answer) == example.answer_a
-answer = a(puzzle.input_data)
-print("a:", answer)
-puzzle.answer_a = answer
+if 0:
+    answer = a(puzzle.input_data)
+    print("a:", answer)
+    puzzle.answer_a = answer
 
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    file_size = list(map(int, data[::2]))
+    free_space = list(map(int, data[1::2]))
+    free_space.append(0)
+    file_id = list(range(len(file_size)))
+    p = 0
+    file_pos = [-1] * len(file_size)
+    for fid, fsz, fsp in zip(file_id, file_size, free_space):
+        file_pos[fid] = p
+        p += fsz + fsp
+    free_space = np.array(free_space)
+    file_size_tmp = file_size.copy()
+    for fid in range(file_id[-1], 0, -1):
+        tmp = free_space >= file_size[fid]
+        if not np.any(tmp):
+            continue
+        after = np.argmax(tmp)
+        if after > fid:
+            continue
+        file_pos[fid] = file_pos[after] + file_size_tmp[after]
+        file_size_tmp[after] += file_size[fid]
+        free_space[after] -= file_size[fid]
+    s = 0
+    for fid, fpos, fsz in zip(file_id, file_pos, file_size):
+        for p in range(fpos, fpos + fsz):
+            s += fid*p
+    return s
 
 
 for example in puzzle.examples:
