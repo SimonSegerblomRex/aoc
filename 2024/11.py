@@ -1,17 +1,12 @@
-import datetime
-import re
 from collections import Counter, defaultdict
 from functools import cache
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 11
 
 puzzle = Puzzle(year=YEAR, day=DAY)
-
-example = "0 1 10 99 999"
 
 
 def blinkhelper(stone):
@@ -37,7 +32,6 @@ def blink(stones):
 def a(data, blinks=25):
     stones = list(map(int, data.split()))
     stones = Counter(stones)
-    stones = defaultdict(int, stones)
     for _ in range(blinks):
         stones = blink(stones)
     return sum(Counter(stones).values())
