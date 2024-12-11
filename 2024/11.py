@@ -1,6 +1,6 @@
 import datetime
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import cache
 
 import numpy as np
@@ -24,33 +24,22 @@ def blinkhelper(stone):
     return [2024 * stone]
 
 
-@cache
-def blinkk(stones, blinks):
-    if blinks == 0:
-        return stones
-    new = []
+def blink(stones):
+    out = defaultdict(int)
     for s in stones:
-        new += blinkhelper(s)
-    new = sorted(new)
-    return blinkk(tuple(new), blinks - 1)
-
-
-@cache
-def blink(stone, blinks):
-    return blinkk((stone,), blinks)
+        new = blinkhelper(s)
+        for n in new:
+            out[n] += stones[s]
+    return out
 
 
 # Part a
 def a(data, blinks=25):
     stones = list(map(int, data.split()))
-    chunk = 25
-    tot = 0
-    for _ in range(blinks // chunk):
-        stones = Counter(stones)
-        new = []
-        for s, c in stones.items():
-            new += c * blink(s, chunk)
-        stones = new
+    stones = Counter(stones)
+    stones = defaultdict(int, stones)
+    for _ in range(blinks):
+        stones = blink(stones)
     return sum(Counter(stones).values())
 
 
