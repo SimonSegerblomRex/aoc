@@ -1,5 +1,4 @@
 from collections import Counter, defaultdict
-from functools import cache
 
 from aocd.models import Puzzle
 
@@ -9,22 +8,22 @@ DAY = 11
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
-def blinkhelper(stone):
+def blink_helper(stone):
     ss = str(stone)
     if stone == 0:
         return [1]
     elif not len(ss) % 2:
         w = len(ss)
-        return [int(ss[:w//2]), int(ss[w//2:])]
+        return [int(ss[: w // 2]), int(ss[w // 2 :])]
     return [2024 * stone]
 
 
 def blink(stones):
     out = defaultdict(int)
-    for s in stones:
-        new = blinkhelper(s)
+    for stone, count in stones.items():
+        new = blink_helper(stone)
         for n in new:
-            out[n] += stones[s]
+            out[n] += count
     return out
 
 
@@ -34,19 +33,16 @@ def a(data, blinks=25):
     stones = Counter(stones)
     for _ in range(blinks):
         stones = blink(stones)
-    return sum(Counter(stones).values())
+    return sum(stones.values())
 
 
 example = "125 17"
-answer = a(example)
-print(answer)
-assert answer == 55312
+assert a(example) == 55312
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-
+assert answer == 185205
 
 # Part b
 answer = a(puzzle.input_data, blinks=75)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 221280540398419
