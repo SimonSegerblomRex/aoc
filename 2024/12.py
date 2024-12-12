@@ -12,7 +12,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
+def a(data, sides=False):
     plants = {}
     for i, line in enumerate(data.splitlines()):
         width = len(line)
@@ -53,29 +53,49 @@ def a(data):
                 if (not (0 <= n.real < width)) or (not (0 <= n.imag < height)) or (plants[n] != plants[p]):
                     border.add((n, n - p))
         borders.append(border)
+    if not sides:
+        s = 0
+        for r, b in zip(regions, borders):
+            s += len(r) * len(b)
+        return s
+    sides = []
+
+    for border in borders:
+        lines = []
+        border = sorted(border, key=lambda x: (x[0].real, x[1].real, x[0].imag, x[1].imag))
+        for p, dir in border:
+            for line in lines:
+                if dir.real == 0:
+                    if ((p + 1, dir) in line) or ((p - 1, dir) in line):
+                        line.append((p, dir))
+                        break
+                elif dir.imag == 0:
+                    if ((p + 1j, dir) in line) or ((p - 1j, dir) in line):
+                        line.append((p, dir))
+                        break
+            else:
+                lines.append([(p, dir)])
+        sides.append(lines)
+
     s = 0
-    for r, b in zip(regions, borders):
-        s += len(r) * len(b)
+    for r, t in zip(regions, sides):
+        s += len(r) * len(t)
     return s
 
 
-
-answer = a(puzzle.input_data)
-print("a:", answer)
-puzzle.answer_a = answer
+if 0:
+    answer = a(puzzle.input_data)
+    print("a:", answer)
+    puzzle.answer_a = answer
 
 
 # Part b
-def b(data):
-    print(data)
-    breakpoint()
-
-
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+example = """AAAA
+BBCD
+BBCC
+EEEC"""
+answer = a(example, sides=True)
+print(answer)
+answer = a(puzzle.input_data, sides=True)
 print("b:", answer)
 puzzle.answer_b = answer
