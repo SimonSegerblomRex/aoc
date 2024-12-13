@@ -17,7 +17,7 @@ Prize: X=(?P<goal_x>\d+), Y=(?P<goal_y>\d+)"""
 
 
 # Part a
-def a(data):
+def a(data, extra=0):
     machines = []
     machines = re.findall(pattern, data)
     machines = [[int(n) for n in m] for m in machines]
@@ -26,6 +26,8 @@ def a(data):
         #tmp = np.linalg.inv(np.array([[m[0], m[2]], [m[1], m[3]]], dtype=int).reshape(2, 2))
         x0, x1, x2, x3 =  m[0], m[2], m[1], m[3]
         det = x0*x3 - x1*x2
+        m[-1] += extra
+        m[-2] += extra
         if det != 0:
             A = (x3*m[-2] - x1*m[-1])
             B = (-x2*m[-2] + x0*m[-1])
@@ -44,16 +46,6 @@ breakpoint()
 
 
 # Part b
-def b(data):
-    print(data)
-    breakpoint()
-
-
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+answer = a(puzzle.input_data, extra=10000000000000)
 print("b:", answer)
 puzzle.answer_b = answer
