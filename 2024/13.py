@@ -15,18 +15,16 @@ Prize: X=(?P<goal_x>\d+), Y=(?P<goal_y>\d+)"""
 
 # Part a
 def a(data, extra=0):
-    machines = []
-    machines = re.findall(pattern, data)
-    machines = [[int(n) for n in m] for m in machines]
+    machines = [[int(n) for n in m] for m in re.findall(pattern, data)]
     s = 0
     for m in machines:
-        x0, x1, x2, x3 =  m[0], m[2], m[1], m[3]
-        det = x0*x3 - x1*x2
+        x0, x1, x2, x3 = m[0], m[2], m[1], m[3]
+        det = x0 * x3 - x1 * x2
         m[-1] += extra
         m[-2] += extra
         if det != 0:
-            A = (x3*m[-2] - x1*m[-1])
-            B = (-x2*m[-2] + x0*m[-1])
+            A = x3 * m[-2] - x1 * m[-1]
+            B = -x2 * m[-2] + x0 * m[-1]
             if not (A % det) and not (B % det):
                 s += (A // det) * 3 + B // det
     return s
