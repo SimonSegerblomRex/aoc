@@ -21,7 +21,7 @@ def display_image(positions, width, height, title):
 
 
 # Part a
-def a(data, width=101, height=103, seconds=100, display=False):
+def a(data, width=101, height=103, seconds=100, b=False):
     robot_pos = []
     robot_dir = []
     for line in data.splitlines():
@@ -35,8 +35,9 @@ def a(data, width=101, height=103, seconds=100, display=False):
             new_pos = pos + dir
             new_pos = (new_pos.real % width) + (new_pos.imag % height) * 1j
             robot_pos[i] = new_pos
-        if display and np.var(robot_pos) < 1000:
-            display_image(robot_pos, width, height, second + 1)
+        if b and np.var(robot_pos) < 1000:
+            # display_image(robot_pos, width, height, second + 1)
+            return second + 1
     scores = [0, 0, 0, 0]
     for pos in robot_pos:
         if pos.real < (width - 1) // 2 and pos.imag < (height - 1) // 2:
@@ -52,7 +53,10 @@ def a(data, width=101, height=103, seconds=100, display=False):
 
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer == 224969976
 
 
 # Part b
-answer = a(puzzle.input_data, seconds=10000, display=True)
+answer = a(puzzle.input_data, seconds=10000, b=True)
+print("b:", answer)
+assert answer == 7892
