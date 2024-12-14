@@ -11,7 +11,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data, width=101, height=103, seconds=100):
+def a(data, width=101, height=103, seconds=100, display=False):
     robot_pos = []
     robot_dir = []
     for line in data.splitlines():
@@ -20,11 +20,20 @@ def a(data, width=101, height=103, seconds=100):
         dir = x[2] + x[3]*1j
         robot_pos.append(pos)
         robot_dir.append(dir)
-    for _ in range(seconds):
+    for second in range(seconds):
         for i, (pos, dir) in enumerate(zip(robot_pos, robot_dir)):
             new_pos = pos + dir
             new_pos = (new_pos.real % width) + (new_pos.imag % height) * 1j
             robot_pos[i] = new_pos
+        if display and np.var(robot_pos) < 1000:
+            import matplotlib.pyplot as plt
+            image = np.zeros((height, width), dtype="u1")
+            tmp = set(robot_pos)
+            for pos in tmp:
+                image[int(pos.imag), int(pos.real)] = 1
+            plt.imshow(image)
+            plt.title(second + 1)
+            plt.show()
     scores = [0, 0, 0 ,0]
     for pos in robot_pos:
         if (pos.real < ((width - 1) // 2)) and (pos.imag < ((height - 1) // 2)):
@@ -56,20 +65,9 @@ print(answer)
 assert answer == 12
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
-breakpoint()
+
 
 # Part b
-def b(data):
-    print(data)
-    breakpoint()
-
-
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+answer = a(puzzle.input_data, seconds=1000000, display=True)
 print("b:", answer)
-puzzle.answer_b = answer
+#puzzle.answer_b = answer
