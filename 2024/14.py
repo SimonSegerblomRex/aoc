@@ -40,13 +40,13 @@ def a(data, width=101, height=103, seconds=100, b=False):
             return second + 1
     scores = [0, 0, 0, 0]
     for pos in robot_pos:
-        if pos.real < (width - 1) // 2 and pos.imag < (height - 1) // 2:
+        if pos.real < width // 2 and pos.imag < height // 2:
             scores[0] += 1
-        elif pos.real > (width - 1) // 2 and pos.imag < (height - 1) // 2:
+        elif pos.real > width // 2 and pos.imag < height // 2:
             scores[1] += 1
-        elif pos.real < (width - 1) // 2 and pos.imag > (height - 1) // 2:
+        elif pos.real < width // 2 and pos.imag > height // 2:
             scores[2] += 1
-        elif pos.real > (width - 1) // 2 and pos.imag > (height - 1) // 2:
+        elif pos.real > width // 2 and pos.imag > height // 2:
             scores[3] += 1
     return prod(scores)
 
