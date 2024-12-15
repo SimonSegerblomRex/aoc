@@ -166,8 +166,10 @@ def b(data):
                         boxes_to_move.add(cand1)
                     if cand2 in box_coords:
                         boxes_to_move.add(cand2)
-                    elif cand2 in wall:
-                        can_move = False
+                    for cand in (cand2,):
+                        if (cand - 0.5) in wall or (cand + 0.5) in wall:
+                            can_move = False
+                    if not can_move:
                         break
                 if tmp == boxes_to_move:
                     break
@@ -212,7 +214,7 @@ vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
 <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
 ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
 v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^"""
-if 0:
+if 1:
     answer = b(example0)
     print("b:", answer)
 answer = b(example)
