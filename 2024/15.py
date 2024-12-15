@@ -103,7 +103,7 @@ def b(data):
         for box_coord in box_coords:
             boxes.add(box_coord - 0.5)
             boxes.add(box_coord + 0.5)
-        if 1:
+        if 0:
             for i in range(height):
                 for j in range(width):
                     p = j + i*1j
@@ -162,14 +162,8 @@ def b(data):
                     cand2 = box + dir
                     if cand0 in box_coords:
                         boxes_to_move.add(cand0)
-                    elif cand0 in wall:
-                        can_move = False
-                        break
                     if cand1 in box_coords:
                         boxes_to_move.add(cand1)
-                    elif cand1 in wall:
-                        can_move = False
-                        break
                     if cand2 in box_coords:
                         boxes_to_move.add(cand2)
                     elif cand2 in wall:
@@ -226,4 +220,5 @@ print("b:", answer)
 assert answer == 9021
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer > 1518399
 puzzle.answer_b = answer
