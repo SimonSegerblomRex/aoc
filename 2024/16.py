@@ -79,11 +79,11 @@ puzzle.answer_a = answer
 
 def a_star_modified(start, goal, walls):
     def h(node):
-        return int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
+        return 0#int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
 
-    open_set = queue.PriorityQueue()
+    open_set = []
     # (f_score, dummy, pos, dir, path)
-    open_set.put((0, 0, start, 1, [start]))
+    open_set.append((0, 0, start, 1, [start]))
 
     g_score = defaultdict(lambda: 1 << 30)
     g_score[(start, 1)] = 0
@@ -94,9 +94,11 @@ def a_star_modified(start, goal, walls):
     i = 1
     good = set()
     best_score = 1 << 30
-    while not open_set.empty():
-        _, _, curr_pos, curr_dir, path = open_set.get()
+    tmp = []
+    while open_set:
+        _, _, curr_pos, curr_dir, path = open_set.pop(0)
         if curr_pos == goal:
+            tmp.append((int(g_score[(curr_pos, curr_dir)]), path))
             if int(g_score[(curr_pos, curr_dir)]) < best_score:
                 best_score = int(g_score[(curr_pos, curr_dir)])
             if int(g_score[(curr_pos, curr_dir)]) <= best_score:
@@ -116,7 +118,7 @@ def a_star_modified(start, goal, walls):
             if tentative_g_score <= g_score[(next_node, dir)]:
                 g_score[(next_node, dir)] = tentative_g_score
                 f_score[(next_node, dir)] = tentative_g_score + h(next_node)
-                open_set.put(
+                open_set.append(
                     (
                         f_score[(next_node, dir)],
                         i,
@@ -127,7 +129,7 @@ def a_star_modified(start, goal, walls):
                 )
                 i += 1
 
-    if 0:
+    if 1:
         height = int(max(n.imag for n in walls)) + 1
         width = int(max(n.real for n in walls)) + 1
         for i in range(height):
@@ -141,6 +143,13 @@ def a_star_modified(start, goal, walls):
                     print(".", end="")
             print()
 
+    best_score = min(s for s, _ in tmp)
+    gg = set()
+    for s, p in tmp:
+        if s == best_score:
+            gg |= set(p)
+    return len(gg)
+    breakpoint()
     return len(good)
 
 
