@@ -98,7 +98,7 @@ def b(data):
                 out = run(codes, A, B, C)
                 if out == codes:
                     return A
-                elif out[:checking] == codes[:checking]:
+                if out[:checking] == codes[:checking]:
                     new.append(A)
                 A += incr
         candidates = new
