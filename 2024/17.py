@@ -92,14 +92,20 @@ def b(data):
     B = numbers[1]
     C = numbers[2]
     codes = numbers[3:]
-    #A = 0b100100010100110011011
-    #    0b10000000000000000000000
-    A = 0b100100010100110011011
-    A = 0
+    # 105875099939593 too high
+    """
+    0b11000000100101011110111101110001000111100001001 105875099913993
+    0b11000000100101011110111101110001000111100000001 105875099913985
+    0b11000000100101011110111101110001000100110011010 105875099912602
+    """
+    A = 0b10001000100110011010
     check = 2
-    incr = 1
+    incr = -1
+    candidates = []
     while True:
         out = run(codes, A, B, C, special=True)
+        if out == codes:
+            print(bin(A), A)
         if out[:check - 1] == codes[:check - 1]:
             check += 2
             tmp = A
@@ -111,8 +117,6 @@ def b(data):
             incr >>= 1
             print(check)
             print(out, codes, check)
-        if out == codes:
-            break
         A += incr
     return A
 
