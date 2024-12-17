@@ -11,12 +11,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
-    numbers = [int(n) for n in re.findall(r"(\d+)", data)]
-    A = numbers[0]
-    B = numbers[1]
-    C = numbers[2]
-    codes = numbers[3:]
+def run(codes, A, B, C, special=False):
     pos = 0
     def combo_operand2val(operand):
         if 0 <= operand <= 3:
@@ -54,8 +49,12 @@ def a(data):
         elif code == 5:
             out.append(combo_operand2val(codes[pos + 1]) % 8)
             pos += 2
+            if special:
+                for i, o in enumerate(out):
+                    if o != codes[i]:
+                        return out
         elif code == 6:
-            B = A //2**combo_operand2val(codes[pos + 1])
+            B = A // 2**combo_operand2val(codes[pos + 1])
             pos += 2
         elif code == 7:
             C = A // 2**combo_operand2val(codes[pos + 1])
@@ -63,6 +62,16 @@ def a(data):
         else:
             print("hmm")
             breakpoint()
+    return out
+
+
+def a(data):
+    numbers = [int(n) for n in re.findall(r"(\d+)", data)]
+    A = numbers[0]
+    B = numbers[1]
+    C = numbers[2]
+    codes = numbers[3:]
+    out = run(codes, A, B, C)
     return ",".join(str(n) for n in out)
 
 
@@ -78,15 +87,42 @@ puzzle.answer_a = answer
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    numbers = [int(n) for n in re.findall(r"(\d+)", data)]
+    A = numbers[0]
+    B = numbers[1]
+    C = numbers[2]
+    codes = numbers[3:]
+    #A = 0b100100010100110011011
+    #    0b10000000000000000000000
+    A = 0b100100010100110011011
+    A = 0
+    check = 2
+    incr = 1
+    while True:
+        out = run(codes, A, B, C, special=True)
+        if out[:check - 1] == codes[:check - 1]:
+            check += 2
+            tmp = A
+            c = 0
+            while tmp:
+                c += 1
+                tmp >>= 1
+            incr = 1 << c
+            incr >>= 1
+            print(check)
+            print(out, codes, check)
+        if out == codes:
+            break
+        A += incr
+    return A
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
+if 0:
+    for example in puzzle.examples:
+        if example.answer_b:
+            example_answer = b(example.input_data)
+            print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
+            assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
