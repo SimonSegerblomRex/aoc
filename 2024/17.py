@@ -1,11 +1,10 @@
-import datetime
 import re
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 17
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -89,50 +88,24 @@ def b(data):
     C = numbers[2]
     codes = numbers[3:]
     A = 0
-    incr = 1
     checking = 1
+    incr = 1
     candidates = [A]
-    for A in candidates:
+    while True:
         new = []
-        for A in range(A, A + 1 << 10):
-            out = run(codes, A, B, C)
-            if out[:checking] == codes[:checking]:
-                new.append(A)
-    candidates = new
-    checking += 1
-    good = []
-    for A in candidates:
-        checking = 2
-        incr = 1 << 10
-        tmp = [A]
-        while True:
-            new = []
-            for A in tmp:
-                for _ in range(8):
-                    out = run(codes, A, B, C)
-                    if out == codes:
-                        good.append(A)
-                        break
-                    if out[:checking] == codes[:checking]:
-                        new.append(A)
-                    A += incr
-            if out == codes:
-                good.append(A)
-                break
-            if not new:
-                break
-            tmp = new.copy()
-            checking += 1
-            incr <<= 3
-    return min(good)
+        for A in sorted(candidates):
+            for _ in range(1024 if checking == 1 else 8):
+                out = run(codes, A, B, C)
+                if out == codes:
+                    return A
+                elif out[:checking] == codes[:checking]:
+                    new.append(A)
+                A += incr
+        candidates = new.copy()
+        incr <<= 10 if checking == 1 else 3
+        checking += 1
 
 
-if 0:
-    for example in puzzle.examples:
-        if example.answer_b:
-            example_answer = b(example.input_data)
-            print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-            assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
 assert answer == 105875099912602
