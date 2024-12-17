@@ -98,27 +98,35 @@ def b(data):
     0b11000000100101011110111101110001000111100000001 105875099913985
     0b11000000100101011110111101110001000100110011010 105875099912602
     """
-    A = 0b10001000100110011010
-    check = 2
-    incr = -1
+    #A = 0b10001000100110011010
+    A = 2
+    check = 4
+    incr = 1
     candidates = []
     while True:
         out = run(codes, A, B, C, special=True)
         if out == codes:
-            print(bin(A), A)
-        if out[:check - 1] == codes[:check - 1]:
-            check += 2
+            break
+        if out[:check - 3] == codes[:check - 3]:
+            check += 4
             tmp = A
             c = 0
             while tmp:
                 c += 1
                 tmp >>= 1
             incr = 1 << c
-            incr >>= 1
-            print(check)
-            print(out, codes, check)
+            incr >>= 2
+            A &= incr -1
         A += incr
-    return A
+
+    incr = -1
+    candidates = []
+    for _ in range(100000):
+        out = run(codes, A, B, C, special=True)
+        if out == codes:
+            candidates.append(A)
+        A += incr
+    return min(candidates)
 
 
 if 0:
@@ -129,4 +137,4 @@ if 0:
             assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 105875099912602
