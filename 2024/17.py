@@ -11,7 +11,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def run(codes, A, B, C, special=False):
+def run(codes, A, B, C):
     pos = 0
     def combo_operand2val(operand):
         if 0 <= operand <= 3:
@@ -49,10 +49,6 @@ def run(codes, A, B, C, special=False):
         elif code == 5:
             out.append(combo_operand2val(codes[pos + 1]) % 8)
             pos += 2
-            if special:
-                for i, o in enumerate(out):
-                    if o != codes[i]:
-                        return out
         elif code == 6:
             B = A // 2**combo_operand2val(codes[pos + 1])
             pos += 2
@@ -92,41 +88,43 @@ def b(data):
     B = numbers[1]
     C = numbers[2]
     codes = numbers[3:]
-    # 105875099939593 too high
-    """
-    0b11000000100101011110111101110001000111100001001 105875099913993
-    0b11000000100101011110111101110001000111100000001 105875099913985
-    0b11000000100101011110111101110001000100110011010 105875099912602
-    """
-    #A = 0b10001000100110011010
-    A = 2
-    check = 4
+    A = 0
     incr = 1
-    candidates = []
-    while True:
-        out = run(codes, A, B, C, special=True)
-        if out == codes:
-            break
-        if out[:check - 3] == codes[:check - 3]:
-            check += 4
-            tmp = A
-            c = 0
-            while tmp:
-                c += 1
-                tmp >>= 1
-            incr = 1 << c
-            incr >>= 2
-            A &= incr -1
-        A += incr
-
-    incr = -1
-    candidates = []
-    for _ in range(100000):
-        out = run(codes, A, B, C, special=True)
-        if out == codes:
-            candidates.append(A)
-        A += incr
-    return min(candidates)
+    checking = 1
+    candidates = [A]
+    for A in candidates:
+        new = []
+        for A in range(A, A + 1 << 10):
+            out = run(codes, A, B, C)
+            if out[:checking] == codes[:checking]:
+                new.append(A)
+    candidates = new
+    checking += 1
+    good = []
+    for A in candidates:
+        checking = 2
+        incr = 1 << 10
+        tmp = [A]
+        while True:
+            new = []
+            for A in tmp:
+                for _ in range(8):
+                    out = run(codes, A, B, C)
+                    if out == codes:
+                        good.append(A)
+                        break
+                    if out[:checking] == codes[:checking]:
+                        new.append(A)
+                    A += incr
+            if out == codes:
+                good.append(A)
+                break
+            if not new:
+                break
+            tmp = new.copy()
+            checking += 1
+            incr <<= 3
+    return min(good)
 
 
 if 0:
