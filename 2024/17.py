@@ -101,7 +101,7 @@ def b(data):
                 elif out[:checking] == codes[:checking]:
                     new.append(A)
                 A += incr
-        candidates = new.copy()
+        candidates = new
         incr <<= 10 if checking == 1 else 3
         checking += 1
 
