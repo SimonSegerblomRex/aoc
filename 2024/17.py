@@ -107,15 +107,13 @@ def b(data):
 
 
 def b_z3(data):
+    import z3
     numbers = [int(n) for n in re.findall(r"(\d+)", data)]
     A = numbers[0]
     B = numbers[1]
     C = numbers[2]
     codes = numbers[3:]
-    import z3
     A = z3.BitVec("A", 64)
-    C = A >> ((A % 8) ^ 5)
-    B = (A % 8) ^ 3 ^ C
     s = z3.Solver()
     for i, code in enumerate(codes):
         a = A >> 3*i
