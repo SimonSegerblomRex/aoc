@@ -55,7 +55,6 @@ def a_star(start, goal, walls):
                     )
                 )
                 i += 1
-    breakpoint()
 
 
 # Part a
@@ -64,7 +63,7 @@ def a(data, width=7, height=7, stop=12):
     for n, line in enumerate(data.splitlines()):
         if n == stop:
             break
-        i, j = line.split(",")
+        j, i = line.split(",")
         obstacles.add(int(j) + int(i)*1j)
     for i in (-1, height):
         for j in range(-1, width):
@@ -95,16 +94,26 @@ assert answer == 234
 
 
 # Part b
-def b(data):
-    print(data)
-    breakpoint()
+def b(data, width=7, height=7, guess=13):
+    obstacles = []
+    for n, line in enumerate(data.splitlines()):
+        j, i = line.split(",")
+        obstacles.append(int(j) + int(i)*1j)
+    stop = guess
+    while True:
+        answer = a(data, width=width, height=height, stop=stop)
+        if answer is None:
+            break
+        stop += 1
+    stop -= 1
+    return f"{int(obstacles[stop].real)},{int(obstacles[stop].imag)}"
 
 
 for example in puzzle.examples:
     if example.answer_b:
         example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+        print(f"Example answer: {example_answer} (expecting: 6,1)")
+        assert example_answer == "6,1"
+answer = b(puzzle.input_data, width=71, height=71, guess=3000)
 print("b:", answer)
 puzzle.answer_b = answer
