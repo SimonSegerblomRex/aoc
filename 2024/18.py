@@ -1,13 +1,10 @@
-import datetime
 import queue
-import re
 from collections import defaultdict
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 18
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -66,10 +63,10 @@ def a(data, width=7, height=7, stop=12):
         j, i = line.split(",")
         obstacles.add(int(j) + int(i)*1j)
     for i in (-1, height):
-        for j in range(-1, width):
+        for j in range(-1, width + 1):
             obstacles.add(j + i*1j)
     for j in (-1, width):
-        for i in range(-1, height):
+        for i in range(-1, height + 1):
             obstacles.add(j + i*1j)
     if 0:
         for i in range(-1, height + 1):
