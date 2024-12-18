@@ -106,6 +106,35 @@ def b(data):
         checking += 1
 
 
+def b_z3(data):
+    numbers = [int(n) for n in re.findall(r"(\d+)", data)]
+    A = numbers[0]
+    B = numbers[1]
+    C = numbers[2]
+    codes = numbers[3:]
+    import z3
+    A = z3.BitVec("A", 64)
+    C = A >> ((A % 8) ^ 5)
+    B = (A % 8) ^ 3 ^ C
+    s = z3.Solver()
+    for i, code in enumerate(codes):
+        a = A >> 3*i
+        C = a >> ((a % 8) ^ 5)
+        B = (a % 8) ^ 3 ^ C
+        s.add(B % 8 == code)
+    s.add(A >> 3*(i + 1) == 0)
+    solutions = []
+    while s.check() == z3.sat:
+        answer = s.model()[A].as_long()
+        solutions.append(answer)
+        s.add(A < answer)
+    return min(solutions)
+
+
 answer = b(puzzle.input_data)
 print("b:", answer)
+assert answer == 105875099912602
+
+answer = b_z3(puzzle.input_data)
+print("b_z3:", answer)
 assert answer == 105875099912602
