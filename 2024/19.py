@@ -1,12 +1,9 @@
-import datetime
-import re
 from functools import cache
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 19
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -19,20 +16,14 @@ def a(data):
     designs = designs.split()
     @cache
     def check(design):
-        if not design or design in patterns:
+        if design in patterns:
             return True
-        ok = False
         for i in range(len(design)):
             if design[:i] in patterns:
-                ok = check(design[i:])
-                if ok:
-                    break
-        return ok
-    s = 0
-    for design in designs:
-        if check(design):
-            s += 1
-    return s
+                if check(design[i:]):
+                    return True
+        return False
+    return sum(check(design) for design in designs)
 
 
 for example in puzzle.examples:
@@ -42,7 +33,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 238
 
 
 # Part b
@@ -51,34 +42,13 @@ def b(data):
     patterns = patterns.split(", ")
     designs = designs.split()
     @cache
-    def check(design):
-        if not design or design in patterns:
-            return True
-        ok = False
-        for i in range(len(design)):
-            if design[:i] in patterns:
-                ok = check(design[i:])
-                if ok:
-                    break
-        return ok
-    @cache
     def count(design):
-        if len(design) == 1 and design in patterns:
-            return 1
-        if not design:
-            return 0
-        c = 0
-        if design in patterns:
-            c += 1
+        c = 1 if design in patterns else 0
         for i in range(len(design)):
             if design[:i] in patterns:
-                if check(design[i:]):
-                    c += count(design[i:])
+                c += count(design[i:])
         return c
-    s = 0
-    for design in designs:
-        s += count(design)
-    return s
+    return sum(count(design) for design in designs)
 
 
 for example in puzzle.examples:
@@ -88,4 +58,4 @@ for example in puzzle.examples:
         assert example_answer == 16
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 635018909726691
