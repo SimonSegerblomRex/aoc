@@ -75,9 +75,9 @@ def a(data):
     shortest = a_star(start, goal, walls)
     c = 0
     for w in walls:
-        if w.real in (0, width):
+        if w.real in (0, width - 1):
             continue
-        if w.imag in (0, height):
+        if w.imag in (0, height - 1):
             continue
         walls.remove(w)
         if a_star(start, goal, walls, shortest) <= shortest - 100:
