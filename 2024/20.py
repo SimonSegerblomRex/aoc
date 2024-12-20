@@ -18,7 +18,7 @@ def a_star(start, goal, walls, limit=1<<30):
 
     open_set = queue.PriorityQueue()
     # (f_score, dummy, pos, dir)
-    open_set.put((0, 0, start, 1))
+    open_set.put((0, 0, start, 1, [start]))
 
     g_score = defaultdict(lambda: 1 << 30)
     g_score[(start, 1)] = 0
@@ -28,21 +28,18 @@ def a_star(start, goal, walls, limit=1<<30):
 
     i = 1
     while not open_set.empty():
-        _, _, curr_pos, curr_dir = open_set.get()
+        _, _, curr_pos, curr_dir, path = open_set.get()
         if curr_pos == goal:
-            return int(g_score[(curr_pos, curr_dir)])
+            return path
 
         dirs = [1, -1j, -1, 1j]
         for dir in dirs:
-            turning_cost = 0
-            if dir != curr_dir:
-                turning_cost = 0
             if dir == -curr_dir:
                 continue
             next_node = curr_pos + dir
             if next_node in walls:
                 continue
-            tentative_g_score = g_score[(curr_pos, curr_dir)] + 1 + turning_cost
+            tentative_g_score = g_score[(curr_pos, curr_dir)] + 1
             if tentative_g_score < g_score[(next_node, dir)]:
                 g_score[(next_node, dir)] = tentative_g_score
                 f_score[(next_node, dir)] = tentative_g_score + h(next_node)
@@ -52,6 +49,7 @@ def a_star(start, goal, walls, limit=1<<30):
                         i,
                         next_node,
                         dir,
+                        [*path, next_node]
                     )
                 )
                 i += 1
@@ -60,6 +58,7 @@ def a_star(start, goal, walls, limit=1<<30):
 # Part a
 def a(data):
     walls = set()
+    track = set()
     for i, line in enumerate(data.splitlines()):
         width = len(line)
         for j, c in enumerate(line):
@@ -70,19 +69,20 @@ def a(data):
             elif c == "E":
                 goal = j + i*1j
     height = i + 1
-    shortest = a_star(start, goal, walls)
+    track = a_star(start, goal, walls)
+    steps_from_start = dict(zip(track, range(len(track))))
+    steps_to_goal = dict(zip(track, list(range(len(track)))[::-1]))
+    shortest = steps_to_goal[start]
+    def neihgbours(p):
+        return p + 2, p - 2j, p - 2, p + 2j
     c = 0
-    for w in walls:
-        if w.real in (0, width - 1):
-            continue
-        if w.imag in (0, height - 1):
-            continue
-        walls.remove(w)
-        if a_star(start, goal, walls, shortest) <= shortest - 100:
-            c += 1
-        walls.add(w)
+    for pos in track:
+        neigh = set(neihgbours(pos))
+        neigh &= set(track)
+        for n in neigh:
+            if steps_from_start[pos] + 2 + steps_to_goal[n] <= shortest - 100:
+                c+= 1
     return c
-    breakpoint()
 
 
 if 0:
@@ -93,12 +93,13 @@ if 0:
             assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
+assert answer > 1384
+assert answer != 1408
 puzzle.answer_a = answer
 
 
 # Part b
 def b(data):
-    print(data)
     breakpoint()
 
 
