@@ -43,8 +43,10 @@ def a_star(start, goal, walls, limit=1<<30):
             if next_node in walls:
                 continue
             tentative_g_score = g_score[(curr_pos, curr_dir)] + 1 + turning_cost
-            if tentative_g_score < g_score[(next_node, dir)] and tentative_g_score <= limit:
+            if tentative_g_score < g_score[(next_node, dir)]:
                 g_score[(next_node, dir)] = tentative_g_score
+                if tentative_g_score + h(next_node) > limit:
+                    continue
                 f_score[(next_node, dir)] = tentative_g_score + h(next_node)
                 open_set.put(
                     (
