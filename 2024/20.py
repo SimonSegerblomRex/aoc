@@ -12,7 +12,7 @@ DAY = datetime.datetime.today().day
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
-def a_star(start, goal, walls):
+def a_star(start, goal, walls, limit=1<<30):
     def h(node):
         return int(abs(goal.real - node.real) + abs(goal.imag - node.imag))
 
@@ -43,7 +43,7 @@ def a_star(start, goal, walls):
             if next_node in walls:
                 continue
             tentative_g_score = g_score[(curr_pos, curr_dir)] + 1 + turning_cost
-            if tentative_g_score < g_score[(next_node, dir)]:
+            if tentative_g_score < g_score[(next_node, dir)] and tentative_g_score <= limit:
                 g_score[(next_node, dir)] = tentative_g_score
                 f_score[(next_node, dir)] = tentative_g_score + h(next_node)
                 open_set.put(
@@ -78,7 +78,7 @@ def a(data):
         if w.imag in (0, height):
             continue
         walls.remove(w)
-        if a_star(start, goal, walls) <= shortest - 100:
+        if a_star(start, goal, walls, shortest) <= shortest - 100:
             c += 1
         walls.add(w)
     return c
