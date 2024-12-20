@@ -1,13 +1,11 @@
-import datetime
 import queue
-import re
 from collections import defaultdict
 
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 20
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -135,4 +133,4 @@ for example in puzzle.examples:
         assert example_answer == 285
 answer = b(puzzle.input_data, 100)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1012821
