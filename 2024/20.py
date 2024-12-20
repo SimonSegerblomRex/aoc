@@ -85,29 +85,54 @@ def a(data):
     return c
 
 
-if 0:
-    for example in puzzle.examples:
-        if example.answer_a:
-            example_answer = a(example.input_data)
-            print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-            assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answer > 1384
-assert answer != 1408
-puzzle.answer_a = answer
+assert answer == 1409
 
 
 # Part b
-def b(data):
-    breakpoint()
+def b(data, save):
+    walls = set()
+    track = set()
+    for i, line in enumerate(data.splitlines()):
+        width = len(line)
+        for j, c in enumerate(line):
+            if c == "#":
+                walls.add(j + i*1j)
+            elif c == "S":
+                start = j + i*1j
+            elif c == "E":
+                goal = j + i*1j
+    height = i + 1
+    track = a_star(start, goal, walls)
+    steps_from_start = dict(zip(track, range(len(track))))
+    steps_to_goal = dict(zip(track, list(range(len(track)))[::-1]))
+    shortest = steps_to_goal[start]
+    def neihgbours(p):
+        neighs = []
+        for i in range(-20, 21):
+            for j in range(-20, 21):
+                if abs(i) + abs(j) > 20:
+                    continue
+                neighs.append(p + j + i * 1j)
+        return neighs
+    def manhattan(x, y):
+        return int(abs(x.real - y.real) + abs(x.imag - y.imag))
+    c = 0
+    for pos in track:
+        neigh = set(neihgbours(pos))
+        neigh &= set(track)
+        for n in neigh:
+            if steps_from_start[pos] + manhattan(pos, n) + steps_to_goal[n] <= shortest - save:
+                c+= 1
+    return c
 
 
 for example in puzzle.examples:
     if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+        example_answer = b(example.input_data, 50)
+        print(f"Example answer: {example_answer} (expecting: {285})")
+        assert example_answer == 285
+answer = b(puzzle.input_data, 100)
 print("b:", answer)
 puzzle.answer_b = answer
