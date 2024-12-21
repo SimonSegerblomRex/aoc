@@ -69,10 +69,10 @@ def path_directional(start, goal):
         path += "v" * -dy
     if dx < 0:
         path += "<" * -dx
-    if dx > 0:
-        path += ">" * dx
     if dy > 0:
         path += "^" * dy
+    if dx > 0:
+        path += ">" * dx
     return path
 
 
@@ -116,12 +116,13 @@ print("a:", answer)
 assert answer == 162740
 
 # Part b
-def b(data):
+def btmp(data):
     codes = data.split()
     s = 0
     pos_d1 = "A"
     pos_d2 = "A"
     pos_d3 = "A"
+    pos_d4 = "A"
     pos_n = 10
     for code_str in codes:
         code = [int(n, 16) for n in code_str]
@@ -131,18 +132,22 @@ def b(data):
             pos_n = d
             path_d += "A"
             for d in path_d:
-                path_d = path_directional(pos_d3, d)
-                pos_d3 = d
+                path_d = path_directional(pos_d4, d)
+                pos_d4 = d
                 path_d += "A"
                 for d in path_d:
-                    path_d = path_directional(pos_d2, d)
-                    pos_d2 = d
+                    path_d = path_directional(pos_d3, d)
+                    pos_d3 = d
                     path_d += "A"
                     for d in path_d:
-                        path_d = path_directional(pos_d1, d)
-                        pos_d1 = d
+                        path_d = path_directional(pos_d2, d)
+                        pos_d2 = d
                         path_d += "A"
-                        c += len(path_d)
+                        for d in path_d:
+                            path_d = path_directional(pos_d1, d)
+                            pos_d1 = d
+                            path_d += "A"
+                            c += len(path_d)
         s += int(code_str[:3]) * c
     return s
 
@@ -175,9 +180,13 @@ def bb(data, drobots=25):
     return s
 
 
-answer_b = b(puzzle.input_data)
-print("b:", answer)
-answer_bb = bb(puzzle.input_data)
+answer_b = btmp(puzzle.input_data)
+print("btmp:", answer)
+answer_bb = bb(puzzle.input_data, 25)
 print("bb:", answer_bb)
-assert b(puzzle.input_data) == bb(puzzle.input_data, 3)
-assert answer < 325407610843116
+assert btmp(puzzle.input_data) == bb(puzzle.input_data, 4)
+assert a(puzzle.input_data) == bb(puzzle.input_data, 2)
+assert 128183088638138 < answer_bb < 325407610843116
+#assert answer_bb != 328240366912228
+assert answer_bb != 241523801340054
+puzzle.answer_b = bb(puzzle.input_data, 25)
