@@ -88,8 +88,8 @@ def a(data):
         c = 0
         for target in code:
             path_n = path_numeric(pos_n, target)
+            pos_n = target
             path_n += "A"
-            # Move to target digit on numerical pad
             for d in path_n:
                 path_d2 = path_directional(pos_d2, d)
                 pos_d2 = d
@@ -97,8 +97,8 @@ def a(data):
                 for k in path_d2:
                     path_d1 = path_directional(pos_d1, k)
                     pos_d1 = k
-                    c += len(path_d1) + 1  # + 1 for A
-            pos_n = target
+                    path_d1 += "A"
+                    c += len(path_d1)
         s += int(code_str[:3]) * c
     return s
 
