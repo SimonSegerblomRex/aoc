@@ -83,7 +83,8 @@ def path_directional(start, goal):
 
 
 @cache
-def count(path, i, pos="A"):
+def count(path, i):
+    pos="A"
     c = 0
     for d in path:
         path = path_directional(pos, d)
