@@ -81,7 +81,7 @@ def a(data):
     codes = data.split()
     s = 0
     pos_d1 = "A"
-    pos_d2 = "A"
+    pos_dn = "A"
     pos_n = 10
     for code_str in codes:
         code = [int(n, 16) for n in code_str]
@@ -91,14 +91,14 @@ def a(data):
             pos_n = target
             path_n += "A"
             for d in path_n:
-                path_d2 = path_directional(pos_d2, d)
-                pos_d2 = d
-                path_d2 += "A"
-                for k in path_d2:
-                    path_d1 = path_directional(pos_d1, k)
-                    pos_d1 = k
-                    path_d1 += "A"
-                    c += len(path_d1)
+                path_d = path_directional(pos_dn, d)
+                pos_dn = d
+                path_d += "A"
+                for d in path_d:
+                    path_d = path_directional(pos_d1, d)
+                    pos_d1 = d
+                    path_d += "A"
+                    c += len(path_d)
         s += int(code_str[:3]) * c
     return s
 
@@ -117,8 +117,67 @@ assert answer == 162740
 
 # Part b
 def b(data):
-    breakpoint()
+    codes = data.split()
+    s = 0
+    pos_d1 = "A"
+    pos_d2 = "A"
+    pos_d3 = "A"
+    pos_n = 10
+    for code_str in codes:
+        code = [int(n, 16) for n in code_str]
+        c = 0
+        for d in code:
+            path_d = path_numeric(pos_n, d)
+            pos_n = d
+            path_d += "A"
+            for d in path_d:
+                path_d = path_directional(pos_d3, d)
+                pos_d3 = d
+                path_d += "A"
+                for d in path_d:
+                    path_d = path_directional(pos_d2, d)
+                    pos_d2 = d
+                    path_d += "A"
+                    for d in path_d:
+                        path_d = path_directional(pos_d1, d)
+                        pos_d1 = d
+                        path_d += "A"
+                        c += len(path_d)
+        s += int(code_str[:3]) * c
+    return s
 
 
-answer = b(puzzle.input_data)
+def bb(data, drobots=25):
+    codes = data.split()
+    s = 0
+    pos_n = 10
+    for code_str in codes:
+        code = [int(n, 16) for n in code_str]
+        c = 0
+        for d in code:
+            path = path_numeric(pos_n, d)
+            pos_n = d
+            path += "A"
+            @cache
+            def count(path, i, pos="A"):
+                c = 0
+                for d in path:
+                    path = path_directional(pos, d)
+                    pos = d
+                    path += "A"
+                    if i > 0:
+                        c += count(path, i - 1)
+                    else:
+                        c += len(path)
+                return c
+            c += count(path, drobots - 1)
+        s += int(code_str[:3]) * c
+    return s
+
+
+answer_b = b(puzzle.input_data)
 print("b:", answer)
+answer_bb = bb(puzzle.input_data)
+print("bb:", answer_bb)
+assert b(puzzle.input_data) == bb(puzzle.input_data, 3)
+assert answer < 325407610843116
