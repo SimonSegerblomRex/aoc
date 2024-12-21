@@ -65,10 +65,16 @@ def path_directional(start, goal):
     dx = int(g.real - s.real)
     dy = int(g.imag - s.imag)
     dy = -dy
-    if dy < 0:
-        path += "v" * -dy
+    if start in ["^", "A"] and goal in ["<"]:
+        path = "v"
+        dy = 0
+    if start in ["<"] and goal in ["^", "A"]:
+        path = ">" * dx
+        dx = 0
     if dx < 0:
         path += "<" * -dx
+    if dy < 0:
+        path += "v" * -dy
     if dy > 0:
         path += "^" * dy
     if dx > 0:
@@ -189,4 +195,5 @@ assert a(puzzle.input_data) == bb(puzzle.input_data, 2)
 assert 128183088638138 < answer_bb < 325407610843116
 #assert answer_bb != 328240366912228
 assert answer_bb != 241523801340054
-puzzle.answer_b = bb(puzzle.input_data, 25)
+assert answer_bb != 175407510093318
+puzzle.answer_b = answer_bb
