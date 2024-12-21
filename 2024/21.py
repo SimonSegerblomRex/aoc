@@ -93,15 +93,11 @@ def a(data):
             for d in path_n:
                 path_d2 = path_directional(pos_d2, d)
                 pos_d2 = d
+                path_d2 += "A"
                 for k in path_d2:
                     path_d1 = path_directional(pos_d1, k)
                     pos_d1 = k
-                    c += len(path_d1)
-                    c += 1  # for A
-                path_d1 = path_directional(pos_d1, "A")
-                pos_d1 = "A"
-                c += len(path_d1)
-                c += 1  # for A
+                    c += len(path_d1) + 1  # + 1 for A
             pos_n = target
         s += int(code_str[:3]) * c
     return s
