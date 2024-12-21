@@ -1,12 +1,9 @@
-import datetime
-import re
 from functools import cache
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 21
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -68,13 +65,10 @@ def path_directional(start, goal):
     dx = int(g.real - s.real)
     dy = int(g.imag - s.imag)
     dy = -dy
-    if start in ["^", "A"] and goal in ["<"]:
-        path = "v"
-        dy = 0
-    if dx < 0:
-        path += "<" * -dx
     if dy < 0:
         path += "v" * -dy
+    if dx < 0:
+        path += "<" * -dx
     if dx > 0:
         path += ">" * dx
     if dy > 0:
@@ -94,6 +88,7 @@ def a(data):
         c = 0
         for target in code:
             path_n = path_numeric(pos_n, target)
+            path_n += "A"
             # Move to target digit on numerical pad
             for d in path_n:
                 path_d2 = path_directional(pos_d2, d)
@@ -107,18 +102,6 @@ def a(data):
                 pos_d1 = "A"
                 c += len(path_d1)
                 c += 1  # for A
-            # Time to press A on directional pad 2
-            path_d2 = path_directional(pos_d2, "A")
-            pos_d2 = "A"
-            for k in path_d2:
-                path_d1 = path_directional(pos_d1, k)
-                pos_d1 = k
-                c += len(path_d1)
-                c += 1  # for A
-            path_d1 = path_directional(pos_d1, "A")
-            pos_d1 = "A"
-            c += len(path_d1)
-            c += 1  # for A
             pos_n = target
         s += int(code_str[:3]) * c
     return s
@@ -134,21 +117,12 @@ print(example_answer)
 assert example_answer == 126384
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answer < 163872
-assert answer > 160060
-puzzle.answer_a = answer
-
+assert answer == 162740
 
 # Part b
 def b(data):
     breakpoint()
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
