@@ -46,29 +46,35 @@ def path_numeric(start, goal):
     if start in [0, 10] and goal in [1, 4, 7]:
         path = "^" * dy
         dy = 0
+    if start in [1, 7, 4] and goal in [0, 10]:
+        path = ">" * dx
+        dx = 0
     if dx < 0:
         path += "<" * -dx
+    if dy < 0:
+        path += "v" * -dy
     if dy > 0:
         path += "^" * dy
     if dx > 0:
         path += ">" * dx
-    if dy < 0:
-        path += "v" * -dy
     return path
 
 
 @cache
 def path_directional(start, goal):
-    start = directional_keypad[start]
-    goal = directional_keypad[goal]
+    s = directional_keypad[start]
+    g = directional_keypad[goal]
     path = ""
-    dx = int(goal.real - start.real)
-    dy = int(goal.imag - start.imag)
+    dx = int(g.real - s.real)
+    dy = int(g.imag - s.imag)
     dy = -dy
-    if dy < 0:
-        path += "v" * -dy
+    if start in ["^", "A"] and goal in ["<"]:
+        path = "v"
+        dy = 0
     if dx < 0:
         path += "<" * -dx
+    if dy < 0:
+        path += "v" * -dy
     if dx > 0:
         path += ">" * dx
     if dy > 0:
@@ -114,7 +120,6 @@ def a(data):
             c += len(path_d1)
             c += 1  # for A
             pos_n = target
-        print(c)
         s += int(code_str[:3]) * c
     return s
 
@@ -130,6 +135,7 @@ assert example_answer == 126384
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer < 163872
+assert answer > 160060
 puzzle.answer_a = answer
 
 
