@@ -37,20 +37,23 @@ directional_keypad = {
 
 @cache
 def path_numeric(start, goal):
-    start = numeric_keypad[start]
-    goal = numeric_keypad[goal]
+    s = numeric_keypad[start]
+    g = numeric_keypad[goal]
     path = ""
-    dx = int(goal.real - start.real)
-    dy = int(goal.imag - start.imag)
+    dx = int(g.real - s.real)
+    dy = int(g.imag - s.imag)
     dy = -dy
+    if start in [0, 10] and goal in [1, 4, 7]:
+        path = "^" * dy
+        dy = 0
+    if dx < 0:
+        path += "<" * -dx
     if dy > 0:
         path += "^" * dy
     if dx > 0:
         path += ">" * dx
     if dy < 0:
         path += "v" * -dy
-    if dx < 0:
-        path += "<" * -dx
     return path
 
 
@@ -64,15 +67,14 @@ def path_directional(start, goal):
     dy = -dy
     if dy < 0:
         path += "v" * -dy
+    if dx < 0:
+        path += "<" * -dx
     if dx > 0:
         path += ">" * dx
     if dy > 0:
         path += "^" * dy
-    if dx < 0:
-        path += "<" * -dx
     return path
 
-breakpoint()
 
 # Part a
 def a(data):
@@ -86,7 +88,7 @@ def a(data):
         c = 0
         for target in code:
             path_n = path_numeric(pos_n, target)
-            # Move to target digit in numerical pad
+            # Move to target digit on numerical pad
             for d in path_n:
                 path_d2 = path_directional(pos_d2, d)
                 pos_d2 = d
@@ -99,7 +101,7 @@ def a(data):
                 pos_d1 = "A"
                 c += len(path_d1)
                 c += 1  # for A
-            # Time to press A in numerical pad
+            # Time to press A on directional pad 2
             path_d2 = path_directional(pos_d2, "A")
             pos_d2 = "A"
             for k in path_d2:
@@ -112,6 +114,7 @@ def a(data):
             c += len(path_d1)
             c += 1  # for A
             pos_n = target
+        print(c)
         s += int(code_str[:3]) * c
     return s
 
@@ -126,7 +129,7 @@ print(example_answer)
 assert example_answer == 126384
 answer = a(puzzle.input_data)
 print("a:", answer)
-assert answer < 172288
+assert answer < 163872
 puzzle.answer_a = answer
 
 
