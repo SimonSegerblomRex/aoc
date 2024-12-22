@@ -1,12 +1,9 @@
-import datetime
-import re
 from itertools import product
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2024
+DAY = 22
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -33,6 +30,7 @@ example = """1
 100
 2024"""
 answer = a(example)
+assert answer == 37327623
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 12664695565
@@ -40,12 +38,10 @@ assert answer == 12664695565
 
 # Part b
 def b(data):
-    #numbers = []
     prices = []
     diff = []
     for n in data.split():
         n = int(n)
-        tmp_n = [n]
         tmp_p = [n % 10]
         tmp_d = [0]
         for _ in range(2000):
@@ -58,25 +54,34 @@ def b(data):
             n %= 16777216
             tmp_d.append(n % 10 - tmp_p[-1])
             tmp_p.append(n % 10)
-            tmp_n.append(n)
-        #numbers.append(tmp_n)
         prices.append(tmp_p)
         diff.append(tmp_d)
     seqs = set()
+    tmp = []
     for p, d in zip(prices, diff):
+        hmm = set()
         for i in range(1, len(p) - 3):
-            seqs.add(tuple(d[i:i + 4]))
-    bananas = {}
-    #for seq in product(range(-9, 9 + 1), repeat=4):
+            if d[i + 3] > 0:
+                seqs.add(tuple(d[i:i + 4]))
+                hmm.add(tuple(d[i:i + 4]))
+        tmp.append(hmm)
+    best = 0
+    nbr_buyers = len(prices)
     for seq in seqs:
         s = 0
-        for p, d in zip(prices, diff):
-            for i in range(1, len(p) - 3):
-                if tuple(d[i:i + 4]) == seq:
-                    s += p[i + 3]
-                    break
-        bananas[seq] = s
-    return max(bananas.values())
+        for i, (p, d) in enumerate(zip(prices, diff)):
+            if seq not in tmp[i]:
+                continue
+            for idx in range(1, len(p) - 3):
+                if d[idx + 3] > 0:
+                    if tuple(d[idx:idx + 4]) == seq:
+                        s += p[idx + 3]
+                        break
+            if s + (nbr_buyers - i) * 9 < best:
+                break
+        best = max(s, best)
+        print(best)
+    return best
 
 
 example = """1
@@ -88,4 +93,4 @@ print(answer)
 assert answer == 23
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 1444
