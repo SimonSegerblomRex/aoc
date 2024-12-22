@@ -1,4 +1,4 @@
-from itertools import product
+from collections import defaultdict
 
 from aocd.models import Puzzle
 
@@ -56,26 +56,15 @@ def b(data):
             tmp_p.append(n % 10)
         prices.append(tmp_p)
         diff.append(tmp_d)
-    seqs = []
+    bananas = defaultdict(int)
     for p, d in zip(prices, diff):
-        seq = set()
+        visited = set()
         for i in range(1, len(p) - 3):
-            if d[i + 3] > 0:
-                seq.add(tuple(d[i:i + 4]))
-        seqs.append(seq)
-    bananas = []
-    for n, seq in enumerate(set.union(*seqs)):
-        s = 0
-        seq_list = list(seq)
-        for i, (p, d) in enumerate(zip(prices, diff)):
-            if seq not in seqs[i]:
-                continue
-            for idx in range(1, len(p) - 3):
-                if d[idx:idx + 4] == seq_list:
-                    s += p[idx + 3]
-                    break
-        bananas.append(s)
-    return max(bananas)
+            seq = tuple(d[i:i + 4])
+            if seq not in visited:
+                bananas[seq] += p[i + 3]
+            visited.add(seq)
+    return max(bananas.values())
 
 
 example = """1
