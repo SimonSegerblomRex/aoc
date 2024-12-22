@@ -56,32 +56,26 @@ def b(data):
             tmp_p.append(n % 10)
         prices.append(tmp_p)
         diff.append(tmp_d)
-    seqs = set()
-    tmp = []
+    seqs = []
     for p, d in zip(prices, diff):
-        hmm = set()
+        seq = set()
         for i in range(1, len(p) - 3):
             if d[i + 3] > 0:
-                seqs.add(tuple(d[i:i + 4]))
-                hmm.add(tuple(d[i:i + 4]))
-        tmp.append(hmm)
-    best = 0
-    nbr_buyers = len(prices)
-    for seq in seqs:
+                seq.add(tuple(d[i:i + 4]))
+        seqs.append(seq)
+    bananas = []
+    for n, seq in enumerate(set.union(*seqs)):
         s = 0
+        seq_list = list(seq)
         for i, (p, d) in enumerate(zip(prices, diff)):
-            if seq not in tmp[i]:
+            if seq not in seqs[i]:
                 continue
             for idx in range(1, len(p) - 3):
-                if d[idx + 3] > 0:
-                    if tuple(d[idx:idx + 4]) == seq:
-                        s += p[idx + 3]
-                        break
-            if s + (nbr_buyers - i) * 9 < best:
-                break
-        best = max(s, best)
-        print(best)
-    return best
+                if d[idx:idx + 4] == seq_list:
+                    s += p[idx + 3]
+                    break
+        bananas.append(s)
+    return max(bananas)
 
 
 example = """1
