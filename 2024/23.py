@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-import networkx as nx
 from aocd.models import Puzzle
 
 YEAR = 2024
@@ -47,8 +46,29 @@ def b(data):
         c0, c1 = line.split("-")
         connections[c0].append(c1)
         connections[c1].append(c0)
-    G = nx.Graph(connections)
-    cliques = ((len(clique), clique) for clique in nx.find_cliques(G))
+    good = []
+    for c0, conns0 in connections.items():
+        clique = set([c0])
+        tmp = []
+        for c1 in conns0:
+            clique.add(c1)
+            tmp.append(clique.copy())
+        for clique in tmp:
+            ok = True
+            for c0 in clique:
+                for c1 in clique:
+                    if c0 == c1:
+                        continue
+                    if c0 not in connections[c1]:
+                        ok = False
+                        break
+            if ok:
+                good.append(clique)
+    cliques = ((len(clique), clique) for clique in good)
+    # Alternative solution using networkx:
+    # import networkx as nx
+    # G = nx.Graph(connections)
+    # cliques = ((len(clique), clique) for clique in nx.find_cliques(G))
     return ",".join(sorted(sorted(cliques)[-1][1]))
 
 
