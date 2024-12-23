@@ -26,7 +26,7 @@ def a(data):
             if c0 not in conns1:
                 continue
             for c2 in set(conns0) & set(conns1):
-                triplets.add(tuple(sorted([c0, c1, c2])))
+                triplets.add(frozenset([c0, c1, c2]))
     return sum(1 for t in triplets if "t" in "".join(chr0 for chr0, _ in t))
 
 
@@ -47,12 +47,9 @@ def b(data):
         c0, c1 = line.split("-")
         connections[c0].append(c1)
         connections[c1].append(c0)
-    G = nx.Graph()
-    for from_node, to_nodes in connections.items():
-        for to_node in to_nodes:
-            G.add_edge(from_node, to_node)
+    G = nx.Graph(connections)
     cliques = ((len(clique), clique) for clique in nx.find_cliques(G))
-    return  ",".join(sorted(sorted(cliques)[-1][1]))
+    return ",".join(sorted(sorted(cliques)[-1][1]))
 
 
 for example in puzzle.examples:
