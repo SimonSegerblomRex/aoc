@@ -25,19 +25,20 @@ def a(data):
         "OR": "|",
         "XOR": "^",
     }
+    looking_for = set([g for g in values if g[0] == "z"])
     for gate in gates:
         gatess[gate[-1]] = f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']"
+        if gate[-1][0] == "z":
+            looking_for.add(gate[-1])
     done = False
-    i = 0
     while not done:
-        if i > 1e4:
-            break
-        i += 1
         for g, f in gatess.items():
             try:
                 values[g] = eval(f)
             except KeyError:
                 pass
+        if looking_for == looking_for & set(values):
+            done = True
     out = []
     for k, v in values.items():
         if k[0] == "z":
