@@ -28,15 +28,18 @@ def a(data):
     }
     looking_for = set([g for g in values if g[0] == "z"])
     for gate in gates:
-        gatess[gate[-1]] = f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']"
+        gatess[gate[-1]] = compile(f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']", "<string>", "eval")
         if gate[-1][0] == "z":
             looking_for.add(gate[-1])
     while True:
+        old = values.copy()
         for g, f in gatess.items():
             try:
                 values[g] = eval(f)
             except KeyError:
                 pass
+        if values == old:
+            break
         if looking_for == looking_for & set(values):
             break
     out = []
@@ -71,21 +74,24 @@ def b(data, swap=2):
     }
     looking_for = set([g for g in values if g[0] == "z"])
     for gate in gates:
-        gatess[gate[-1]] = f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']"
+        gatess[gate[-1]] = compile(f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']", "<string>", "eval")
         if gate[-1][0] == "z":
             looking_for.add(gate[-1])
     values_orig = values.copy()
     hmm = combinations(list(gatess), 2)
-    for combo in combinations(hmm, swap):
+    for i, combo in enumerate(combinations(hmm, swap)):
         values = values_orig.copy()
         for g0, g1 in combo:
             gatess[g0], gatess[g1] = gatess[g1], gatess[g0]
         while True:
+            old = values.copy()
             for g, f in gatess.items():
                 try:
                     values[g] = eval(f)
                 except KeyError:
                     pass
+            if values == old:
+                break
             if looking_for == looking_for & set(values):
                 break
         out = []
