@@ -74,11 +74,9 @@ def b(data, swap=2):
         gatess[gate[-1]] = f"values['{gate[0]}'] {opmap[gate[1]]} values['{gate[2]}']"
         if gate[-1][0] == "z":
             looking_for.add(gate[-1])
-    gatess_orig = gatess.copy()
     values_orig = values.copy()
     hmm = combinations(list(gatess), 2)
     for combo in combinations(hmm, swap):
-        gatess = gatess_orig.copy()
         values = values_orig.copy()
         for g0, g1 in combo:
             gatess[g0], gatess[g1] = gatess[g1], gatess[g0]
@@ -95,8 +93,10 @@ def b(data, swap=2):
             if k[0] == "z":
                 out.append((k, v))
         z = int("0b" + "".join([str(b) for _, b in sorted(out)[::-1]]), 2)
-        if x & y == z:
+        if x + y == z:  # + for real input, & for example....
             break
+        for g0, g1 in combo:
+            gatess[g0], gatess[g1] = gatess[g1], gatess[g0]
     return ",".join(sorted(chain(*combo)))
 
 
@@ -119,8 +119,8 @@ x02 AND y02 -> z01
 x03 AND y03 -> z03
 x04 AND y04 -> z04
 x05 AND y05 -> z00"""
-answer = b(example, swap=2)
-print("example:", answer)
+#answer = b(example, swap=2)
+#print("example:", answer)
 answer = b(puzzle.input_data, swap=4)
 print("b:", answer)
 #puzzle.answer_b = answer
