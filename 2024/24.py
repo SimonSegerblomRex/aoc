@@ -21,17 +21,13 @@ def run(values, connections, looking_for):
             break
         if looking_for == looking_for & set(values):
             break
-    out = []
-    for k, v in values.items():
-        if k[0] == "z":
-            out.append((k, v))
+    out = [(k, v) for k, v in values.items() if k[0] == "z"]
     if not out:
         return -1
     return int("0b" + "".join([str(b) for _, b in sorted(out)[::-1]]), 2)
 
 
-# Part a
-def a(data):
+def get_connections(data):
     initial_values, gates = data.split("\n\n")
     gates = re.findall("(.+) (.+) (.+) -> (.+)", gates)
     values = {}
@@ -49,6 +45,12 @@ def a(data):
         connections[out] = compile(f"values['{in1}'] {opmap[op]} values['{in2}']", "<string>", "eval")
         if out[0] == "z":
             looking_for.add(out)
+    return values, connections, looking_for
+
+
+# Part a
+def a(data):
+    values, connections, looking_for = get_connections(data)
     return run(values, connections, looking_for)
 
 
@@ -57,40 +59,21 @@ print("a:", answer)
 assert answer == 53755311654662
 
 
+def get_values(bits):
+    numbers = [2**bits - 1, 1, 0]
+    for x, y in combinations_with_replacement(numbers, 2):
+        values = {}
+        for bit in range(bits):
+            values[f"x{bit:02}"] = (x >> bit) & 0b1
+            values[f"y{bit:02}"] = (y >> bit) & 0b1
+        yield x, y, values
+
+
 # Part b
 def b(data, swap=2):
-    initial_values, gates = data.split("\n\n")
-    x = re.findall("x.+: (\d)", initial_values)
-    y = re.findall("y.+: (\d)", initial_values)
-    xx = int("0b" + "".join(x[::-1]), 2)
-    yy = int("0b" + "".join(y[::-1]), 2)
-    gates = re.findall("(.+) (.+) (.+) -> (.+)", gates)
-
-    values = {}
-    for value in initial_values.splitlines():
-        gate, val = value.split(": ")
-        values[gate] = int(val)
-    opmap = {
-        "AND": "&",
-        "OR": "|",
-        "XOR": "^",
-    }
-    looking_for = set([g for g in values if g[0] == "z"])
-    connections = {}
-    for in1, op, in2, out in gates:
-        connections[out] = compile(f"values['{in1}'] {opmap[op]} values['{in2}']", "<string>", "eval")
-        if out[0] == "z":
-            looking_for.add(out)
+    values, connections, looking_for = get_connections(data)
     bits = int(sorted(looking_for)[-1][1:3]) + 1
     looking_for = sorted(looking_for)
-    def get_values(bits):
-        numbers = [2**bits - 1, 1, 0]
-        for x, y in combinations_with_replacement(numbers, 2):
-            values = {}
-            for bit in range(bits):
-                values[f"x{bit:02}"] = (x >> bit) & 0b1
-                values[f"y{bit:02}"] = (y >> bit) & 0b1
-            yield x, y, values
     gg = list(connections)
     out = []
     for bit in range(bits):
@@ -118,10 +101,11 @@ def b(data, swap=2):
             if i == len(connections):
                 # Hopefully we don't end up here, or we need to
                 # do more than one swap at the time...
-                print("naj...")
-                breakpoint()
+                raise NotImplementedError("Can't handle more than one swap at the time...")
             # Swap
             connections[gg[i]], connections[gg[j]] = connections[gg[j]], connections[gg[i]]
+        if len(out) == 8:
+            break
     return ",".join(sorted([gg[g] for g in out]))
 
 
