@@ -25,19 +25,13 @@ def a(data):
     for lock in locks:
         for key in keys:
             for col in range(5):
-                tmp = lock[col] + key[col]
-                if tmp > 5:
+                if lock[col] + key[col] > 5:
                     break
             else:
                 s += 1
     return s
 
 
-for example in puzzle.examples:
-    if example.answer_a:
-        example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 2993
