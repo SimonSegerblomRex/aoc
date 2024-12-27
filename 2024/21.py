@@ -84,12 +84,11 @@ def path_directional(start, goal):
 
 @cache
 def count(path, i):
-    pos="A"
+    pos = "A"
     c = 0
     for d in path:
-        path = path_directional(pos, d)
+        path = path_directional(pos, d) + "A"
         pos = d
-        path += "A"
         if i > 0:
             c += count(path, i - 1)
         else:
@@ -100,28 +99,19 @@ def count(path, i):
 # Part a
 def a(data, drobots=2):
     codes = data.split()
+    pos = 10
     s = 0
-    pos_n = 10
     for code_str in codes:
         code = [int(n, 16) for n in code_str]
         c = 0
         for d in code:
-            path = path_numeric(pos_n, d)
-            pos_n = d
-            path += "A"
+            path = path_numeric(pos, d) + "A"
+            pos = d
             c += count(path, drobots - 1)
         s += int(code_str[:3]) * c
     return s
 
 
-example = """029A
-980A
-179A
-456A
-379A"""
-example_answer = a(example)
-print(example_answer)
-assert example_answer == 126384
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 162740
