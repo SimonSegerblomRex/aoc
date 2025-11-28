@@ -1,5 +1,6 @@
 import ast
 import re
+from dataclasses import dataclass
 
 import numpy as np
 from aocd.models import Puzzle
@@ -10,53 +11,82 @@ DAY = 18
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
-nodes
-
 class SnailFishNumber:
-
-    def __init__(self, list_, parent=None, depth=1):
-        self.depth = depth
+    def __init__(self, val, depth=0, parent=None):
         self.parent = parent
-        left, right = list_
-        if isinstance(left, list):
-            self.left = SnailFishNumber(left, self)
+        self.depth = depth
+        if isinstance(val, int):
+            self.val = val
+            self.left = None
+            self.right = None
+        elif isinstance(val, list):
+            self.val = None
+            left, right = val
+            self.left = SnailFishNumber(left, depth + 1, self)
+            self.right = SnailFishNumber(right, depth + 1, self)
         else:
-            self.left = left
-        if isinstance(right, list):
-            self.right = SnailFishNumber(right, self)
-        else:
-            self.right = right
-        if parent is not None:
-            parent.depth += 1
-        while self.depth == 4:  # bara if parent is None?
-            # Need to explode!
-            self.explode()
-            breakpoint()
-            # while split criteria...
-
-    def __add__(self, other):
-        new = SnailFishNumber([self, other], None, max(self.depth, other.depth) + 1)
-        self.parent = new
-        other.parent = new
-        return new
+            raise ValueError("Can't handle val...")
 
     def __repr__(self):
+        if self.left is None and self.right is None:
+            return str(self.val)
         return f"[{self.left}, {self.right}]"
 
-    def _update_depth(self):
-        if isinstance(SnailFishNumber, self.left):
-            self.left._update_depth()
-        if isinstance(SnailFishNumber, self.right):
-            self.left._update_depth()
-        self.depth += 1
+    def leaves(self, l=None):
+        if l is None:
+            l = []
+        if self.left is None and self.right is None:
+            l.append(self)
+            return l
+        l.extend(e for e in self.left.leaves(l) if e not in l)
+        l.extend(e for e in self.right.leaves(l) if e not in l)
+        return l
+
+    def magnitude(self):
+        if self.val is not None:
+            return self.val
+        return 3 * self.left.magnitude() + 2 * self.right.magnitude()
+
+
+def reduce(n):
+    l = n.leaves()
+    for i, e in enumerate(l):
+        if e.depth == 5:
+            # explode
+            assert(l[i + 1].val is not None)
+            if i > 0:
+                l[i - 1].val += e.val
+            try:
+                l[i + 2].val += l[i + 1].val
+            except IndexError:
+                pass
+            e.parent.left = None
+            e.parent.right = None
+            e.parent.val = 0
+            return True
+    for i, e in enumerate(l):
+        if e.val >= 10:
+            # split
+            e.left = SnailFishNumber(e.val // 2, e.depth + 1, e)
+            e.right = SnailFishNumber((e.val + 1) // 2, e.depth + 1, e)
+            e.val = None
+            return True
+    return False
+
 
 # Part a
 def a(data):
-    #sn = ast.literal_eval("[[[[[9,8],1],2],3],4]")
-    sn1 = SnailFishNumber([[[[4,3],4],4],[7,[[8,4],9]]])
-    sn2 = SnailFishNumber([1,1])
-    tmp = sn1 + sn2
-    breakpoint()
+    prev = None
+    for n in data.split():
+        if prev is None:
+            prev = n
+            continue
+        l1 = ast.literal_eval(str(prev))
+        l2 = ast.literal_eval(str(n))
+        prev = SnailFishNumber([l1, l2])
+        while reduce(prev):
+            pass
+    return prev.magnitude()
 
 
 for example in puzzle.examples:
@@ -66,7 +96,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-#puzzle.answer_a = answer
+puzzle.answer_a = answer
 
 
 # Part b
