@@ -1,6 +1,6 @@
 import ast
-import re
 from dataclasses import dataclass
+from itertools import permutations
 
 import numpy as np
 from aocd.models import Puzzle
@@ -53,7 +53,7 @@ def reduce(n):
     for i, e in enumerate(l):
         if e.depth == 5:
             # explode
-            assert(l[i + 1].val is not None)
+            assert l[i + 1].val is not None
             if i > 0:
                 l[i - 1].val += e.val
             try:
@@ -96,9 +96,26 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 3359
 
 
 # Part b
 def b(data):
-    exit()
+    high_score = 0
+    for n1, n2 in permutations(data.split(), 2):
+        l1 = ast.literal_eval(n1)
+        l2 = ast.literal_eval(n2)
+        prev = SnailFishNumber([l1, l2])
+        while reduce(prev):
+            pass
+        high_score = max(prev.magnitude(), high_score)
+    return high_score
+
+
+for example in puzzle.examples:
+    if example.answer_b:
+        example_answer = b(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
+        assert str(example_answer) == example.answer_b
+answer = b(puzzle.input_data)
+assert answer == 4616
