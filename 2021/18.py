@@ -12,18 +12,29 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 class SnailFishNumber:
-    def __init__(self, val, depth=0, parent=None):
+    def __init__(self, val, parent=None, depth=0, i=None):
         self.parent = parent
-        self.depth = depth
+        if parent is None:
+            # root
+            self.depth = 0
+            self.leaves = []
+        else:
+            self.depth = parent.depth + 1
+            self.leaves = parent.leaves
         if isinstance(val, int):
+            # leaf
             self.val = val
             self.left = None
             self.right = None
+            if i is None:
+                self.leaves.append(self)
+            else:
+                self.leaves.insert(i, self)
         elif isinstance(val, list):
             self.val = None
             left, right = val
-            self.left = SnailFishNumber(left, depth + 1, self)
-            self.right = SnailFishNumber(right, depth + 1, self)
+            self.left = SnailFishNumber(left, self)
+            self.right = SnailFishNumber(right, self)
         else:
             raise ValueError("Can't handle val...")
 
@@ -32,36 +43,38 @@ class SnailFishNumber:
             return str(self.val)
         return f"[{self.left}, {self.right}]"
 
-    def leaves(self):
-        if self.val is not None:
-            return [self]
-        l = self.left.leaves()
-        l += self.right.leaves()
-        return l
+    def explode(self):
+        i = self.leaves.index(self.left)
+        assert self.right in self.leaves
+        if i > 0:
+            self.leaves[i - 1].val += self.left.val
+        try:
+            self.leaves[i + 2].val += self.right.val
+        except IndexError:
+            pass
+        self.leaves.pop(i)
+        self.leaves.pop(i)
+        self.leaves.insert(i, self)
+        self.left = None
+        self.right = None
+        self.val = 0
+
+    def split(self):
+        i = self.leaves.index(self)
+        self.right = SnailFishNumber((self.val + 1) // 2, self, i=i)
+        self.left = SnailFishNumber(self.val // 2, self, i=i)
+        self.val = None
+        self.leaves.remove(self)
 
     def reduce(self):
-        l = self.leaves()
-        for i, e in enumerate(l):
+        for e in self.leaves:
             if e.depth == 5:
-                # explode
-                assert l[i + 1].val is not None
-                if i > 0:
-                    l[i - 1].val += e.val
-                try:
-                    l[i + 2].val += l[i + 1].val
-                except IndexError:
-                    pass
-                e.parent.left = None
-                e.parent.right = None
-                e.parent.val = 0
+                e.parent.explode()
                 self.reduce()
                 return
-        for e in l:
+        for e in self.leaves:
             if e.val >= 10:
-                # split
-                e.left = SnailFishNumber(e.val // 2, e.depth + 1, e)
-                e.right = SnailFishNumber((e.val + 1) // 2, e.depth + 1, e)
-                e.val = None
+                e.split()
                 self.reduce()
                 return
 
