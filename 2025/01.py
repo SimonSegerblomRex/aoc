@@ -1,7 +1,3 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2025
@@ -15,10 +11,8 @@ def a(data):
     c = 0
     l = 50
     for i in data.split():
-        if i[0] == "L":
-            l -= int(i[1:])
-        else:
-            l += int(i[1:])
+        d = int(i[1:])
+        l += -d if (i[0] == "L") else d
         l %= 100
         if l == 0:
             c += 1
@@ -39,16 +33,24 @@ def b(data):
     c = 0
     l = 50
     for i in data.split():
-        for t in range(int(i[1:])):
-            if i[0] == "L":
-                l -= 1
-            else:
-                l += 1
-            l %= 100
-            if l == 0:
-                c += 1
+        d = int(i[1:])
+        p = l
+        l += -d if (i[0] == "L") else d
+        if l == 0:
+            c += 1
+        elif l > 0:
+            c += l // 100
+        else:
+            c += -l // 100 + (p != 0)
+        l %= 100
     return c
 
+
+for example in puzzle.examples:
+    if example.answer_b:
+        example_answer = b(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: 6)")
+        assert str(example_answer) == "6"
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 6412
