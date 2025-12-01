@@ -36,12 +36,9 @@ def b(data):
         d = int(i[1:])
         p = l
         l += -d if (i[0] == "L") else d
-        if l == 0:
+        c += abs(l) // 100
+        if (l == 0) or (l < 0 and p != 0):
             c += 1
-        elif l > 0:
-            c += l // 100
-        else:
-            c += -l // 100 + (p != 0)
         l %= 100
     return c
 
