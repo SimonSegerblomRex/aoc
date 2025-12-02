@@ -1,13 +1,7 @@
-import datetime
-import re
-
-# from itertools import batched
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2025
+DAY = 2
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -36,6 +30,8 @@ print("a:", answer)
 assert answer == 44854383294
 
 
+# found "batched" in the itertools documentation...
+# ...but only had python3.9 on my Chromebook...
 def batched(s, n):
     return (s[i * n : i * n + n] for i in range(len(s) // n))
 
@@ -47,16 +43,12 @@ def b(data):
         lo, hi = line.split("-")
         for n in range(int(lo), int(hi) + 1):
             n = str(n)
-            invalid = False
             for c in range(1, len(n) // 2 + 1):
                 if len(n) % c:
                     continue
                 if len(set(batched(n, c))) == 1:
-                    invalid = True
-                if invalid:
+                    s += int(n)
                     break
-            if invalid:
-                s += int(n)
     return s
 
 
@@ -67,4 +59,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 55647141923
