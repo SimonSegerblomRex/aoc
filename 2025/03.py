@@ -11,22 +11,17 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data):
+def a(data, d=2):
     s = 0
     for line in data.split():
-        d1 = "0"
-        d2 = "0"
-        for i, c in enumerate(line[:-1]):
-            if c > d1:
-                d1 = c
-                d2 = line[i + 1]
-                continue
-            if c > d2:
-                d2 = c
-        if line[-1] > d2:
-            d2 = line[-1]
-        print(d1+ d2)
-        s += int(d1 + d2)
+        dj = ["0"] * d
+        l = len(line)
+        i = 0
+        for j in range(d):
+            dj[j] = max(line[i:l-d+j+1])
+            i += np.argmax(list(line[i:l-d+j+1])) + 1
+        print("".join(dj))
+        s += int("".join(dj))
     return s
 
 
@@ -37,20 +32,15 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 16858
 
 
 # Part b
-def b(data):
-    print(data)
-    breakpoint()
-
-
 for example in puzzle.examples:
     if example.answer_b:
-        example_answer = b(example.input_data)
+        example_answer = a(example.input_data, 12)
         print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
         assert str(example_answer) == example.answer_b
-answer = b(puzzle.input_data)
+answer = a(puzzle.input_data, 12)
 print("b:", answer)
 puzzle.answer_b = answer
