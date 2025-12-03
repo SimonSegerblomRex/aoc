@@ -1,4 +1,3 @@
-import numpy as np
 from aocd.models import Puzzle
 
 YEAR = 2025
@@ -8,16 +7,16 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
-def a(data, d=2):
+def a(data, digits=2):
     s = 0
     for line in data.split():
-        dj = ["0"] * d
-        l = len(line)
-        i = 0
-        for j in range(d):
-            dj[j] = max(line[i : l - d + j + 1])
-            i += np.argmax(list(line[i : l - d + j + 1])) + 1
-        s += int("".join(dj))
+        number = []
+        start = 0
+        for i in range(digits):
+            view = line[start : len(line) - digits + i + 1]
+            number.append(max(view))
+            start += view.index(number[-1]) + 1
+        s += int("".join(number))
     return s
 
 
