@@ -1,11 +1,8 @@
-import datetime
-import re
-
 import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2025
+DAY = 3
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -18,9 +15,8 @@ def a(data, d=2):
         l = len(line)
         i = 0
         for j in range(d):
-            dj[j] = max(line[i:l-d+j+1])
-            i += np.argmax(list(line[i:l-d+j+1])) + 1
-        print("".join(dj))
+            dj[j] = max(line[i : l - d + j + 1])
+            i += np.argmax(list(line[i : l - d + j + 1])) + 1
         s += int("".join(dj))
     return s
 
@@ -43,4 +39,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = a(puzzle.input_data, 12)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 167549941654721
