@@ -1,53 +1,65 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2025
+DAY = 4
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
 
 # Part a
 def a(data):
-    pos = []
+    pos = set()
     for j, line in enumerate(data.split()):
         for i, ch in enumerate(line):
             if ch == "@":
-                pos.append(i + j*1j)
+                pos.add(i + j * 1j)
     c = 0
     for p in pos:
-        neighbours = {p + 1, p + 1 - 1j, p - 1j, p - 1 - 1j, p - 1, p - 1 + 1j, p + 1j, p + 1 + 1j}
-        if len(neighbours & set(pos)) < 4:
+        neighbours = {
+            p + 1,
+            p + 1 - 1j,
+            p - 1j,
+            p - 1 - 1j,
+            p - 1,
+            p - 1 + 1j,
+            p + 1j,
+            p + 1 + 1j,
+        }
+        if len(neighbours & pos) < 4:
             c += 1
     return c
 
 
-#answer = a(puzzle.input_data)
-#print("a:", answer)
-#puzzle.answer_a = answer
-
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 1549
 
 # Part b
 def b(data):
-    pos = []
+    pos = set()
     for j, line in enumerate(data.split()):
         for i, ch in enumerate(line):
             if ch == "@":
-                pos.append(i + j*1j)
+                pos.add(i + j * 1j)
     c = 0
     while True:
-        new_pos = []
+        new_pos = set()
         old_c = c
-        tmp = set(pos)
         for p in pos:
-            neighbours = {p + 1, p + 1 - 1j, p - 1j, p - 1 - 1j, p - 1, p - 1 + 1j, p + 1j, p + 1 + 1j}
-            if len(neighbours & tmp) < 4:
+            neighbours = {
+                p + 1,
+                p + 1 - 1j,
+                p - 1j,
+                p - 1 - 1j,
+                p - 1,
+                p - 1 + 1j,
+                p + 1j,
+                p + 1 + 1j,
+            }
+            if len(neighbours & pos) < 4:
                 c += 1
             else:
-                new_pos.append(p)
+                new_pos.add(p)
         pos = new_pos
         if old_c == c:
             break
@@ -61,4 +73,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 8887
