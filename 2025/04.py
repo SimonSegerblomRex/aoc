@@ -25,15 +25,33 @@ def a(data):
     return c
 
 
-answer = a(puzzle.input_data)
-print("a:", answer)
-puzzle.answer_a = answer
+#answer = a(puzzle.input_data)
+#print("a:", answer)
+#puzzle.answer_a = answer
 
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    pos = []
+    for j, line in enumerate(data.split()):
+        for i, ch in enumerate(line):
+            if ch == "@":
+                pos.append(i + j*1j)
+    c = 0
+    while True:
+        new_pos = []
+        old_c = c
+        tmp = set(pos)
+        for p in pos:
+            neighbours = {p + 1, p + 1 - 1j, p - 1j, p - 1 - 1j, p - 1, p - 1 + 1j, p + 1j, p + 1 + 1j}
+            if len(neighbours & tmp) < 4:
+                c += 1
+            else:
+                new_pos.append(p)
+        pos = new_pos
+        if old_c == c:
+            break
+    return c
 
 
 for example in puzzle.examples:
