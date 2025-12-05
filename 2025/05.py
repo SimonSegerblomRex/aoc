@@ -43,7 +43,7 @@ def b(data):
         for r in all_ranges:
             if int(id) in r:
                 fresh_ranges.add(r)
-    fresh_ranges = sorted(list(fresh_ranges), key=lambda r: (r.start, r.stop))
+    fresh_ranges = sorted(list(all_ranges), key=lambda r: (r.start, r.stop))
     fresh_ranges = [[r.start, r.stop - 1] for r in fresh_ranges]
     union = [fresh_ranges[0]]
     for g in fresh_ranges[1:]:
@@ -54,7 +54,6 @@ def b(data):
                 union.append(g)
     s = 0
     for g in union:
-        assert g[1] > g[0]
         s += g[1] - g[0] + 1
     return s
 
