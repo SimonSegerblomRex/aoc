@@ -38,15 +38,10 @@ def b(data):
     for r in ranges.split():
         lo, hi = r.split("-")
         all_ranges.add(range(int(lo), int(hi) + 1))
-    fresh_ranges = set()
-    for id in ids.split():
-        for r in all_ranges:
-            if int(id) in r:
-                fresh_ranges.add(r)
-    fresh_ranges = sorted(list(all_ranges), key=lambda r: (r.start, r.stop))
-    fresh_ranges = [[r.start, r.stop - 1] for r in fresh_ranges]
-    union = [fresh_ranges[0]]
-    for g in fresh_ranges[1:]:
+    all_ranges = sorted(list(all_ranges), key=lambda r: (r.start, r.stop))
+    all_ranges = [[r.start, r.stop - 1] for r in all_ranges]
+    union = [all_ranges[0]]
+    for g in all_ranges[1:]:
         if g[1] > union[-1][1]:
             if g[0] <= union[-1][1]:
                 union[-1][1] = g[1]
@@ -63,8 +58,4 @@ print(example_answer)
 assert example_answer == 14
 answer = b(puzzle.input_data)
 print("b:", answer)
-assert answer != 337646673718690
-assert answer != 337878930639144
-assert answer != 337878930639150
-assert answer != 348324210241501
-puzzle.answer_b = answer
+assert answer == 352807801032167
