@@ -14,7 +14,7 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 def a(data):
     problems = []
     for j, line in enumerate(data.split("\n")):
-        for i, e in enumerate([e for e in  line.split(" ") if e]):
+        for i, e in enumerate([e for e in line.split(" ") if e]):
             if i > len(problems) - 1:
                 problems.append([])
             problems[i].append(e)
@@ -45,8 +45,38 @@ assert answer == 5335495999141
 
 # Part b
 def b(data):
-    print(data)
-    breakpoint()
+    chars = {}
+    max_i = 0
+    for j, line in enumerate(data.split("\n")):
+        for i, c in enumerate(line):
+            chars[(j, i)] = c
+        max_i = max(i, max_i)
+    max_j = j
+    start_idx = []
+    for i, c in enumerate(line):
+        if c in "+*":
+            start_idx.append(i)
+    stop_idx = [e - 2 for e in start_idx[1:]]
+    stop_idx.append(max_i)
+    s = 0
+    for start, stop in zip(start_idx, stop_idx):
+        numbers = []
+        for i in range(start, stop + 1):
+            numbers.append([])
+            for j in range(max_j):
+                numbers[i - start].append(chars[(j, i)])
+        numbers = [int("".join(e)) for e in numbers]
+        if line[start] == "+":
+            tmp = 0
+        else:
+            tmp = 1
+        for e in numbers:
+            if line[start] == "+":
+                tmp += int(e)
+            else:
+                tmp *= int(e)
+        s += tmp
+    return s
 
 
 for example in puzzle.examples:
@@ -56,4 +86,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 10142723156431
