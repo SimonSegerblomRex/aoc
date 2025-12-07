@@ -1,8 +1,6 @@
-from functools import cache
-
 from aocd.models import Puzzle
 
-YEAR = 2027
+YEAR = 2025
 DAY = 7
 
 puzzle = Puzzle(year=YEAR, day=DAY)
@@ -46,19 +44,6 @@ assert answer == 1649
 
 
 # Part b
-@cache
-def paths(front, splitters, stop):
-    c = 0
-    if front.imag > stop:
-        return 1
-    if front + 1j in splitters:
-        c += paths(front - 1 + 1j, splitters, stop)
-        c += paths(front + 1 + 1j, splitters, stop)
-    else:
-        c += paths(front + 1j, splitters, stop)
-    return c
-
-
 def b(data):
     splitters = set()
     for j, line in enumerate(data.splitlines()):
@@ -67,7 +52,24 @@ def b(data):
                 S = i + 1j * j
             elif c == "^":
                 splitters.add(i + 1j * j)
-    return paths(S, tuple(splitters), j)
+    stop = j
+    cache = {}
+
+    def paths(front):
+        if front in cache:
+            return cache[front]
+        if front.imag > stop:
+            return 1
+        c = 0
+        if front + 1j in splitters:
+            c += paths(front - 1 + 1j)
+            c += paths(front + 1 + 1j)
+        else:
+            c += paths(front + 1j)
+        cache[front] = c
+        return c
+
+    return paths(S)
 
 
 for example in puzzle.examples:
