@@ -1,12 +1,9 @@
-import datetime
-import re
 from functools import cache
 
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2027
+DAY = 7
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -72,6 +69,7 @@ def b(data):
                 splitters.add(i + 1j * j)
     return paths(S, tuple(splitters), j)
 
+
 for example in puzzle.examples:
     if example.answer_b:
         example_answer = b(example.input_data)
@@ -79,4 +77,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 16937871060075
