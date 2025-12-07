@@ -12,23 +12,23 @@ def a(data):
     for j, line in enumerate(data.splitlines()):
         for i, c in enumerate(line):
             if c == "S":
-                S = i + 1j * j
+                S = (i, j)
             elif c == "^":
-                splitters.add(i + 1j * j)
+                splitters.add((i, j))
     max_j = j
-    beam_fronts = set([S + 1j])
-    curr_j = S.imag
+    beam_fronts = set([S])
+    curr_j = S[1]
     c = 0
     while curr_j < max_j:
         new_fronts = set()
-        for front in beam_fronts:
-            if front + 1j in splitters:
-                new_fronts.add(front - 1 + 1j)
-                new_fronts.add(front + 1 + 1j)
+        for i, j in beam_fronts:
+            if (i, j + 1) in splitters:
+                new_fronts.add((i - 1, j + 1))
+                new_fronts.add((i + 1, j + 1))
                 c += 1
             else:
-                new_fronts.add(front + 1j)
-        curr_j = front.imag
+                new_fronts.add((i, j + 1))
+        curr_j = j
         beam_fronts = new_fronts
     return c
 
@@ -49,24 +49,25 @@ def b(data):
     for j, line in enumerate(data.splitlines()):
         for i, c in enumerate(line):
             if c == "S":
-                S = i + 1j * j
+                S = (i, j)
             elif c == "^":
-                splitters.add(i + 1j * j)
+                splitters.add((i, j))
     stop = j
     cache = {}
 
-    def paths(front):
-        if front in cache:
-            return cache[front]
-        if front.imag > stop:
+    def paths(coord):
+        if coord in cache:
+            return cache[coord]
+        i, j = coord
+        if j > stop:
             return 1
         c = 0
-        if front + 1j in splitters:
-            c += paths(front - 1 + 1j)
-            c += paths(front + 1 + 1j)
+        if (i, j + 1) in splitters:
+            c += paths((i - 1, j + 1))
+            c += paths((i + 1, j + 1))
         else:
-            c += paths(front + 1j)
-        cache[front] = c
+            c += paths((i, j + 1))
+        cache[coord] = c
         return c
 
     return paths(S)
