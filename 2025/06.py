@@ -1,5 +1,3 @@
-import re
-
 from aocd.models import Puzzle
 
 YEAR = 2025
@@ -10,8 +8,9 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def a(data):
-    numbers = re.findall(r"\d+", data)
-    operators = data.splitlines()[-1].split()
+    op_idx = data.rfind("\n")
+    numbers = data[:op_idx].split()
+    operators = data[op_idx:].split()
     nbr_problems = len(operators)
     s = 0
     for i, operator in enumerate(operators):
@@ -32,7 +31,7 @@ assert answer == 5335495999141
 # Part b
 def b(data):
     *data, operators = data.splitlines()
-    numbers = ["".join(line[i] for line in data).strip() for i in range(len(data[0]))]
+    numbers = ["".join(n).strip() for n in zip(*data)]
     start_idx = [i for i, operator in enumerate(operators) if operator != " "]
     stop_idx = [idx - 1 for idx in start_idx[1:]]
     stop_idx.append(len(operators))
