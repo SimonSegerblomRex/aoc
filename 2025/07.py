@@ -1,0 +1,82 @@
+import datetime
+import re
+from functools import cache
+
+import numpy as np
+from aocd.models import Puzzle
+
+YEAR = datetime.datetime.today().year
+DAY = datetime.datetime.today().day
+
+puzzle = Puzzle(year=YEAR, day=DAY)
+
+
+# Part a
+def a(data):
+    splitters = set()
+    for j, line in enumerate(data.splitlines()):
+        for i, c in enumerate(line):
+            if c == "S":
+                S = i + 1j * j
+            elif c == "^":
+                splitters.add(i + 1j * j)
+    max_j = j
+    beam_fronts = set([S + 1j])
+    curr_j = S.imag
+    c = 0
+    while curr_j < max_j:
+        new_fronts = set()
+        for front in beam_fronts:
+            if front + 1j in splitters:
+                new_fronts.add(front - 1 + 1j)
+                new_fronts.add(front + 1 + 1j)
+                c += 1
+            else:
+                new_fronts.add(front + 1j)
+        curr_j = front.imag
+        beam_fronts = new_fronts
+    return c
+
+
+for example in puzzle.examples:
+    if example.answer_a:
+        example_answer = a(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
+        assert str(example_answer) == example.answer_a
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 1649
+
+
+# Part b
+@cache
+def paths(front, splitters, stop):
+    c = 0
+    if front.imag > stop:
+        return 1
+    if front + 1j in splitters:
+        c += paths(front - 1 + 1j, splitters, stop)
+        c += paths(front + 1 + 1j, splitters, stop)
+    else:
+        c += paths(front + 1j, splitters, stop)
+    return c
+
+
+def b(data):
+    splitters = set()
+    for j, line in enumerate(data.splitlines()):
+        for i, c in enumerate(line):
+            if c == "S":
+                S = i + 1j * j
+            elif c == "^":
+                splitters.add(i + 1j * j)
+    return paths(S, tuple(splitters), j)
+
+for example in puzzle.examples:
+    if example.answer_b:
+        example_answer = b(example.input_data)
+        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
+        assert str(example_answer) == example.answer_b
+answer = b(puzzle.input_data)
+print("b:", answer)
+puzzle.answer_b = answer
