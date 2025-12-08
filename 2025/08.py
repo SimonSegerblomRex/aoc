@@ -20,17 +20,12 @@ def a(data, stop=None):
         for c1 in coords:
             if c0 != c1 and (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
-    distances = dict(sorted(distances.items(), key=lambda t: t[1]))
+    distances = sorted(distances, key=lambda k: distances[k])[:stop]
     circuits = {coord: {coord} for coord in coords}
-    for i, (c0, c1) in enumerate(distances):
-        # Stop criterion for a
-        if i == stop:
-            break
-        # Combine
+    for c0, c1 in distances:
         circuits[c0] |= circuits[c1]
         for coord in circuits[c1]:
             circuits[coord] = circuits[c0]
-        # Stop criterion for b
         if len(circuits[c0]) == len(coords):
             return c0[0] * c1[0]
     circuits = {frozenset(circuit) for circuit in circuits.values()}
