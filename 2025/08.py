@@ -23,27 +23,27 @@ def a(data, stop=None):
             if (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
-    circuits = [{coord} for coord in coords]
-    circuit_map = {coord: circuit for coord, circuit in zip(coords, circuits)}
+    circuits = {coord: {coord} for coord in coords}
     for i, (c0, c1) in enumerate(distances):
         # Stop criterion for a
         if i == stop:
             break
-        if circuit_map[c0] == circuit_map[c1]:
+        if circuits[c0] is circuits[c1]:
             # Do nothing
             continue
         # Combine
-        circuit_map[c0] |= circuit_map[c1]
-        circuits.remove(circuit_map[c1])
-        for c in circuit_map[c1]:
-            circuit_map[c] = circuit_map[c0]
+        circuits[c0] |= circuits[c1]
+        for coord in circuits[c1]:
+            circuits[coord] = circuits[c0]
         # Stop criterion for b
-        if len(circuits[0]) == len(coords):
+        if len(circuits[c0]) == len(coords):
             return c0[0] * c1[0]
-    sizes = sorted((len(c) for c in circuits), reverse=True)
+    circuits = {frozenset(c) for c in circuits.values()}
     s = 1
-    for i in range(3):
-        s *= sizes[i]
+    for i, circuit in enumerate(sorted(circuits, key=lambda c: len(c), reverse=True)):
+        s *= len(circuit)
+        if i > 1:
+            break
     return s
 
 
