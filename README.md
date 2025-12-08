@@ -10,6 +10,18 @@ was an official [sponsor](https://adventofcode.com/2022/sponsors) of the event.
 Local time the puzzles are published 6:00 am.
 
 ## Retrospective
+
+### 2025
+...
+
+### 2024
+This was the first year I managed to solve each puzzle the same day it was published.
+Day 21 was the toughest one getting the recursion right... Christmas Eve was also
+tough
+
+### 2023
+Day 21 with the stones...
+
 ### 2022
 The first week I could finish the puzzles before it was time to bring
 the boys to school.

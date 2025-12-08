@@ -1,11 +1,7 @@
-import datetime
-import re
-
-import numpy as np
 from aocd.models import Puzzle
 
-YEAR = datetime.datetime.today().year
-DAY = datetime.datetime.today().day
+YEAR = 2025
+DAY = 8
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
@@ -64,8 +60,6 @@ def a(data, stop=10):
             circuit_map[c1] = circuit
             i += 1
     sizes = sorted([len(c) for c in circuits], reverse=True)
-    print(sizes)
-    breakpoint()
     s = 1
     for i in range(3):
         s *= sizes[i]
@@ -79,11 +73,7 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_a
 answer = a(puzzle.input_data, 1000)
 print("a:", answer)
-assert answer > 1540
-assert answer != 2184
-assert answer != 4032
-assert answer != 5472
-puzzle.answer_a = answer
+assert answer == 66912
 
 
 # Part b
