@@ -33,19 +33,16 @@ def a(data, stop=10):
                 # Do nothing
                 continue
             # Combine
-            circuit = circuit_map[c1]
-            circuits.remove(circuit)
-            for c in circuit:
+            circuit_map[c0] |= circuit_map[c1]
+            circuits.remove(circuit_map[c1])
+            for c in circuit_map[c1]:
                 circuit_map[c] = circuit_map[c0]
-                circuit_map[c0].add(c)
         elif c0 in circuit_map:
             # c1 new
-            assert c1 not in circuit_map
             circuit_map[c0].add(c1)
             circuit_map[c1] = circuit_map[c0]
         elif c1 in circuit_map:
             # c0 new
-            assert c0 not in circuit_map
             circuit_map[c1].add(c0)
             circuit_map[c0] = circuit_map[c1]
         else:
@@ -91,19 +88,16 @@ def b(data):
                 # Do nothing
                 continue
             # Combine
-            circuit = circuit_map[c1]
-            circuits.remove(circuit)
-            for c in circuit:
+            circuit_map[c0] |= circuit_map[c1]
+            circuits.remove(circuit_map[c1])
+            for c in circuit_map[c1]:
                 circuit_map[c] = circuit_map[c0]
-                circuit_map[c0].add(c)
         elif c0 in circuit_map:
             # c1 new
-            assert c1 not in circuit_map
             circuit_map[c0].add(c1)
             circuit_map[c1] = circuit_map[c0]
         elif c1 in circuit_map:
             # c0 new
-            assert c0 not in circuit_map
             circuit_map[c1].add(c0)
             circuit_map[c0] = circuit_map[c1]
         else:
