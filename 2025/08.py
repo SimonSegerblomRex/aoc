@@ -33,22 +33,14 @@ def a(data, stop=None):
     return sizes[0] * sizes[1] * sizes[2]
 
 
-for example in puzzle.examples:
-    if example.answer_a:
-        example_answer = a(example.input_data, 10)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
-        assert str(example_answer) == example.answer_a
+assert (answer := a(puzzle.examples[0].input_data, 10)) == 40, answer
 answer = a(puzzle.input_data, 1000)
 print("a:", answer)
 assert answer == 66912
 
 
 # Part b
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
+assert (answer := a(puzzle.examples[0].input_data)) == 25272, answer
 answer = a(puzzle.input_data)
 print("b:", answer)
 assert answer == 724454082
