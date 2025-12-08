@@ -8,7 +8,8 @@ puzzle = Puzzle(year=YEAR, day=DAY)
 
 # Part a
 def distance(x0, y0, z0, x1, y1, z1):
-    return (x1 - x0)**2 + (y1 - y0)**2 + (z1 - z0)**2
+    return (x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2
+
 
 def a(data, stop=10):
     coords = set()
@@ -19,20 +20,17 @@ def a(data, stop=10):
         for c1 in coords:
             if c0 == c1:
                 continue
-            #distances[tuple(sorted((c0, c1)))] = distance(*c0, *c1)
             if (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
     circuits = []
     circuit_map = {}
-    i = 0
-    for c0, c1 in distances:
+    for i, (c0, c1) in enumerate(distances):
         if i >= stop:
             break
         if c0 in circuit_map and c1 in circuit_map:
             if circuit_map[c0] == circuit_map[c1]:
                 # Do nothing
-                i += 1
                 continue
             # Combine
             circuit = circuit_map[c1]
@@ -40,25 +38,21 @@ def a(data, stop=10):
             for c in circuit:
                 circuit_map[c] = circuit_map[c0]
                 circuit_map[c0].add(c)
-            i += 1
         elif c0 in circuit_map:
             # c1 new
             assert c1 not in circuit_map
             circuit_map[c0].add(c1)
             circuit_map[c1] = circuit_map[c0]
-            i += 1
         elif c1 in circuit_map:
             # c0 new
             assert c0 not in circuit_map
             circuit_map[c1].add(c0)
             circuit_map[c0] = circuit_map[c1]
-            i += 1
         else:
             circuit = set((c0, c1))
             circuits.append(circuit)
             circuit_map[c0] = circuit
             circuit_map[c1] = circuit
-            i += 1
     sizes = sorted([len(c) for c in circuits], reverse=True)
     s = 1
     for i in range(3):
@@ -86,7 +80,6 @@ def b(data):
         for c1 in coords:
             if c0 == c1:
                 continue
-            #distances[tuple(sorted((c0, c1)))] = distance(*c0, *c1)
             if (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
@@ -129,4 +122,4 @@ for example in puzzle.examples:
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
 print("b:", answer)
-puzzle.answer_b = answer
+assert answer == 724454082
