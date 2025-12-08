@@ -33,7 +33,7 @@ assert answer == 44854383294
 # found "batched" in the itertools documentation...
 # ...but only had python3.9 on my Chromebook...
 def batched(s, n):
-    return (s[i * n : i * n + n] for i in range(len(s) // n))
+    return zip(*[iter(s)] * n)
 
 
 # Part b
