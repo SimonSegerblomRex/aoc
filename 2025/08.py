@@ -23,33 +23,19 @@ def a(data, stop=10):
             if (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
-    circuits = []
-    circuit_map = {}
+    circuits = [{coord} for coord in coords]
+    circuit_map = {coord: circuit for coord, circuit in zip(coords, circuits)}
     for i, (c0, c1) in enumerate(distances):
-        if i >= stop:
+        if i == stop:
             break
-        if c0 in circuit_map and c1 in circuit_map:
-            if circuit_map[c0] == circuit_map[c1]:
-                # Do nothing
-                continue
-            # Combine
-            circuit_map[c0] |= circuit_map[c1]
-            circuits.remove(circuit_map[c1])
-            for c in circuit_map[c1]:
-                circuit_map[c] = circuit_map[c0]
-        elif c0 in circuit_map:
-            # c1 new
-            circuit_map[c0].add(c1)
-            circuit_map[c1] = circuit_map[c0]
-        elif c1 in circuit_map:
-            # c0 new
-            circuit_map[c1].add(c0)
-            circuit_map[c0] = circuit_map[c1]
-        else:
-            circuit = set((c0, c1))
-            circuits.append(circuit)
-            circuit_map[c0] = circuit
-            circuit_map[c1] = circuit
+        if circuit_map[c0] == circuit_map[c1]:
+            # Do nothing
+            continue
+        # Combine
+        circuit_map[c0] |= circuit_map[c1]
+        circuits.remove(circuit_map[c1])
+        for c in circuit_map[c1]:
+            circuit_map[c] = circuit_map[c0]
     sizes = sorted([len(c) for c in circuits], reverse=True)
     s = 1
     for i in range(3):
@@ -80,31 +66,17 @@ def b(data):
             if (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
-    circuits = []
-    circuit_map = {}
+    circuits = [{coord} for coord in coords]
+    circuit_map = {coord: circuit for coord, circuit in zip(coords, circuits)}
     for c0, c1 in distances:
-        if c0 in circuit_map and c1 in circuit_map:
-            if circuit_map[c0] == circuit_map[c1]:
-                # Do nothing
-                continue
-            # Combine
-            circuit_map[c0] |= circuit_map[c1]
-            circuits.remove(circuit_map[c1])
-            for c in circuit_map[c1]:
-                circuit_map[c] = circuit_map[c0]
-        elif c0 in circuit_map:
-            # c1 new
-            circuit_map[c0].add(c1)
-            circuit_map[c1] = circuit_map[c0]
-        elif c1 in circuit_map:
-            # c0 new
-            circuit_map[c1].add(c0)
-            circuit_map[c0] = circuit_map[c1]
-        else:
-            circuit = set((c0, c1))
-            circuits.append(circuit)
-            circuit_map[c0] = circuit
-            circuit_map[c1] = circuit
+        if circuit_map[c0] == circuit_map[c1]:
+            # Do nothing
+            continue
+        # Combine
+        circuit_map[c0] |= circuit_map[c1]
+        circuits.remove(circuit_map[c1])
+        for c in circuit_map[c1]:
+            circuit_map[c] = circuit_map[c0]
         if len(circuits[0]) == len(coords):
             return c0[0] * c1[0]
 
