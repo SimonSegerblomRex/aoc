@@ -18,9 +18,7 @@ def a(data, stop=None):
     distances = {}
     for c0 in coords:
         for c1 in coords:
-            if c0 == c1:
-                continue
-            if (c1, c0) not in distances:
+            if c0 != c1 and (c1, c0) not in distances:
                 distances[(c0, c1)] = distance(*c0, *c1)
     distances = dict(sorted(distances.items(), key=lambda t: t[1]))
     circuits = {coord: {coord} for coord in coords}
@@ -28,9 +26,6 @@ def a(data, stop=None):
         # Stop criterion for a
         if i == stop:
             break
-        if circuits[c0] is circuits[c1]:
-            # Do nothing
-            continue
         # Combine
         circuits[c0] |= circuits[c1]
         for coord in circuits[c1]:
@@ -38,13 +33,9 @@ def a(data, stop=None):
         # Stop criterion for b
         if len(circuits[c0]) == len(coords):
             return c0[0] * c1[0]
-    circuits = {frozenset(c) for c in circuits.values()}
-    s = 1
-    for i, circuit in enumerate(sorted(circuits, key=lambda c: len(c), reverse=True)):
-        s *= len(circuit)
-        if i > 1:
-            break
-    return s
+    circuits = {frozenset(circuit) for circuit in circuits.values()}
+    sizes = sorted(map(len, circuits), reverse=True)
+    return sizes[0] * sizes[1] * sizes[2]
 
 
 for example in puzzle.examples:
