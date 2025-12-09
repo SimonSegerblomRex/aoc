@@ -20,11 +20,7 @@ def a(data):
     return m
 
 
-for example in puzzle.examples:
-    if example.answer_a:
-        example_answer = a(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {50})")
-        assert str(example_answer) == "50"
+assert (answer := a(puzzle.examples[0].input_data)) == 50, answer
 answer = a(puzzle.input_data)
 print("a:", answer)
 assert answer == 4769758290
@@ -35,47 +31,38 @@ def b(data):
     red = [tuple(map(int, line.split(","))) for line in data.splitlines()]
     vertices = set(red)
     red.append(red[0])
-    lines = set(zip(red, red[1:]))
+    lines = zip(red, red[1:])
+    vertical = set()
+    horizontal = set()
+    for (x0, y0), (x1, y1) in lines:
+        if x0 == x1:
+            vertical.add((x0, min(y0, y1), max(y0, y1)))
+        else:
+            horizontal.add((y0, min(x0, x1), max(x0, x1)))
 
     m = 0
-    for c0 in red:
-        for c1 in red:
+    for c0 in vertices:
+        for c1 in vertices:
+            if c0 == c1:
+                continue
             candidate_area = area(*c0, *c1)
             if candidate_area <= m:
                 continue
             x_min, x_max = sorted([c0[0], c1[0]])
             y_min, y_max = sorted([c0[1], c1[1]])
-            x_lim = range(x_min + 1, x_max)
-            y_lim = range(y_min + 1, y_max)
-            if not x_lim or not y_lim:
-                continue
-            # Check so that no vertices are inside the rectangle
-            for x, y in vertices:
-                if (x in x_lim) and (y in y_lim):
+            for x, y0, y1 in vertical:
+                if y0 < y_max and y1 > y_min and x_min < x < x_max:
                     break
             else:
-                # Check lines
-                for v0, v1 in lines:
-                    lx_min, lx_max = sorted([v0[0], v1[0]])
-                    ly_min, ly_max = sorted([v0[1], v1[1]])
-                    if ly_min == ly_max:
-                        if lx_min <= x_min and lx_max >= x_max and y_min < ly_min < y_max:
-                            break
-                    elif lx_min == lx_max:
-                        if ly_min <= y_min and ly_max >= y_max and x_min < lx_min < x_max:
-                            break
-                    else:
-                        raise RuntimeError("shouldn't end up here...")
+                for y, x0, x1 in horizontal:
+                    if x0 < x_max and x1 > x_min and y_min < y < y_max:
+                        break
                 else:
                     m = max(m, candidate_area)
     return m
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {24})")
-        #assert str(example_answer) == "24"
+assert (answer := b(puzzle.examples[0].input_data)) == 24, answer
 answer = b(puzzle.input_data)
 print("b:", answer)
 assert answer == 1588990708
