@@ -26,12 +26,12 @@ def update_state(state, action):
 
 
 def find_fewest_presses(start, goal, actions, b_check=False):
-    def h(node):
-        return 1
+    def h(next_state):
+        return sum(g - s for g, s in zip(goal, next_state))
 
     open_set = queue.PriorityQueue()
-    # (f_score, dummy, state, prev_action)
-    open_set.put((0, 0, start, None))
+    # (f_score, state, prev_action)
+    open_set.put((0, start, None))
 
     g_score = defaultdict(lambda: 1 << 30)
     g_score[(start, None)] = 0
@@ -39,9 +39,8 @@ def find_fewest_presses(start, goal, actions, b_check=False):
     f_score = defaultdict(lambda: 1 << 30)
     f_score[(start, None)] = h(start)
 
-    i = 1
     while not open_set.empty():
-        _, _, curr_state, prev_action = open_set.get()
+        _, curr_state, prev_action = open_set.get()
         if curr_state == goal:
             return int(g_score[(curr_state, prev_action)])
 
@@ -58,12 +57,10 @@ def find_fewest_presses(start, goal, actions, b_check=False):
                 open_set.put(
                     (
                         f_score[(next_state, action)],
-                        i,
                         next_state,
                         action,
                     )
                 )
-                i += 1
 
 
 def a(data):
