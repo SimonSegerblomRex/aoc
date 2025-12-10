@@ -25,7 +25,7 @@ def update_state(state, action):
     return tuple(new_state)
 
 
-def find_fewest_presses(start, goal, actions):
+def find_fewest_presses(start, goal, actions, b_check=False):
     def h(node):
         return 1
 
@@ -49,6 +49,8 @@ def find_fewest_presses(start, goal, actions):
             if action == prev_action:
                 continue
             next_state = update_state(curr_state, action)
+            if b_check and any(s > g for s, g in zip(next_state, goal)):
+                continue
             tentative_g_score = g_score[(curr_state, prev_action)] + 1
             if tentative_g_score < g_score[(next_state, action)]:
                 g_score[(next_state, action)] = tentative_g_score
@@ -87,9 +89,23 @@ puzzle.answer_a = answer
 
 
 # Part b
+def update_state(state, action):
+    new_state = list(state)
+    for idx in action:
+        new_state[idx] += 1
+    return tuple(new_state)
+
+
 def b(data):
-    for line in data.splitlines():
-        breakpoint()
+    goals = re.findall(r"{.+\}", data)
+    actions = re.findall(r"\](.+){", data)
+    all_goals = [tuple(map(int, goal.strip(r"{}").split(","))) for goal in goals]
+    all_actions = tuple(tuple(tuple(map(int, e.strip("()").split(","))) for e in action.split()) for action in actions)
+    s = 0
+    for goal, actions in zip(all_goals, all_actions):
+        state = tuple([0] * len(goal))
+        s += find_fewest_presses(state, goal, actions, b_check=True)
+    return s
 
 
 for example in puzzle.examples:
