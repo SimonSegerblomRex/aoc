@@ -45,7 +45,7 @@ def find_fewest_presses(start, goal, actions, b_check=False):
             return int(g_score[(curr_state, prev_action)])
 
         for action in actions:
-            if action == prev_action:
+            if not b_check and action == prev_action:
                 continue
             next_state = update_state(curr_state, action)
             if b_check and any(s > g for s, g in zip(next_state, goal)):
