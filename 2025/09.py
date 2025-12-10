@@ -36,9 +36,9 @@ def b(data):
     horizontal = set()
     for (x0, y0), (x1, y1) in lines:
         if x0 == x1:
-            vertical.add((x0, min(y0, y1), max(y0, y1)))
+            vertical.add((x0, *sorted([y0, y1])))
         else:
-            horizontal.add((y0, min(x0, x1), max(x0, x1)))
+            horizontal.add((y0, *sorted([x0, x1])))
 
     m = 0
     for c0 in vertices:
@@ -50,12 +50,12 @@ def b(data):
                 continue
             x_min, x_max = sorted([c0[0], c1[0]])
             y_min, y_max = sorted([c0[1], c1[1]])
-            for x, y0, y1 in vertical:
-                if y0 < y_max and y1 > y_min and x_min < x < x_max:
+            for y, x0, x1 in horizontal:
+                if x0 < x_max and x1 > x_min and y_min < y < y_max:
                     break
             else:
-                for y, x0, x1 in horizontal:
-                    if x0 < x_max and x1 > x_min and y_min < y < y_max:
+                for x, y0, y1 in vertical:
+                    if y0 < y_max and y1 > y_min and x_min < x < x_max:
                         break
                 else:
                     m = max(m, candidate_area)
