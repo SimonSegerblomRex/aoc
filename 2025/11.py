@@ -43,13 +43,39 @@ puzzle.answer_a = answer
 # Part b
 def b(data):
     breakpoint()
+    devices = {}
+    for line in data.splitlines():
+        key, val = line.split(":")
+        devices[key] = val.strip().split(" ")
+    @cache
+    def find_path(start, goal, goal0=False, goal1=False):
+        if start == goal:
+            if goal0 and goal1:
+                return 1
+            return 0
+        c = 0
+        for device in devices[start]:
+            c += find_path(device, goal, goal0=goal0 or device == "fft", goal1=goal1 or device == "dac")
+        return c
+    return find_path("svr", "out")
 
 
-for example in puzzle.examples:
-    if example.answer_b:
-        example_answer = b(example.input_data)
-        print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
-        assert str(example_answer) == example.answer_b
+example_answer = b("""svr: aaa bbb
+aaa: fft
+fft: ccc
+bbb: tty
+tty: ccc
+ccc: ddd eee
+ddd: hub
+hub: fff
+eee: dac
+dac: fff
+fff: ggg hhh
+ggg: out
+hhh: out
+""")
+print(f"Example answer: {example_answer} (expecting: 2)")
+assert str(example_answer) == "2"
 answer = b(puzzle.input_data)
 print("b:", answer)
 puzzle.answer_b = answer
