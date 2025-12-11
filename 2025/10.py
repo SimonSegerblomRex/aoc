@@ -1,6 +1,5 @@
-import datetime
-import re
 import queue
+import re
 from collections import defaultdict
 from functools import cache
 
@@ -8,14 +7,11 @@ import numpy as np
 from aocd.models import Puzzle
 from scipy.optimize import linprog
 
-YEAR = datetime.datetime.today().year
+YEAR = 2025
 DAY = 10
 
 puzzle = Puzzle(year=YEAR, day=DAY)
 
-
-import sys
-sys.setrecursionlimit(5000)
 
 # Part a
 @cache
@@ -28,7 +24,7 @@ def update_state(state, action):
 
 def find_fewest_presses(start, goal, actions, b_check=False):
     def h(next_state):
-        return 1#sum(g - s for g, s in zip(goal, next_state))
+        return 0
 
     open_set = queue.PriorityQueue()
     # (f_score, state, prev_action)
@@ -68,7 +64,10 @@ def a(data):
     goals = re.findall(r"\[.+\]", data)
     actions = re.findall(r"\](.+){", data)
     all_goals = [tuple(c == "#" for c in goal.strip("[]")) for goal in goals]
-    all_actions = tuple(tuple(tuple(map(int, e.strip("()").split(","))) for e in action.split()) for action in actions)
+    all_actions = tuple(
+        tuple(tuple(map(int, e.strip("()").split(","))) for e in action.split())
+        for action in actions
+    )
     s = 0
     for goal, actions in zip(all_goals, all_actions):
         state = tuple([False] * len(goal))
@@ -81,37 +80,20 @@ for example in puzzle.examples:
         example_answer = a(example.input_data)
         print(f"Example answer: {example_answer} (expecting: {example.answer_a})")
         assert str(example_answer) == example.answer_a
-#answer = a(puzzle.input_data)
-#print("a:", answer)
-#puzzle.answer_a = answer
+answer = a(puzzle.input_data)
+print("a:", answer)
+assert answer == 434
 
 
 # Part b
-def update_state(state, action):
-    new_state = list(state)
-    for idx in action:
-        new_state[idx] += 1
-    return tuple(new_state)
-
-
-def update_history(state, idx):
-    new_state = list(state)
-    new_state[idx] += 1
-    return tuple(new_state)
-
-
-def find_best_action(state, goal, actions):
-    # Look for indeces that need many keypresses
-
-    breakpoint()
-
-best_solution = None
-
 def b(data):
     goals = re.findall(r"{.+\}", data)
     actions = re.findall(r"\](.+){", data)
     all_goals = [tuple(map(int, goal.strip(r"{}").split(","))) for goal in goals]
-    all_actions = tuple(tuple(tuple(map(int, e.strip("()").split(","))) for e in action.split()) for action in actions)
+    all_actions = tuple(
+        tuple(tuple(map(int, e.strip("()").split(","))) for e in action.split())
+        for action in actions
+    )
 
     s = 0
     for ii, (goal, actions) in enumerate(zip(all_goals, all_actions)):
@@ -120,11 +102,15 @@ def b(data):
             for i in action:
                 A[i, j] = 1
         bounds = [(0, max(goal))] * len(actions)
-        c = [1]*len(actions)
-        res = linprog(c, A_eq=A, b_eq=goal, bounds=bounds, integrality=1, options={"presolve": False})
-        if not res.success:
-            print("!!!")
-            breakpoint()
+        c = [1] * len(actions)
+        res = linprog(
+            c,
+            A_eq=A,
+            b_eq=goal,
+            bounds=bounds,
+            integrality=1,
+            options={"presolve": False},
+        )
         s += int(res.fun)
     return s
 
@@ -135,10 +121,6 @@ for example in puzzle.examples:
         print(f"Example answer: {example_answer} (expecting: {example.answer_b})")
         assert str(example_answer) == example.answer_b
 answer = b(puzzle.input_data)
-assert answer > 14954
-assert answer < 15244
-assert answer != 15102
-assert answer != 15131
-assert answer != 15101
 print("b:", answer)
 puzzle.answer_b = answer
+assert answer == 15132
