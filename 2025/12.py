@@ -40,4 +40,4 @@ print(f"Example answer: {example_answer} (expecting: {puzzle.examples[0].answer_
 # assert example_answer == int(puzzle.examples[0].answer_a)
 answer = a(puzzle.input_data)
 print("a:", answer)
-puzzle.answer_a = answer
+assert answer == 589
