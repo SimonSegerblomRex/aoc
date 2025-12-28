@@ -1,5 +1,3 @@
-from functools import cache
-
 from aocd.models import Puzzle
 
 YEAR = 2025
@@ -15,7 +13,6 @@ def a(data):
         key, val = line.split(":")
         devices[key] = val.strip().split(" ")
 
-    @cache
     def find_path(start, goal):
         if start == goal:
             return 1
@@ -39,8 +36,10 @@ def b(data):
         key, val = line.split(":")
         devices[key] = val.strip().split(" ")
 
-    @cache
+    cache = {}
     def find_path(start, goal, goal0=False, goal1=False):
+        if (start, goal, goal0, goal1) in cache:
+            return cache[(start, goal, goal0, goal1)]
         if start == goal:
             if goal0 and goal1:
                 return 1
@@ -53,6 +52,7 @@ def b(data):
                 goal0=goal0 or device == "fft",
                 goal1=goal1 or device == "dac",
             )
+        cache[(start, goal, goal0, goal1)] = c
         return c
 
     return find_path("svr", "out")
